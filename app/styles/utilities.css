@@ -1,0 +1,37 @@
+/* Define custom CSS properties in @theme */
+@theme {
+  /* Transition timing functions */
+  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-spring: cubic-bezier(0.25, 0.1, 0.25, 1.5);
+  
+}
+
+/* Transition utilities using Tailwind v4 @utility syntax */
+@utility ease-out-expo {
+  transition-timing-function: var(--ease-out-expo);
+}
+
+@utility ease-spring {
+  transition-timing-function: var(--ease-spring);
+}
+
+@utility transform-gpu {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  will-change: transform;
+}
+
+
+
+/* Additional layout utilities */
+@utility layout-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@utility layout-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+} 

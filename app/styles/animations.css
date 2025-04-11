@@ -1,0 +1,107 @@
+@theme inline {
+  /* Animation definitions */
+  --animate-float: float 5s ease-in-out infinite;
+  --animate-logo-spin: logo-spin 1s linear infinite;
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+  --animate-fade-in: fade-in 0.3s ease-out;
+  --animate-fade-out: fade-out 0.3s ease-out;
+  --animate-slide-up: slide-up 0.4s ease-out;
+  --animate-slide-down: slide-down 0.4s ease-out;
+  --animate-scale-in: scale-in 0.3s ease-out;
+  --animate-float: float 3s ease-in-out infinite;
+  --animate-pulse-subtle: pulse-subtle 3s ease-in-out infinite;
+  --animate-shimmer: shimmer 1.5s infinite linear;
+
+  @keyframes logo-spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes accordion-down {
+    from { height: 0 }
+    to { height: var(--radix-accordion-content-height) }
+  }
+
+  @keyframes accordion-up {
+    from { height: var(--radix-accordion-content-height) }
+    to { height: 0 }
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0 }
+    to { opacity: 1 }
+  }
+
+  @keyframes fade-out {
+    from { opacity: 1 }
+    to { opacity: 0 }
+  }
+
+  @keyframes slide-up {
+    from { transform: translateY(10px); opacity: 0 }
+    to { transform: translateY(0); opacity: 1 }
+  }
+
+  @keyframes slide-down {
+    from { transform: translateY(-10px); opacity: 0 }
+    to { transform: translateY(0); opacity: 1 }
+  }
+
+  @keyframes scale-in {
+    from { transform: scale(0.95); opacity: 0 }
+    to { transform: scale(1); opacity: 1 }
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0) }
+    50% { transform: translateY(-5px) }
+  }
+
+  @keyframes pulse-subtle {
+    0%, 100% { opacity: 1 }
+    50% { opacity: 0.85 }
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -500px 0 }
+    100% { background-position: 500px 0 }
+  }
+}
+
+@layer utilities {
+  .animate-accordion-down {
+    animation: var(--animate-accordion-down);
+  }
+  .animate-accordion-up {
+    animation: var(--animate-accordion-up);
+  }
+  .animate-fade-in {
+    animation: var(--animate-fade-in);
+  }
+  .animate-fade-out {
+    animation: var(--animate-fade-out);
+  }
+  .animate-slide-up {
+    animation: var(--animate-slide-up);
+  }
+  .animate-slide-down {
+    animation: var(--animate-slide-down);
+  }
+  .animate-scale-in {
+    animation: var(--animate-scale-in);
+  }
+  .animate-float {
+    animation: var(--animate-float);
+  }
+  .animate-pulse-subtle {
+    animation: var(--animate-pulse-subtle);
+  }
+  .animate-shimmer {
+    animation: var(--animate-shimmer);
+  }
+} 

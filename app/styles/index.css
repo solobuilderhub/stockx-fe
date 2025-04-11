@@ -1,0 +1,20 @@
+/* Main stylesheet that imports all component styles */
+
+/* Import Tailwind first */
+@import "tailwindcss";
+
+/* Base styles and variables */
+@import "./base.css";
+
+/* Theme configuration */
+@import "./theme.css";
+
+/* Animation keyframes and utilities */
+@import "./animations.css";
+
+/* General utilities */
+@import "./utilities.css";
+
+
+/* Miscellaneous styles */
+@import "./misc.css"; 

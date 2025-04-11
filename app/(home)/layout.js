@@ -1,0 +1,43 @@
+import { Navbar } from "@/components/custom/nav/navbar";
+import Footer from "@/components/custom/ui/Footer";
+import { cookies } from "next/headers";
+import { auth } from "../(auth)/auth";
+import { categoriesApi } from "@/api/platform/category-api";
+import { ClientProviders } from "@/components/providers/ClientProvider";
+import { UserRole } from "@/api/user-data";
+import CategoryScroll from "@/components/custom/nav/CategoryScroll";
+
+export default async function RootLayout({ children }) {
+  const [session, cookieStore] = await Promise.all([auth(), cookies()]);
+  // console.log("session", session);
+  const isSeller = session?.roles?.includes(UserRole.SELLER);
+  const isAdmin = session?.roles?.includes(
+    UserRole.ADMIN,
+    UserRole.SUPER_ADMIN
+  );
+
+  const params = {
+    page: 1,
+    limit: 100,
+  };
+  const response = await categoriesApi.getAll({ params });
+  const categories = response?.docs || [];
+
+  return (
+    <ClientProviders categories={categories}>
+      <div className="flex flex-col min-h-screen">
+        <div className="bg-white dark:bg-black">
+          <Navbar
+            user={session?.user}
+            token={session?.accessToken}
+            isSeller={isSeller}
+            isAdmin={isAdmin}
+          />
+    
+        </div>
+        <main className=" flex-grow  mx-auto">{children}</main>
+        <Footer />
+      </div>
+    </ClientProviders>
+  );
+}
