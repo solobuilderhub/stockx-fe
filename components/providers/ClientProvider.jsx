@@ -1,13 +1,14 @@
 "use client";
-import { CategoriesProvider } from "./contexts/categories-context";
 
-export function ClientProviders({ children, categories }) {
+export function ClientProviders({ children,  }) {
   return (
 
 
-        <CategoriesProvider initialCategories={categories || []}>
-          {children}
-        </CategoriesProvider>
+<div>
+
+  {children}
+</div>
+
 
 
   );

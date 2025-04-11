@@ -19,12 +19,10 @@ export default async function RootLayout({ children }) {
   const params = {
     page: 1,
     limit: 100,
-  };
-  const response = await categoriesApi.getAll({ params });
-  const categories = response?.docs || [];
+  }
 
   return (
-    <ClientProviders categories={categories}>
+    <ClientProviders>
       <div className="flex flex-col min-h-screen">
         <div className="bg-white dark:bg-black">
           <Navbar
