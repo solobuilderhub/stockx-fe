@@ -1,7 +1,7 @@
 "use client";
 
 import { UserNav } from "./user-nav";
-import CartButton from "./CartButton";
+
 import { cn } from "@/lib/utils";
 
 export function NavbarIcons({
@@ -15,9 +15,7 @@ export function NavbarIcons({
   return (
     <div className={cn("flex items-center gap-3 md:gap-4", className)}>
       {/* Cart button */}
-      <div className="flex items-center">
-        <CartButton cartCount={cartCount} isLoading={isLoading} />
-      </div>
+   
 
       {/* User menu */}
       <div className="flex items-center">

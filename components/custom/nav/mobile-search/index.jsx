@@ -3,18 +3,12 @@
 import { useState, useEffect } from "react";
 import ExpandedSearch from "./ExpandedSearch";
 import { AnimatePresence, motion } from "motion/react";
-import { useLocation } from "@/contexts/LocationContext";
 import { cn } from "@/lib/utils";
 import { Search, MapPin } from "lucide-react";
 
 const MobileSearch = ({ className }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const { 
-    searchQuery, 
-    setSearchQuery,
-    selectedLocation,
-    openLocationModal
-  } = useLocation();
+
 
   // Prevent body scrolling when search is expanded
   useEffect(() => {
@@ -31,9 +25,6 @@ const MobileSearch = ({ className }) => {
   
   // Display location text
   const getDisplayLocation = () => {
-    if (!selectedLocation) return "Select location";
-    if (selectedLocation.name) return selectedLocation.name;
-    if (selectedLocation.coordinates) return "Selected location";
     return "Select location";
   };
 
@@ -57,7 +48,7 @@ const MobileSearch = ({ className }) => {
       <div className="mt-16 py-2 px-4 ">
         <motion.div 
           className="flex items-center text-sm font-medium text-primary" 
-          onClick={openLocationModal}
+          onClick={() => setIsExpanded(true)}
           whileTap={{ scale: 0.98 }}
         >
           <MapPin className="h-4 w-4 mr-1" />

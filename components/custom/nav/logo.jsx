@@ -6,7 +6,7 @@ export function Logo({ className }) {
   return (
     <Link href="/" className={`flex items-center ${className || ""}`}>
       <span className="text-2xl font-serif font-bold text-primary">
-        Hala<span className="text-halaeats-800">Eats</span>
+        Stock<span className="text-halaeats-800">X</span>
       </span>
     </Link>
   );

@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/sonner";
 import TanstackProvider from "./react-query";
 import { SessionProvider } from "next-auth/react";
 import { ThemeProvider } from "./theme-provider";
-import { TranslationsProvider } from "./translations-context";
+
 
 const Providers = ({ children }) => {
   return (
@@ -16,10 +16,10 @@ const Providers = ({ children }) => {
           enableSystem
           disableTransitionOnChange
         >
-          <TranslationsProvider>
+   
             <Toaster position="top-center" />
             {children}
-          </TranslationsProvider>
+    
         </ThemeProvider>
       </TanstackProvider>
     </SessionProvider>

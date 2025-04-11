@@ -3,12 +3,10 @@
 import { useState, useEffect, useRef } from "react";
 import { Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useLocation } from "@/contexts/LocationContext";
 import { AnimatePresence, motion } from "motion/react";
 import ExpandedSearch from "./mobile-search/ExpandedSearch";
 
 const SearchBar = ({ className }) => {
-  const { searchQuery } = useLocation();
   const [isExpanded, setIsExpanded] = useState(false);
   const searchBarRef = useRef(null);
 

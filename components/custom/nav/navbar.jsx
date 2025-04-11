@@ -5,29 +5,22 @@ import { Logo } from "./logo";
 import { MobileNav } from "./mobile-nav";
 import { NavbarIcons } from "./navbar-icons";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useCart } from "@/hooks/query/useCart";
 import SearchBar from "./SearchBar";
 import MobileSearch from "./mobile-search";
-import LocationSelector from "./LocationSelector";
-import LocationModal from "@/components/map/LocationModal";
-import CartButton from "./CartButton";
+
 
 export function Navbar({ user, token, isSeller, isAdmin }) {
   const isMobile = useIsMobile();
-  const { cart, isLoading, isUpdating } = useCart(token);
-
-  // You can implement actual cart count logic here
-  const cartCount = isLoading || isUpdating ? 0 : cart?.items?.length ?? 0;
 
   // Simplified version for mobile with pixel art styling
   function MobileNavbarIcons({ user, cartCount = 0, isSeller, isAdmin }) {
     return (
       <div className="flex items-center">
-        <CartButton cartCount={cartCount} isLoading={isLoading}  />
+
         {isMobile && (
           <MobileNav
             user={user}
-            cartCount={cartCount}
+            cartCount={0}
             isSeller={isSeller}
             isAdmin={isAdmin}
           />
@@ -45,9 +38,7 @@ export function Navbar({ user, token, isSeller, isAdmin }) {
             {/* Left section: Logo and Location */}
             <div className="flex items-center gap-3 flex-shrink-0 min-w-[140px]">
               <Logo />
-              <div className="hidden md:block">
-                <LocationSelector />
-              </div>
+     
             </div>
 
             {/* Middle section: Search */}
@@ -60,7 +51,7 @@ export function Navbar({ user, token, isSeller, isAdmin }) {
               {isMobile ? (
                 <MobileNavbarIcons
                   user={user}
-                  cartCount={cartCount}
+                  cartCount={0}
                   isSeller={isSeller}
                   isAdmin={isAdmin}
                 />
@@ -68,15 +59,15 @@ export function Navbar({ user, token, isSeller, isAdmin }) {
                 <>
                   <NavbarIcons
                     user={user}
-                    cartCount={cartCount}
-                    isLoading={isLoading}
+                    cartCount={0}
+                    isLoading={false}
                     isSeller={isSeller}
                     isAdmin={isAdmin}
                   />
                   <div className="ml-2 border-l pl-2">
                     <MobileNav
                       user={user}
-                      cartCount={cartCount}
+                      cartCount={0}
                       isSeller={isSeller}
                       isAdmin={isAdmin}
                     />
@@ -85,7 +76,7 @@ export function Navbar({ user, token, isSeller, isAdmin }) {
               )}
             </div>
           </div>
-          <LocationModal />
+     
         </nav>
       </header>
 

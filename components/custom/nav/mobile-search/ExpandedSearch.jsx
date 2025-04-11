@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Search, X, ArrowLeft, MapPin, ChevronLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useLocation } from "@/contexts/LocationContext";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -25,12 +24,11 @@ const popularRestaurants = [
 
 const ExpandedSearch = ({ className, onCollapse, isDesktop = false }) => {
   const router = useRouter();
-  const {
-    searchQuery,
-    setSearchQuery,
-    selectedLocation,
-    openLocationModal,
-  } = useLocation();
+  // add mock search query and selected location
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [openLocationModal, setOpenLocationModal] = useState(false);
+  
   
   const [inputFocused, setInputFocused] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
