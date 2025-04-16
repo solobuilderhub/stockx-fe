@@ -3,13 +3,13 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, FilterIcon } from "lucide-react";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 export default function PeriodFilter({
   currentPeriodType = 'month',
@@ -24,6 +24,7 @@ export default function PeriodFilter({
   const [month, setMonth] = useState(currentMonth || new Date().getMonth() + 1);
   const [startDate, setStartDate] = useState(currentStartDate ? new Date(currentStartDate) : new Date());
   const [endDate, setEndDate] = useState(currentEndDate ? new Date(currentEndDate) : new Date());
+  const [isOpen, setIsOpen] = useState(false);
   
   // Generate years for dropdown (last 5 years)
   const currentYear2 = new Date().getFullYear();
@@ -57,25 +58,55 @@ export default function PeriodFilter({
     }
     
     onPeriodChange(filters);
+    setIsOpen(false);
+  };
+  
+  const getDisplayValue = () => {
+    if (periodType === 'month') {
+      const monthName = months.find(m => m.value === month)?.label;
+      return `${monthName} ${year}`;
+    } else if (periodType === 'custom') {
+      return `${format(startDate, "MMM d")} - ${format(endDate, "MMM d, yyyy")}`;
+    } else {
+      return 'All Time';
+    }
   };
   
   return (
-    <Card className="shadow-sm">
-      <CardContent className="p-4">
-        <Tabs defaultValue={periodType} onValueChange={setPeriodType} className="w-full">
-          <TabsList className="grid grid-cols-3 mb-4">
-            <TabsTrigger value="month">Monthly</TabsTrigger>
-            <TabsTrigger value="custom">Custom Range</TabsTrigger>
-            <TabsTrigger value="all-time">All Time</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="month" className="space-y-4">
-            <div className="flex gap-4">
-              <div className="w-1/2">
-                <Label htmlFor="year" className="text-sm mb-1 block">Year</Label>
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <PopoverTrigger asChild>
+        <Button variant="outline" className="flex items-center gap-2">
+          <FilterIcon className="h-4 w-4" />
+          <span>{getDisplayValue()}</span>
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-72 p-3">
+        <div className="space-y-3">
+          <RadioGroup
+            value={periodType}
+            onValueChange={setPeriodType}
+            className="flex flex-col gap-2"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="month" id="month" />
+              <Label htmlFor="month">Monthly</Label>
+            </div>
+            
+            {periodType === 'month' && (
+              <div className="ml-6 flex gap-2">
+                <Select value={month.toString()} onValueChange={(value) => setMonth(parseInt(value))}>
+                  <SelectTrigger className="w-full h-8">
+                    <SelectValue placeholder="Month" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {months.map((m) => (
+                      <SelectItem key={m.value} value={m.value.toString()}>{m.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <Select value={year.toString()} onValueChange={(value) => setYear(parseInt(value))}>
-                  <SelectTrigger id="year" className="w-full">
-                    <SelectValue placeholder="Select year" />
+                  <SelectTrigger className="w-full h-8">
+                    <SelectValue placeholder="Year" />
                   </SelectTrigger>
                   <SelectContent>
                     {years.map((y) => (
@@ -84,86 +115,64 @@ export default function PeriodFilter({
                   </SelectContent>
                 </Select>
               </div>
-              
-              <div className="w-1/2">
-                <Label htmlFor="month" className="text-sm mb-1 block">Month</Label>
-                <Select value={month.toString()} onValueChange={(value) => setMonth(parseInt(value))}>
-                  <SelectTrigger id="month" className="w-full">
-                    <SelectValue placeholder="Select month" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {months.map((m) => (
-                      <SelectItem key={m.value} value={m.value.toString()}>{m.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+            )}
+            
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="custom" id="custom" />
+              <Label htmlFor="custom">Custom Range</Label>
             </div>
-          </TabsContent>
-          
-          <TabsContent value="custom" className="space-y-4">
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="w-full sm:w-1/2">
-                <Label htmlFor="startDate" className="text-sm mb-1 block">Start Date</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start text-left font-normal"
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {startDate ? format(startDate, "MMM d, yyyy") : "Pick a date"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar
-                      mode="single"
-                      selected={startDate}
-                      onSelect={setStartDate}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
+            
+            {periodType === 'custom' && (
+              <div className="ml-6 flex flex-col gap-2">
+                <div className="flex gap-2 items-center">
+                  <Label className="w-10 text-xs">From:</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" className="h-8 justify-start text-left text-xs py-0 px-2">
+                        {startDate ? format(startDate, "MMM d, yyyy") : "Pick date"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={startDate}
+                        onSelect={setStartDate}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                <div className="flex gap-2 items-center">
+                  <Label className="w-10 text-xs">To:</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" className="h-8 justify-start text-left text-xs py-0 px-2">
+                        {endDate ? format(endDate, "MMM d, yyyy") : "Pick date"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={endDate}
+                        onSelect={setEndDate}
+                        initialFocus
+                        disabled={(date) => date < startDate}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
               </div>
-              
-              <div className="w-full sm:w-1/2">
-                <Label htmlFor="endDate" className="text-sm mb-1 block">End Date</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start text-left font-normal"
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {endDate ? format(endDate, "MMM d, yyyy") : "Pick a date"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar
-                      mode="single"
-                      selected={endDate}
-                      onSelect={setEndDate}
-                      initialFocus
-                      disabled={(date) => date < startDate}
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
+            )}
+            
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="all-time" id="all-time" />
+              <Label htmlFor="all-time">All Time</Label>
             </div>
-          </TabsContent>
+          </RadioGroup>
           
-          <TabsContent value="all-time">
-            <p className="text-sm text-muted-foreground">Showing data for all time periods.</p>
-          </TabsContent>
-          
-          <Button 
-            onClick={handleApplyFilter} 
-            className="w-full mt-4"
-          >
-            Apply Filter
-          </Button>
-        </Tabs>
-      </CardContent>
-    </Card>
+          <Button onClick={handleApplyFilter} className="w-full">Apply</Button>
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 }

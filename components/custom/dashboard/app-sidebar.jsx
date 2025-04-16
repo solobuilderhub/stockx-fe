@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Box, Building, ReceiptText } from "lucide-react";
+import { LayoutDashboard } from "lucide-react";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 import { NavMain } from "@/components/custom/dashboard/nav-main";
@@ -19,9 +19,11 @@ import {
 } from "@/components/ui/sidebar";
 import { data } from "./sidebar-data";
 import { SheetDescription, SheetTitle } from "@/components/ui/sheet";
+import { cn } from "@/lib/utils";
 
 export function AppSidebar({ admin, user, ...props }) {
   const { isMobile, state } = useSidebar();
+  const isCollapsed = state === "collapsed";
 
   return (
     <Sidebar variant="inset" collapsible="icon" {...props}>
@@ -37,13 +39,32 @@ export function AppSidebar({ admin, user, ...props }) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
-              <a href="/">
-                <div className="text-lg font-bold flex items-center gap-2">
-                  {/* <img src="/brihoteng_logo.svg" alt="Directory Hub Logo" /> */}
-                  <Box />
-                  Halal Eats
+            <SidebarMenuButton
+              size="lg"
+              asChild
+              tooltip={isCollapsed ? "StockX" : undefined}
+            >
+              <a
+                href="/"
+                className={cn(
+                  "flex items-center",
+                  isCollapsed && !isMobile && "justify-center"
+                )}
+              >
+                <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
+                  <LayoutDashboard
+                    size={18}
+                    className="text-primary-foreground"
+                  />
                 </div>
+                <span
+                  className={cn(
+                    "ml-2 font-semibold",
+                    !isMobile && isCollapsed && "hidden"
+                  )}
+                >
+                  StockX
+                </span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>

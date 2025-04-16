@@ -27,7 +27,7 @@ export const authConfig = {
       }
 
       if (isLoggedIn && (isOnLogin || isOnRegister)) {
-        return Response.redirect(new URL("/", nextUrl));
+        return Response.redirect(new URL("/dashboard", nextUrl));
       }
 
       // if (isLoggedIn) {

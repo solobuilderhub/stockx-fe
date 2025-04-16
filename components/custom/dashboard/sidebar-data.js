@@ -28,6 +28,9 @@ import {
   DiamondPlusIcon,
   Package,
   ForkKnifeCrossedIcon,
+  Settings,
+  ShoppingBasket,
+  ShoppingCart,
 } from "lucide-react";
 export const data = {
   user: {
@@ -74,14 +77,19 @@ export const data = {
           items: [],
         },
         {
-          title: "Menu",
-          url: "/dashboard/menu",
-          icon: ListFilter,
+          title: "Inventory",
+          url: "/dashboard/inventory",
+          icon: Package,
         },
         {
           title: "Orders",
           url: "/dashboard/orders",
-          icon: Package,
+          icon: ShoppingCart,
+        },
+        {
+          title: "Listings",
+          url: "/dashboard/listings",
+          icon: ListIcon,
         },
         // {
         //   title: "Messages",
@@ -101,9 +109,9 @@ export const data = {
           icon: UserCircle,
         },
         {
-          title: "Caterer",
-          url: "/dashboard/caterer",
-          icon: ForkKnifeCrossedIcon,
+          title: "Settings",
+          url: "/dashboard/settings",
+          icon: Settings,
         },
 
       ],

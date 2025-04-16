@@ -17,24 +17,24 @@ export default async function DashboardPage(props) {
   const endDate = searchParams.endDate;
   const allTime = periodType === 'all-time';
   
-  let dashboardData = null;
+  let dashboardData = {} || null;
   let error = null;
 
   // console.log("accessToken", accessToken);
   
-  try {
-    dashboardData = await getSellerDashboard({
-      token: accessToken,
-      year,
-      month,
-      startDate,
-      endDate,
-      allTime
-    });
-  } catch (err) {
-    console.error("Failed to fetch dashboard data:", err);
-    error = err.message || "Failed to load dashboard data";
-  }
+  // try {
+  //   dashboardData = await getSellerDashboard({
+  //     token: accessToken,
+  //     year,
+  //     month,
+  //     startDate,
+  //     endDate,
+  //     allTime
+  //   });
+  // } catch (err) {
+  //   console.error("Failed to fetch dashboard data:", err);
+  //   error = err.message || "Failed to load dashboard data";
+  // }
   
   const breadcrumbItems = [
     { label: "Home", href: "/" },

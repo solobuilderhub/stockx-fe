@@ -61,7 +61,7 @@ export default function LoginPage() {
       setIsGoogleLoading(true);
       const result = await signIn("google", {
         redirect: false,
-        callbackUrl: callbackUrl || "/"
+        callbackUrl: callbackUrl || "/dashboard"
       });
 
       if (result?.error) {
