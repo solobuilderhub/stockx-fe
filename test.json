@@ -1,0 +1,64 @@
+{
+    "success": true,
+    "message": "Inventory table items retrieved successfully",
+    "executionTime": "178ms",
+    "data": [
+        {
+            "_id": "68050bccc9eeea95cf000ba4",
+            "id": "68050bccc9eeea95cf000ba4",
+            "product-name": "Puma Bow Slide Marshmallow Puma Silver (Women's)",
+            "stockx-sku": "365774",
+            "goat-sku": "365774",
+            "brand": "Puma",
+            "image": "",
+            "size": "US W 7.5",
+            "retail-price": 90,
+            "brand-wholesale": 49.5,
+            "inventory-added-date": "2025-03-06T12:00:00.000Z",
+            "location-1": "WBC6",
+            "location-2": null,
+            "quantity": 10,
+            "variantId": "3e93caeb-27e7-4f8f-a6f1-d073314ca996",
+            "createdAt": "2025-04-20T14:59:24.861Z",
+            "updatedAt": "2025-04-20T14:59:24.861Z",
+            "__v": 0
+        },
+        {
+            "_id": "68050bccc9eeea95cf000ba7",
+            "id": "68050bccc9eeea95cf000ba7",
+            "product-name": null,
+            "stockx-sku": "192361874526",
+            "goat-sku": "192361874526",
+            "brand": "The North Face",
+            "image": "",
+            "size": null,
+            "retail-price": 279,
+            "brand-wholesale": 153.45,
+            "inventory-added-date": "2025-03-11T12:00:00.000Z",
+            "location-1": "WBZ1",
+            "location-2": null,
+            "quantity": 1,
+            "variantId": null,
+            "createdAt": "2025-04-20T14:59:24.873Z",
+            "updatedAt": "2025-04-20T14:59:24.873Z",
+            "__v": 0
+        }
+    ],
+    "pagination": {
+        "totalItems": 8078,
+        "itemsPerPage": 20,
+        "currentPage": 1,
+        "totalPages": 404,
+        "hasNextPage": true,
+        "hasPrevPage": false,
+        "nextPage": 2,
+        "prevPage": null
+    },
+    "links": {
+        "self": "/api/stockx?page=1&limit=20",
+        "first": "/api/stockx?page=1&limit=20",
+        "last": "/api/stockx?page=404&limit=20",
+        "next": "/api/stockx?page=2&limit=20",
+        "prev": null
+    }
+}
