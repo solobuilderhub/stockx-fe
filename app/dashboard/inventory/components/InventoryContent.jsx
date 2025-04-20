@@ -71,6 +71,7 @@ export function InventoryContent({
                         onPageChange={handleLocalPageChange}
                         handleViewDetails={handleViewDetails}
                         token={token}
+                        tableHeight="h-[600px]"
                     />
                 </div>
             </div>
