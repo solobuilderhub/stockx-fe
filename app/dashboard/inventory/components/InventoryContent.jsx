@@ -6,7 +6,7 @@ import { Filter, Search } from "lucide-react";
 import { useState } from "react";
 import { FilterModal } from "./FilterModal";
 import { InventoryTable } from "./InventoryTable";
-import { MasterInventoryUpload } from "./MasterInventoryUpload";
+// import { MasterInventoryUpload } from "./MasterInventoryUpload";
 
 export function InventoryContent({
     token,
@@ -33,7 +33,7 @@ export function InventoryContent({
     return (
         <div className="">
             <div className="max-w-6xl mx-auto space-y-8">
-                <MasterInventoryUpload />
+                {/* <MasterInventoryUpload /> */}
 
                 <div className="bg-card rounded-xl p-6 shadow-sm">
                     <div className="lg:flex justify-between items-center mb-6">

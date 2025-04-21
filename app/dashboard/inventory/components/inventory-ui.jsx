@@ -1,6 +1,6 @@
 // app/profile/my-orders/components/orders-ui.jsx
 "use client";
-import HeaderSection from "@/components/custom/dashboard/header-section";
+// import HeaderSection from "@/components/custom/dashboard/header-section";
 import ErrorBoundaryWrapper from "@/components/custom/error/error-boundary-wrapper";
 import { Package } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -34,11 +34,11 @@ export function InventoryUi({ token, initialPage = 1, initialStatus = "" }) {
 
     return (
         <div className="space-y-6">
-            <HeaderSection
+            {/* <HeaderSection
                 icon={Package}
                 title="Inventory"
                 description="View and manage your inventory"
-            />
+            /> */}
 
             <ErrorBoundaryWrapper>
                 <InventoryContent
