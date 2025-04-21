@@ -52,8 +52,9 @@ export const inventoryColumns = () => [
                     {row.getValue("name") || "No Name"}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                    {row.original.styleId}{" "}
-                    {row.original.size ? `/ ${row.original.size}` : ""}
+                    {row.original.stockxSku === row.original.goatSku
+                        ? row.original.stockxSku
+                        : `${row.original.stockxSku} / ${row.original.goatSku}`}
                 </p>
             </div>
         ),

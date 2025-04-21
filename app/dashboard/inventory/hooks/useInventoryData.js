@@ -74,7 +74,8 @@ export function useInventoryData({
             id: item.id,
             image: item.image || "https://via.placeholder.com/150",
             name: item["product-name"] || "No Name",
-            styleId: item["stockx-sku"] || "",
+            stockxSku: item["stockx-sku"] || "",
+            goatSku: item["goat-sku"] || "",
             size: item.size || "N/A",
             quantity: item.quantity || 0,
             dateAdded: new Date(
