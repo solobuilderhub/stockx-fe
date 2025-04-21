@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { DataTable } from "@/components/custom/ui/data-table";
 import { columns } from "./columns";
-import { useSellerOrders } from "@/hooks/query/use-orders";
+// import { useSellerOrders } from "@/hooks/query/use-orders";
 import HeaderSection from "@/components/custom/dashboard/header-section";
 import { Package } from "lucide-react";
 import ErrorBoundaryWrapper from "@/components/custom/error/error-boundary-wrapper";
@@ -28,14 +28,14 @@ export function OrdersUI({ token, initialPage = 1, initialStatus = "" }) {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
-  const { orders, pagination, isLoading, error } = useSellerOrders({
-    token,
-    params: {
-      page: currentPage,
-      limit: 10,
-      status: status === "all" ? "" : status,
-    },
-  });
+  // const { orders, pagination, isLoading, error } = useSellerOrders({
+  //   token,
+  //   params: {
+  //     page: currentPage,
+  //     limit: 10,
+  //     status: status === "all" ? "" : status,
+  //   },
+  // });
 
   const handlePageChange = (page) => {
     const params = new URLSearchParams(searchParams);
