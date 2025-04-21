@@ -12,7 +12,6 @@ export function InventoryTable({
     onPageChange,
     handleViewDetails,
     token,
-    tableHeight = "h-[500px]",
 }) {
     const [itemsPerPage] = React.useState(20);
 
@@ -52,7 +51,6 @@ export function InventoryTable({
                 hasPrevPage: pagination?.hasPrevPage || false,
                 onPageChange: handlePageChangeInternal,
             }}
-            tableHeight={tableHeight}
         />
     );
 }
