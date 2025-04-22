@@ -53,7 +53,7 @@ export const inventoryColumns = () => [
         accessorKey: "id",
         header: "ID",
         cell: ({ row }) => (
-            <p className="text-xs text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
                 {row.getValue("id")}
             </p>
         ),
@@ -104,13 +104,15 @@ export const inventoryColumns = () => [
                     )}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                    {row.original.stockxSku === row.original.goatSku
-                        ? `StockX SKU: ${row.original.stockxSku}`
-                        : <>
+                    {row.original.stockxSku === row.original.goatSku ? (
+                        `StockX SKU: ${row.original.stockxSku}`
+                    ) : (
+                        <>
                             {`StockX SKU: ${row.original.stockxSku}`}
                             <br />
                             {`Goat SKU: ${row.original.goatSku}`}
-                          </>}
+                        </>
+                    )}
                 </p>
             </div>
         ),
@@ -135,9 +137,7 @@ export const inventoryColumns = () => [
         accessorKey: "brandWholesale",
         header: "Brand Wholesale",
         cell: ({ row }) => (
-            <p className="text-xs text-muted-foreground">
-                {row.getValue("brandWholesale")}
-            </p>
+            <p className="text-sm">{row.getValue("brandWholesale")}</p>
         ),
     },
     {
