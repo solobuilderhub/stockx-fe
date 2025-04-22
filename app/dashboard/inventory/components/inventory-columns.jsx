@@ -3,7 +3,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { urlKeyToImage } from "@/lib/utils";
-import { Trash2 } from "lucide-react";
 import Link from "next/link";
 
 export const inventoryColumns = () => [
@@ -51,6 +50,15 @@ export const inventoryColumns = () => [
         cell: () => null,
     },
     {
+        accessorKey: "id",
+        header: "ID",
+        cell: ({ row }) => (
+            <p className="text-xs text-muted-foreground">
+                {row.getValue("id")}
+            </p>
+        ),
+    },
+    {
         accessorKey: "name",
         header: "Name",
         cell: ({ row }) => (
@@ -95,21 +103,26 @@ export const inventoryColumns = () => [
         header: "Warehouse location",
     },
     {
-        accessorKey: "cost",
-        header: "Cost",
+        accessorKey: "brandWholesale",
+        header: "Brand Wholesale",
+        cell: ({ row }) => (
+            <p className="text-xs text-muted-foreground">
+                {row.getValue("brandWholesale")}
+            </p>
+        ),
     },
     {
         accessorKey: "retailPrice",
         header: "Retail Price",
     },
-    {
-        id: "actions",
-        header: "",
-        cell: ({ row }) => (
-            <button className="text-muted-foreground hover:text-destructive transition-colors">
-                <Trash2 size={16} />
-            </button>
-        ),
-        enableSorting: false,
-    },
+    // {
+    //     id: "actions",
+    //     header: "",
+    //     cell: ({ row }) => (
+    //         <button className="text-muted-foreground hover:text-destructive transition-colors">
+    //             <Trash2 size={16} />
+    //         </button>
+    //     ),
+    //     enableSorting: false,
+    // },
 ];

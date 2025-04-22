@@ -68,6 +68,8 @@ export function useInventoryData({
         staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
     });
 
+    console.log("queryData", queryData?.data);
+
     // Map API response to match table format
     const mappedData =
         queryData?.data?.map((item) => ({
@@ -83,7 +85,9 @@ export function useInventoryData({
                 item["inventory-added-date"]
             ).toLocaleDateString("en-GB"), // dd/mm/yyyy
             warehouseLocation: item["location-1"] || "N/A",
-            cost: "$0.00", // Default cost as specified
+            brandWholesale: item["brand-wholesale"]
+                ? `$${item["brand-wholesale"].toFixed(2)}`
+                : "$0.00",
             retailPrice: item["retail-price"]
                 ? `$${item["retail-price"].toFixed(2)}`
                 : "$0.00",
