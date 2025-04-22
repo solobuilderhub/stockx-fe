@@ -2,7 +2,9 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Checkbox } from "@/components/ui/checkbox";
+import { urlKeyToImage } from "@/lib/utils";
 import { Trash2 } from "lucide-react";
+import Link from "next/link";
 
 export const inventoryColumns = () => [
     {
@@ -32,7 +34,7 @@ export const inventoryColumns = () => [
         cell: ({ row }) => (
             <Avatar className="h-10 w-10 rounded">
                 <AvatarImage
-                    src={row.getValue("image")}
+                    src={urlKeyToImage(row.getValue("urlKey"))}
                     alt={row.getValue("name")}
                 />
                 <AvatarFallback className="bg-secondary text-xs">
@@ -44,12 +46,29 @@ export const inventoryColumns = () => [
         enableSorting: false,
     },
     {
+        accessorKey: "urlKey",
+        header: "",
+        cell: () => null,
+    },
+    {
         accessorKey: "name",
         header: "Name",
         cell: ({ row }) => (
             <div>
                 <p className="font-medium">
-                    {row.getValue("name") || "No Name"}
+                    {row.getValue("name") !== "No Name" ? (
+                        <Link
+                            href={`https://stockx.com/${row.getValue(
+                                "urlKey"
+                            )}`}
+                            target="_blank"
+                            className="hover:underline"
+                        >
+                            {row.getValue("name")}
+                        </Link>
+                    ) : (
+                        "No Name"
+                    )}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
                     {row.original.stockxSku === row.original.goatSku
