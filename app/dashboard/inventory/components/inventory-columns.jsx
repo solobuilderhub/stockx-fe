@@ -15,6 +15,7 @@ export const inventoryColumns = () => [
                     table.toggleAllPageRowsSelected(!!value)
                 }
                 aria-label="Select all"
+                className="hidden"
             />
         ),
         cell: ({ row }) => (
@@ -22,6 +23,7 @@ export const inventoryColumns = () => [
                 checked={row.getIsSelected()}
                 onCheckedChange={(value) => row.toggleSelected(!!value)}
                 aria-label="Select row"
+                className="hidden"
             />
         ),
         enableSorting: false,
@@ -29,7 +31,7 @@ export const inventoryColumns = () => [
     },
     {
         accessorKey: "image",
-        header: "",
+        header: "Image",
         cell: ({ row }) => (
             <Avatar className="h-10 w-10 rounded">
                 <AvatarImage
