@@ -24,7 +24,7 @@ export function InventoryContent({
     useEffect(() => {
         const timer = setTimeout(() => {
             setDebouncedSearchQuery(searchQuery);
-        }, 300);
+        }, 400);
 
         return () => {
             clearTimeout(timer);
