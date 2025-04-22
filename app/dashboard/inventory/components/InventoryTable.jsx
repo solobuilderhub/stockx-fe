@@ -22,7 +22,6 @@ export function InventoryTable({
         filters,
         token,
     });
-
     const handlePageChangeInternal = (page) => {
         if (onPageChange) {
             onPageChange(page);

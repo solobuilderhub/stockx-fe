@@ -68,20 +68,26 @@ export function useInventoryData({
         staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
     });
 
+    console.log("queryData", queryData?.data);
+
     // Map API response to match table format
     const mappedData =
         queryData?.data?.map((item) => ({
             id: item.id,
             image: item.image || "https://via.placeholder.com/150",
             name: item["product-name"] || "No Name",
-            styleId: item["stockx-sku"] || "",
+            urlKey: item.urlKey || "",
+            stockxSku: item["stockx-sku"] || "",
+            goatSku: item["goat-sku"] || "",
             size: item.size || "N/A",
             quantity: item.quantity || 0,
             dateAdded: new Date(
                 item["inventory-added-date"]
             ).toLocaleDateString("en-GB"), // dd/mm/yyyy
             warehouseLocation: item["location-1"] || "N/A",
-            cost: "$0.00", // Default cost as specified
+            brandWholesale: item["brand-wholesale"]
+                ? `$${item["brand-wholesale"].toFixed(2)}`
+                : "$0.00",
             retailPrice: item["retail-price"]
                 ? `$${item["retail-price"].toFixed(2)}`
                 : "$0.00",

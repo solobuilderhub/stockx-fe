@@ -71,6 +71,7 @@ export function DataTable({ columns, data, isLoading = false, pagination }) {
                                     </TableRow>
                                 ))}
                             </TableHeader>
+
                             <TableBody className="overflow-y-auto">
                                 {table.getRowModel().rows?.length ? (
                                     table.getRowModel().rows.map((row) => (
