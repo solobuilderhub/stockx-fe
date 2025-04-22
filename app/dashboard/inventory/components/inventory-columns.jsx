@@ -15,6 +15,7 @@ export const inventoryColumns = () => [
                     table.toggleAllPageRowsSelected(!!value)
                 }
                 aria-label="Select all"
+                className="hidden"
             />
         ),
         cell: ({ row }) => (
@@ -22,6 +23,7 @@ export const inventoryColumns = () => [
                 checked={row.getIsSelected()}
                 onCheckedChange={(value) => row.toggleSelected(!!value)}
                 aria-label="Select row"
+                className="hidden"
             />
         ),
         enableSorting: false,
@@ -29,9 +31,9 @@ export const inventoryColumns = () => [
     },
     {
         accessorKey: "image",
-        header: "",
+        header: "Image",
         cell: ({ row }) => (
-            <Avatar className="h-10 w-10 rounded">
+            <Avatar className="h-14 w-14 rounded">
                 <AvatarImage
                     src={urlKeyToImage(row.getValue("urlKey"))}
                     alt={row.getValue("name")}
@@ -53,7 +55,7 @@ export const inventoryColumns = () => [
         accessorKey: "id",
         header: "ID",
         cell: ({ row }) => (
-            <p className="text-xs text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
                 {row.getValue("id")}
             </p>
         ),
@@ -72,16 +74,47 @@ export const inventoryColumns = () => [
                             target="_blank"
                             className="hover:underline"
                         >
-                            {row.getValue("name")}
+                            {row.getValue("name").length > 30
+                                ? (() => {
+                                      const name = row.getValue("name");
+                                      // Find the last space before 30 characters
+                                      const lastSpaceIndex = name
+                                          .substring(0, 30)
+                                          .lastIndexOf(" ");
+                                      // If no space found, break at 30, otherwise break at the last space
+                                      const breakIndex =
+                                          lastSpaceIndex > 0
+                                              ? lastSpaceIndex
+                                              : 30;
+
+                                      return (
+                                          <>
+                                              {name.substring(0, breakIndex)}
+                                              <br />
+                                              {name.substring(
+                                                  breakIndex === 30
+                                                      ? 30
+                                                      : breakIndex + 1
+                                              )}
+                                          </>
+                                      );
+                                  })()
+                                : row.getValue("name")}
                         </Link>
                     ) : (
                         "No Name"
                     )}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                    {row.original.stockxSku === row.original.goatSku
-                        ? row.original.stockxSku
-                        : `${row.original.stockxSku} / ${row.original.goatSku}`}
+                    {row.original.stockxSku === row.original.goatSku ? (
+                        `StockX SKU: ${row.original.stockxSku}`
+                    ) : (
+                        <>
+                            {`StockX SKU: ${row.original.stockxSku}`}
+                            <br />
+                            {`Goat SKU: ${row.original.goatSku}`}
+                        </>
+                    )}
                 </p>
             </div>
         ),
@@ -106,9 +139,7 @@ export const inventoryColumns = () => [
         accessorKey: "brandWholesale",
         header: "Brand Wholesale",
         cell: ({ row }) => (
-            <p className="text-xs text-muted-foreground">
-                {row.getValue("brandWholesale")}
-            </p>
+            <p className="text-sm">{row.getValue("brandWholesale")}</p>
         ),
     },
     {
