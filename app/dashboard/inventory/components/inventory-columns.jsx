@@ -33,7 +33,7 @@ export const inventoryColumns = () => [
         accessorKey: "image",
         header: "Image",
         cell: ({ row }) => (
-            <Avatar className="h-10 w-10 rounded">
+            <Avatar className="h-14 w-14 rounded">
                 <AvatarImage
                     src={urlKeyToImage(row.getValue("urlKey"))}
                     alt={row.getValue("name")}
