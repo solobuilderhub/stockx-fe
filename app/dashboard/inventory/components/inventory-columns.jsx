@@ -72,7 +72,32 @@ export const inventoryColumns = () => [
                             target="_blank"
                             className="hover:underline"
                         >
-                            {row.getValue("name")}
+                            {row.getValue("name").length > 30
+                                ? (() => {
+                                      const name = row.getValue("name");
+                                      // Find the last space before 30 characters
+                                      const lastSpaceIndex = name
+                                          .substring(0, 30)
+                                          .lastIndexOf(" ");
+                                      // If no space found, break at 30, otherwise break at the last space
+                                      const breakIndex =
+                                          lastSpaceIndex > 0
+                                              ? lastSpaceIndex
+                                              : 30;
+
+                                      return (
+                                          <>
+                                              {name.substring(0, breakIndex)}
+                                              <br />
+                                              {name.substring(
+                                                  breakIndex === 30
+                                                      ? 30
+                                                      : breakIndex + 1
+                                              )}
+                                          </>
+                                      );
+                                  })()
+                                : row.getValue("name")}
                         </Link>
                     ) : (
                         "No Name"
@@ -80,8 +105,12 @@ export const inventoryColumns = () => [
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
                     {row.original.stockxSku === row.original.goatSku
-                        ? row.original.stockxSku
-                        : `${row.original.stockxSku} / ${row.original.goatSku}`}
+                        ? `StockX SKU: ${row.original.stockxSku}`
+                        : <>
+                            {`StockX SKU: ${row.original.stockxSku}`}
+                            <br />
+                            {`Goat SKU: ${row.original.goatSku}`}
+                          </>}
                 </p>
             </div>
         ),
