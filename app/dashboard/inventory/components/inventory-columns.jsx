@@ -1,9 +1,10 @@
-"use client";
+// "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Checkbox } from "@/components/ui/checkbox";
-import { urlKeyToImage } from "@/lib/utils";
+// import { urlKeyToImage } from "@/lib/utils";
 import Link from "next/link";
+import FallbackImage from "./custom-image";
 
 export const inventoryColumns = () => [
     {
@@ -34,8 +35,8 @@ export const inventoryColumns = () => [
         header: "Image",
         cell: ({ row }) => (
             <Avatar className="h-14 w-14 rounded">
-                <AvatarImage
-                    src={urlKeyToImage(row.getValue("urlKey"))}
+                <FallbackImage
+                    urlKey={row.getValue("urlKey")}
                     alt={row.getValue("name")}
                 />
                 <AvatarFallback className="bg-secondary text-xs">

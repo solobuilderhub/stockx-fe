@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Filter, Search } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FilterModal } from "./FilterModal";
 import { InventoryTable } from "./InventoryTable";
 // import { MasterInventoryUpload } from "./MasterInventoryUpload";
@@ -15,9 +15,21 @@ export function InventoryContent({
     handlePageChange,
 }) {
     const [searchQuery, setSearchQuery] = useState("");
+    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [appliedFilters, setAppliedFilters] = useState(null);
     const [currentPage, setCurrentPage] = useState(initialPage);
+
+    // Debounce search query with 300ms delay
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearchQuery(searchQuery);
+        }, 400);
+
+        return () => {
+            clearTimeout(timer);
+        };
+    }, [searchQuery]);
 
     const handleApplyFilters = (filters) => {
         setAppliedFilters(filters);
@@ -65,7 +77,7 @@ export function InventoryContent({
                     </div>
 
                     <InventoryTable
-                        searchQuery={searchQuery}
+                        searchQuery={debouncedSearchQuery}
                         filters={appliedFilters}
                         currentPage={currentPage}
                         onPageChange={handleLocalPageChange}
