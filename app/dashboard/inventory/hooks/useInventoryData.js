@@ -17,8 +17,19 @@ const fetchInventory = async ({ page, limit, searchQuery, filters, token }) => {
 
     // Add additional filters if provided
     if (filters) {
-        // Convert filters to API format if needed
-        // This will depend on your specific filtering implementation
+        // Add ID filter if provided
+        if (filters.id) {
+            queryParams.append("id", filters.id);
+        }
+
+        // Add date range filters if provided
+        if (filters.dateFrom) {
+            queryParams.append("dateFrom", filters.dateFrom);
+        }
+
+        if (filters.dateTo) {
+            queryParams.append("dateTo", filters.dateTo);
+        }
     }
 
     // Fetch data from API

@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import {
     Sheet,
@@ -10,27 +9,20 @@ import {
     SheetHeader,
     SheetTitle,
 } from "@/components/ui/sheet";
-import { Slider } from "@/components/ui/slider";
 import { useState } from "react";
 
 export function FilterModal({ open, onOpenChange, onApplyFilters }) {
     const [filters, setFilters] = useState({
-        spreadValue: 0,
-        spreadType: "greater",
-        daysListedValue: 0,
-        daysListedType: "greater",
-        lowestAsk: null,
-        showOnlyExpired: false,
+        id: "",
+        dateFrom: "",
+        dateTo: "",
     });
 
     const handleReset = () => {
         setFilters({
-            spreadValue: 0,
-            spreadType: "greater",
-            daysListedValue: 0,
-            daysListedType: "greater",
-            lowestAsk: null,
-            showOnlyExpired: false,
+            id: "",
+            dateFrom: "",
+            dateTo: "",
         });
     };
 
@@ -53,190 +45,89 @@ export function FilterModal({ open, onOpenChange, onApplyFilters }) {
                             </SheetTitle>
                         </SheetHeader>
                         <SheetClose className="rounded-full p-2 hover:bg-gray-800" />
-                        {/* <X className="h-5 w-5" /> */}
-                        {/* </SheetClose> */}
                     </div>
 
                     <div className="flex-1 overflow-y-auto px-4 py-6 space-y-8">
-                        {/* Spread Filter */}
+                        {/* ID Filter */}
                         <div className="space-y-4">
                             <div className="flex justify-between items-center">
                                 <h3 className="text-lg font-medium">
-                                    Spread ($)
+                                    Filter by ID
                                 </h3>
-                                <span className="text-gray-400 text-sm">
-                                    (for extended groups only)
-                                </span>
                             </div>
                             <div className="flex items-center gap-2 mb-4">
-                                <Button
-                                    variant="outline"
-                                    className={`px-4 ${
-                                        filters.spreadType === "greater"
-                                            ? "bg-secondary"
-                                            : "bg-background"
-                                    }`}
-                                    onClick={() =>
-                                        setFilters({
-                                            ...filters,
-                                            spreadType: "greater",
-                                        })
-                                    }
-                                >
-                                    Greater
-                                </Button>
                                 <Input
                                     type="number"
-                                    value={filters.spreadValue}
-                                    onChange={(e) =>
-                                        setFilters({
-                                            ...filters,
-                                            spreadValue:
-                                                parseInt(e.target.value) || 0,
-                                        })
-                                    }
-                                    className="w-24 bg-background"
+                                    placeholder="Enter Inventory ID"
+                                    value={filters.id}
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+                                        // Only allow numeric values
+                                        if (
+                                            value === "" ||
+                                            /^[0-9]+$/.test(value)
+                                        ) {
+                                            setFilters({
+                                                ...filters,
+                                                id: value,
+                                            });
+                                        }
+                                    }}
+                                    className="w-full bg-background"
+                                    onKeyDown={(e) => {
+                                        // Prevent non-numeric input including 'e'
+                                        if (
+                                            !/[0-9]|\Backspace|\Tab|\Delete|\ArrowLeft|\ArrowRight|\Home|\End/.test(
+                                                e.key
+                                            )
+                                        ) {
+                                            e.preventDefault();
+                                        }
+                                    }}
                                 />
                             </div>
-                            <Slider
-                                value={[filters.spreadValue]}
-                                min={0}
-                                max={100}
-                                step={1}
-                                onValueChange={(value) =>
-                                    setFilters({
-                                        ...filters,
-                                        spreadValue: value[0],
-                                    })
-                                }
-                            />
                         </div>
 
-                        {/* Days Listed Filter */}
+                        {/* Date Range Filter */}
                         <div className="space-y-4">
                             <div className="flex justify-between items-center">
                                 <h3 className="text-lg font-medium">
-                                    Days Listed
+                                    Filter by Inventory Added Date
                                 </h3>
-                                <span className="text-gray-400 text-sm">
-                                    (for extended groups only)
-                                </span>
                             </div>
-                            <div className="flex items-center gap-2 mb-4">
-                                <Button
-                                    variant="outline"
-                                    className={`px-4 ${
-                                        filters.daysListedType === "greater"
-                                            ? "bg-secondary"
-                                            : "bg-background"
-                                    }`}
-                                    onClick={() =>
-                                        setFilters({
-                                            ...filters,
-                                            daysListedType: "greater",
-                                        })
-                                    }
-                                >
-                                    Greater
-                                </Button>
-                                <Input
-                                    type="number"
-                                    value={filters.daysListedValue}
-                                    onChange={(e) =>
-                                        setFilters({
-                                            ...filters,
-                                            daysListedValue:
-                                                parseInt(e.target.value) || 0,
-                                        })
-                                    }
-                                    className="w-24 bg-background"
-                                />
-                            </div>
-                            <Slider
-                                value={[filters.daysListedValue]}
-                                min={0}
-                                max={30}
-                                step={1}
-                                onValueChange={(value) =>
-                                    setFilters({
-                                        ...filters,
-                                        daysListedValue: value[0],
-                                    })
-                                }
-                            />
-                        </div>
-
-                        {/* Lowest Ask Filter */}
-                        <div className="space-y-4">
-                            <div className="flex justify-between items-center">
-                                <h3 className="text-lg font-medium">
-                                    Lowest Ask
-                                </h3>
-                                <span className="text-gray-400 text-sm">
-                                    (for extended groups only)
-                                </span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <Button
-                                    variant="outline"
-                                    className={`px-4 ${
-                                        filters.lowestAsk === "lowestAsk"
-                                            ? "bg-secondary"
-                                            : "bg-background"
-                                    }`}
-                                    onClick={() =>
-                                        setFilters({
-                                            ...filters,
-                                            lowestAsk: "lowestAsk",
-                                        })
-                                    }
-                                >
-                                    Lowest Ask
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    className={`px-4 ${
-                                        filters.lowestAsk === "notLowestAsk"
-                                            ? "bg-secondary"
-                                            : "bg-background"
-                                    }`}
-                                    onClick={() =>
-                                        setFilters({
-                                            ...filters,
-                                            lowestAsk: "notLowestAsk",
-                                        })
-                                    }
-                                >
-                                    Not Lowest Ask
-                                </Button>
-                            </div>
-                        </div>
-
-                        {/* Expired Filter */}
-                        <div className="space-y-4">
-                            <div className="flex justify-between items-center">
-                                <h3 className="text-lg font-medium">Expired</h3>
-                                <span className="text-gray-400 text-sm">
-                                    (for extended groups only)
-                                </span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <Checkbox
-                                    id="expired"
-                                    checked={filters.showOnlyExpired}
-                                    onCheckedChange={(checked) =>
-                                        setFilters({
-                                            ...filters,
-                                            showOnlyExpired: checked === true,
-                                        })
-                                    }
-                                />
-                                <label
-                                    htmlFor="expired"
-                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                >
-                                    Show only expired Listings
-                                </label>
+                            <div className="space-y-3">
+                                <div>
+                                    <label className="text-sm text-gray-400 mb-1 block">
+                                        From
+                                    </label>
+                                    <Input
+                                        type="date"
+                                        value={filters.dateFrom}
+                                        onChange={(e) =>
+                                            setFilters({
+                                                ...filters,
+                                                dateFrom: e.target.value,
+                                            })
+                                        }
+                                        className="w-full bg-background"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-sm text-gray-400 mb-1 block">
+                                        To
+                                    </label>
+                                    <Input
+                                        type="date"
+                                        value={filters.dateTo}
+                                        onChange={(e) =>
+                                            setFilters({
+                                                ...filters,
+                                                dateTo: e.target.value,
+                                            })
+                                        }
+                                        className="w-full bg-background"
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
