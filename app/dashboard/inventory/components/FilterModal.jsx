@@ -13,14 +13,16 @@ import { useState } from "react";
 
 export function FilterModal({ open, onOpenChange, onApplyFilters }) {
     const [filters, setFilters] = useState({
-        id: "",
+        idFrom: "",
+        idTo: "",
         dateFrom: "",
         dateTo: "",
     });
 
     const handleReset = () => {
         setFilters({
-            id: "",
+            idFrom: "",
+            idTo: "",
             dateFrom: "",
             dateTo: "",
         });
@@ -52,39 +54,78 @@ export function FilterModal({ open, onOpenChange, onApplyFilters }) {
                         <div className="space-y-4">
                             <div className="flex justify-between items-center">
                                 <h3 className="text-lg font-medium">
-                                    Filter by ID
+                                    Filter by ID Range
                                 </h3>
                             </div>
-                            <div className="flex items-center gap-2 mb-4">
-                                <Input
-                                    type="number"
-                                    placeholder="Enter Inventory ID"
-                                    value={filters.id}
-                                    onChange={(e) => {
-                                        const value = e.target.value;
-                                        // Only allow numeric values
-                                        if (
-                                            value === "" ||
-                                            /^[0-9]+$/.test(value)
-                                        ) {
-                                            setFilters({
-                                                ...filters,
-                                                id: value,
-                                            });
-                                        }
-                                    }}
-                                    className="w-full bg-background"
-                                    onKeyDown={(e) => {
-                                        // Prevent non-numeric input including 'e'
-                                        if (
-                                            !/[0-9]|\Backspace|\Tab|\Delete|\ArrowLeft|\ArrowRight|\Home|\End/.test(
-                                                e.key
-                                            )
-                                        ) {
-                                            e.preventDefault();
-                                        }
-                                    }}
-                                />
+                            <div className="space-y-3">
+                                <div>
+                                    <label className="text-sm text-gray-400 mb-1 block">
+                                        From
+                                    </label>
+                                    <Input
+                                        type="number"
+                                        placeholder="Starting ID"
+                                        value={filters.idFrom}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            // Only allow numeric values
+                                            if (
+                                                value === "" ||
+                                                /^[0-9]+$/.test(value)
+                                            ) {
+                                                setFilters({
+                                                    ...filters,
+                                                    idFrom: value,
+                                                });
+                                            }
+                                        }}
+                                        className="w-full bg-background"
+                                        onKeyDown={(e) => {
+                                            // Prevent non-numeric input including 'e'
+                                            if (
+                                                !/[0-9]|\Backspace|\Tab|\Delete|\ArrowLeft|\ArrowRight|\Home|\End/.test(
+                                                    e.key
+                                                )
+                                            ) {
+                                                e.preventDefault();
+                                            }
+                                        }}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-sm text-gray-400 mb-1 block">
+                                        To
+                                    </label>
+                                    <Input
+                                        type="number"
+                                        placeholder="Ending ID (optional)"
+                                        value={filters.idTo}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            // Only allow numeric values
+                                            if (
+                                                value === "" ||
+                                                /^[0-9]+$/.test(value)
+                                            ) {
+                                                setFilters({
+                                                    ...filters,
+                                                    idTo: value,
+                                                });
+                                            }
+                                        }}
+                                        className="w-full bg-background"
+                                        onKeyDown={(e) => {
+                                            // Prevent non-numeric input including 'e'
+                                            if (
+                                                !/[0-9]|\Backspace|\Tab|\Delete|\ArrowLeft|\ArrowRight|\Home|\End/.test(
+                                                    e.key
+                                                )
+                                            ) {
+                                                e.preventDefault();
+                                            }
+                                        }}
+                                    />
+                                </div>
                             </div>
                         </div>
 
