@@ -17,9 +17,13 @@ const fetchInventory = async ({ page, limit, searchQuery, filters, token }) => {
 
     // Add additional filters if provided
     if (filters) {
-        // Add ID filter if provided
-        if (filters.id) {
-            queryParams.append("id", filters.id);
+        // Add ID range filters if provided
+        if (filters.idFrom) {
+            queryParams.append("idFrom", filters.idFrom);
+        }
+
+        if (filters.idTo) {
+            queryParams.append("idTo", filters.idTo);
         }
 
         // Add date range filters if provided
