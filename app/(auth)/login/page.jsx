@@ -12,7 +12,7 @@ import { SubmitButton } from "@/components/custom/submit-button";
 import { Button } from "@/components/ui/button";
 
 import AuthContainer from "@/components/auth/auth-container";
-import { GoogleIcon } from "@/components/custom/ui/soical-icons";
+// import { GoogleIcon } from "@/components/custom/ui/soical-icons";
 import { login } from "../actions";
 
 export default function LoginPage() {
@@ -98,7 +98,7 @@ export default function LoginPage() {
                         Sign in
                     </SubmitButton>
 
-                    <Button
+                    {/* <Button
                         type="button"
                         onClick={handleGoogleSignIn}
                         disabled={isGoogleLoading}
@@ -106,7 +106,7 @@ export default function LoginPage() {
                     >
                         <GoogleIcon />
                         <span className="ml-2">Sign in with Google</span>
-                    </Button>
+                    </Button> */}
                 </div>
             </AuthForm>
 
