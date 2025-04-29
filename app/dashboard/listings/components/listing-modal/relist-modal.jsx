@@ -10,179 +10,270 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { X } from "lucide-react";
 import { useState } from "react";
 
-const mockData = {
-    count: 266,
-    pageSize: 10,
-    pageNumber: 1,
-    hasNextPage: true,
-    listings: [
-        {
-            listingId: "98e2e748-8000-45bf-a624-5531d6a68318",
-            status: "ACTIVE",
-            amount: "300",
-            currencyCode: "AUD",
-            inventoryType: "STANDARD",
-            createdAt: "2021-11-09T12:44:31.000Z",
-            updatedAt: "2021-11-09T12:44:31.000Z",
-            batch: {
-                batchId: "86378f62-ad0e-4a06-9c8e-642731bb9140",
-                taskId: "7083634e-3bc5-4747-a4f3-768093074b5e",
+// Mock data for a single item with detailed market and listing data
+const mockStockXData = {
+    productDetails: {
+        name: "Nike Air Jordan 4 Retro Thunder (2023)",
+        styleId: "DH6927-017",
+        sku: "AJ4-THD-23",
+        colorway: "Black/Tour Yellow",
+        retailPrice: "$215",
+        releaseDate: "2023-05-13",
+        condition: "New",
+        size: "US 11",
+        image: "https://images.stockx.com/images/Air-Jordan-4-Retro-Thunder-2023-Product.jpg",
+    },
+    marketData: {
+        lastSale: "$268",
+        highestBid: "$260",
+        lowestAsk: "$275",
+        averageSale: "$270",
+        salesLast72Hrs: 57,
+        volatility: "+3.5%",
+        priceRange: {
+            "30days": {
+                low: "$240",
+                high: "$290",
             },
-            ask: {
-                askId: "string",
-                askCreatedAt: "2021-11-09T12:44:31.000Z",
-                askUpdatedAt: "2021-11-09T12:44:31.000Z",
-                askExpiresAt: "2021-11-09T12:44:31.000Z",
-            },
-            authenticationDetails: {
-                status: "string",
-                failureNotes: "string",
-            },
-            order: {
-                orderNumber: "string",
-                orderCreatedAt: "2021-11-09T12:44:31.000Z",
-                orderStatus: "CREATED",
-            },
-            product: {
-                productId: "bf364c53-eb77-4522-955c-6a6ce952cc6f",
-                productName: "Nike Air",
-                styleId: "FV5029-006",
-            },
-            initiatedShipments: {
-                inbound: {
-                    displayId: "string",
-                },
-            },
-            variant: {
-                variantId: "bf364c53-eb77-4522-955c-6a6ce952cc6f",
-                variantName: "color",
-                variantValue: "black",
+            "90days": {
+                low: "$210",
+                high: "$310",
             },
         },
-        // Duplicate the entry for more visual data
-        {
-            listingId: "98e2e748-8000-45bf-a624-5531d6a68319",
-            status: "ACTIVE",
-            amount: "280",
-            currencyCode: "USD",
-            inventoryType: "STANDARD",
-            createdAt: "2021-11-08T10:44:31.000Z",
-            updatedAt: "2021-11-08T10:44:31.000Z",
-            product: {
-                productId: "bf364c53-eb77-4522-955c-6a6ce952cc6f",
-                productName: "Nike Air Max 90",
-                styleId: "FV5029-008",
-            },
-            variant: {
-                variantId: "bf364c53-eb77-4522-955c-6a6ce952cc6g",
-                variantName: "color",
-                variantValue: "white",
-            },
+    },
+    listingData: {
+        status: "ACTIVE",
+        listingId: "98e2e748-8000-45bf-a624-5531d6a68318",
+        askPrice: "$259",
+        listedOn: "2023-11-09",
+        expiresOn: "2024-02-09",
+        fees: {
+            transactionFee: "$25.90",
+            paymentProcessingFee: "$5.18",
+            estimatedPayout: "$227.92",
         },
-        {
-            listingId: "98e2e748-8000-45bf-a624-5531d6a68320",
-            status: "EXPIRED",
-            amount: "320",
-            currencyCode: "EUR",
-            inventoryType: "STANDARD",
-            createdAt: "2021-11-07T09:44:31.000Z",
-            updatedAt: "2021-11-07T09:44:31.000Z",
-            product: {
-                productId: "bf364c53-eb77-4522-955c-6a6ce952cc6h",
-                productName: "Nike Dunk Low",
-                styleId: "FV5029-010",
-            },
-            variant: {
-                variantId: "bf364c53-eb77-4522-955c-6a6ce952cc6i",
-                variantName: "color",
-                variantValue: "red",
-            },
-        },
-    ],
+    },
 };
 
-const ListingItem = ({ listing, platformName }) => {
-    return (
-        <div className="border rounded-lg p-4 mb-4 hover:bg-accent/50 transition-colors">
-            <div className="flex justify-between items-start mb-2">
-                <div>
-                    <h3 className="font-semibold">
-                        {listing.product.productName}
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                        {listing.product.styleId}
-                    </p>
-                </div>
-                <Badge
-                    variant={
-                        listing.status === "ACTIVE" ? "success" : "destructive"
-                    }
-                    className="capitalize"
-                >
-                    {listing.status.toLowerCase()}
-                </Badge>
-            </div>
-
-            <div className="grid grid-cols-2 gap-x-4 gap-y-2 mt-3 text-sm">
-                <div>
-                    <span className="text-muted-foreground">Amount:</span>{" "}
-                    <span className="font-medium">
-                        {listing.amount} {listing.currencyCode}
-                    </span>
-                </div>
-                <div>
-                    <span className="text-muted-foreground">Type:</span>{" "}
-                    <span className="font-medium">{listing.inventoryType}</span>
-                </div>
-                <div>
-                    <span className="text-muted-foreground">Created:</span>{" "}
-                    <span className="font-medium">
-                        {new Date(listing.createdAt).toLocaleDateString()}
-                    </span>
-                </div>
-                {listing.variant && (
-                    <div>
-                        <span className="text-muted-foreground">
-                            {listing.variant.variantName}:
-                        </span>{" "}
-                        <span className="font-medium capitalize">
-                            {listing.variant.variantValue}
-                        </span>
-                    </div>
-                )}
-            </div>
-
-            <div className="mt-4 flex justify-end">
-                <Button
-                    size="sm"
-                    className="bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 border-none shadow-md transition-all duration-300"
-                >
-                    List this
-                </Button>
-            </div>
-        </div>
-    );
+// Mock data for Goat platform
+const mockGoatData = {
+    productDetails: {
+        name: "Nike Air Jordan 4 Retro Thunder (2023)",
+        styleId: "DH6927-017",
+        sku: "AJ4-THD-23",
+        colorway: "Black/Tour Yellow",
+        retailPrice: "$215",
+        releaseDate: "2023-05-13",
+        condition: "New",
+        size: "US 11",
+        image: "https://images.stockx.com/images/Air-Jordan-4-Retro-Thunder-2023-Product.jpg",
+    },
+    marketData: {
+        lastSale: "$265",
+        highestBid: "$258",
+        lowestAsk: "$272",
+        averageSale: "$268",
+        salesLast72Hrs: 43,
+        volatility: "+2.8%",
+        priceRange: {
+            "30days": {
+                low: "$245",
+                high: "$285",
+            },
+            "90days": {
+                low: "$220",
+                high: "$305",
+            },
+        },
+    },
+    listingData: {
+        status: "ACTIVE",
+        listingId: "76e1c548-9000-32ab-c913-6421a5b54219",
+        askPrice: "$262",
+        listedOn: "2023-11-08",
+        expiresOn: "2024-02-08",
+        fees: {
+            transactionFee: "$26.20",
+            paymentProcessingFee: "$5.24",
+            estimatedPayout: "$230.56",
+        },
+    },
 };
 
 export function RelistModal({ isOpen, onClose, product }) {
     const [activeTab, setActiveTab] = useState("stockx");
 
+    // Use product data if available, otherwise use mock data
+    const stockxData = mockStockXData;
+    const goatData = mockGoatData;
+
+    const renderSingleItem = (data, platform) => {
+        return (
+            <div className="space-y-6">
+                <div className="flex items-start gap-4">
+                    <div className="w-1/3">
+                        <img
+                            src={data.productDetails.image}
+                            alt={data.productDetails.name}
+                            className="w-full rounded-lg object-cover shadow-md"
+                        />
+                    </div>
+                    <div className="w-2/3 space-y-2">
+                        <h3 className="text-lg font-semibold">
+                            {data.productDetails.name}
+                        </h3>
+                        <div className="flex items-center gap-2">
+                            <p className="text-sm text-muted-foreground">
+                                Style: {data.productDetails.styleId}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                                Size: {data.productDetails.size}
+                            </p>
+                        </div>
+                        <Badge
+                            variant={
+                                data.listingData.status === "ACTIVE"
+                                    ? "success"
+                                    : "destructive"
+                            }
+                            className="capitalize mt-1"
+                        >
+                            {data.listingData.status.toLowerCase()}
+                        </Badge>
+                        <div className="mt-2">
+                            <p className="text-sm text-muted-foreground">
+                                Retail Price: {data.productDetails.retailPrice}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                                Release Date: {data.productDetails.releaseDate}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 pt-4 border-t">
+                    <div className="space-y-4">
+                        <h4 className="font-medium">Market Data</h4>
+                        <div className="space-y-2">
+                            <div className="flex justify-between">
+                                <span className="text-sm text-muted-foreground">
+                                    Last Sale:
+                                </span>
+                                <span className="font-medium">
+                                    {data.marketData.lastSale}
+                                </span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-sm text-muted-foreground">
+                                    Highest Bid:
+                                </span>
+                                <span className="font-medium">
+                                    {data.marketData.highestBid}
+                                </span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-sm text-muted-foreground">
+                                    Lowest Ask:
+                                </span>
+                                <span className="font-medium">
+                                    {data.marketData.lowestAsk}
+                                </span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-sm text-muted-foreground">
+                                    Sales (72h):
+                                </span>
+                                <span className="font-medium">
+                                    {data.marketData.salesLast72Hrs}
+                                </span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-sm text-muted-foreground">
+                                    Volatility:
+                                </span>
+                                <span className="font-medium text-green-600">
+                                    {data.marketData.volatility}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="space-y-4">
+                        <h4 className="font-medium">Your Listing</h4>
+                        <div className="space-y-2">
+                            <div className="flex justify-between">
+                                <span className="text-sm text-muted-foreground">
+                                    Ask Price:
+                                </span>
+                                <span className="font-medium">
+                                    {data.listingData.askPrice}
+                                </span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-sm text-muted-foreground">
+                                    Listed On:
+                                </span>
+                                <span className="font-medium">
+                                    {data.listingData.listedOn}
+                                </span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-sm text-muted-foreground">
+                                    Expires On:
+                                </span>
+                                <span className="font-medium">
+                                    {data.listingData.expiresOn}
+                                </span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-sm text-muted-foreground">
+                                    Est. Payout:
+                                </span>
+                                <span className="font-medium text-green-600">
+                                    {data.listingData.fees.estimatedPayout}
+                                </span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-sm text-muted-foreground">
+                                    Total Fees:
+                                </span>
+                                <span className="font-medium text-red-600">
+                                    {`$${(
+                                        parseFloat(
+                                            data.listingData.fees.transactionFee.replace(
+                                                "$",
+                                                ""
+                                            )
+                                        ) +
+                                        parseFloat(
+                                            data.listingData.fees.paymentProcessingFee.replace(
+                                                "$",
+                                                ""
+                                            )
+                                        )
+                                    ).toFixed(2)}`}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="pt-6 flex justify-end">
+                    <Button className="bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 border-none shadow-md transition-all duration-300">
+                        List on {platform}
+                    </Button>
+                </div>
+            </div>
+        );
+    };
+
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-[600px] max-h-[85vh] flex flex-col ">
+            <DialogContent className="sm:max-w-[650px] max-h-[85vh] flex flex-col">
                 <DialogHeader className="flex flex-row items-center justify-between">
                     <DialogTitle>Relist Options</DialogTitle>
-                    {/* <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={onClose}
-                        className="h-8 w-8 p-0"
-                    >
-                        <X className="h-4 w-4" />
-                    </Button> */}
                 </DialogHeader>
 
                 <Tabs
@@ -200,37 +291,13 @@ export function RelistModal({ isOpen, onClose, product }) {
 
                     <TabsContent value="stockx" className="mt-4">
                         <ScrollArea className="max-h-[60vh] pr-4 overflow-y-auto">
-                            <div className="space-y-4">
-                                <p className="text-sm text-muted-foreground mb-4">
-                                    Select a StockX listing to relist your
-                                    product:
-                                </p>
-                                {mockData.listings.map((listing) => (
-                                    <ListingItem
-                                        key={listing.listingId}
-                                        listing={listing}
-                                        platformName="StockX"
-                                    />
-                                ))}
-                            </div>
+                            {renderSingleItem(stockxData, "StockX")}
                         </ScrollArea>
                     </TabsContent>
 
                     <TabsContent value="goat" className="mt-4">
                         <ScrollArea className="max-h-[60vh] pr-4 overflow-y-auto">
-                            <div className="space-y-4">
-                                <p className="text-sm text-muted-foreground mb-4">
-                                    Select a Goat listing to relist your
-                                    product:
-                                </p>
-                                {mockData.listings.map((listing) => (
-                                    <ListingItem
-                                        key={listing.listingId}
-                                        listing={listing}
-                                        platformName="Goat"
-                                    />
-                                ))}
-                            </div>
+                            {renderSingleItem(goatData, "GOAT")}
                         </ScrollArea>
                     </TabsContent>
                 </Tabs>
