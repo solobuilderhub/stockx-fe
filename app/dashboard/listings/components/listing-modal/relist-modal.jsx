@@ -43,17 +43,58 @@ const mockStockXData = {
             },
         },
     },
-    listingData: {
-        status: "ACTIVE",
-        listingId: "98e2e748-8000-45bf-a624-5531d6a68318",
-        askPrice: "$259",
-        listedOn: "2023-11-09",
-        expiresOn: "2024-02-09",
-        fees: {
-            transactionFee: "$25.90",
-            paymentProcessingFee: "$5.18",
-            estimatedPayout: "$227.92",
-        },
+    listingsData: {
+        count: 3,
+        listings: [
+            {
+                listingId: "98e2e748-8000-45bf-a624-5531d6a68318",
+                status: "ACTIVE",
+                amount: "259",
+                currencyCode: "USD",
+                createdAt: "2023-11-09T12:44:31.000Z",
+                updatedAt: "2023-11-09T12:44:31.000Z",
+                ask: {
+                    askExpiresAt: "2024-02-09T12:44:31.000Z",
+                },
+                fees: {
+                    transactionFee: "$25.90",
+                    paymentProcessingFee: "$5.18",
+                    estimatedPayout: "$227.92",
+                },
+            },
+            {
+                listingId: "76e5c748-9060-42bf-b624-5762d6a69428",
+                status: "ACTIVE",
+                amount: "265",
+                currencyCode: "USD",
+                createdAt: "2023-10-25T10:22:15.000Z",
+                updatedAt: "2023-10-25T10:22:15.000Z",
+                ask: {
+                    askExpiresAt: "2024-01-25T10:22:15.000Z",
+                },
+                fees: {
+                    transactionFee: "$26.50",
+                    paymentProcessingFee: "$5.30",
+                    estimatedPayout: "$233.20",
+                },
+            },
+            {
+                listingId: "34a7f842-7130-40af-c714-3351e4a59217",
+                status: "EXPIRED",
+                amount: "255",
+                currencyCode: "USD",
+                createdAt: "2023-08-17T15:36:42.000Z",
+                updatedAt: "2023-08-17T15:36:42.000Z",
+                ask: {
+                    askExpiresAt: "2023-11-17T15:36:42.000Z",
+                },
+                fees: {
+                    transactionFee: "$25.50",
+                    paymentProcessingFee: "$5.10",
+                    estimatedPayout: "$224.40",
+                },
+            },
+        ],
     },
 };
 
@@ -88,17 +129,58 @@ const mockGoatData = {
             },
         },
     },
-    listingData: {
-        status: "ACTIVE",
-        listingId: "76e1c548-9000-32ab-c913-6421a5b54219",
-        askPrice: "$262",
-        listedOn: "2023-11-08",
-        expiresOn: "2024-02-08",
-        fees: {
-            transactionFee: "$26.20",
-            paymentProcessingFee: "$5.24",
-            estimatedPayout: "$230.56",
-        },
+    listingsData: {
+        count: 3,
+        listings: [
+            {
+                listingId: "76e1c548-9000-32ab-c913-6421a5b54219",
+                status: "ACTIVE",
+                amount: "262",
+                currencyCode: "USD",
+                createdAt: "2023-11-08T09:18:45.000Z",
+                updatedAt: "2023-11-08T09:18:45.000Z",
+                ask: {
+                    askExpiresAt: "2024-02-08T09:18:45.000Z",
+                },
+                fees: {
+                    transactionFee: "$26.20",
+                    paymentProcessingFee: "$5.24",
+                    estimatedPayout: "$230.56",
+                },
+            },
+            {
+                listingId: "54b2d639-8140-39ac-d724-7532c4b64329",
+                status: "ACTIVE",
+                amount: "270",
+                currencyCode: "USD",
+                createdAt: "2023-10-15T14:25:36.000Z",
+                updatedAt: "2023-10-15T14:25:36.000Z",
+                ask: {
+                    askExpiresAt: "2024-01-15T14:25:36.000Z",
+                },
+                fees: {
+                    transactionFee: "$27.00",
+                    paymentProcessingFee: "$5.40",
+                    estimatedPayout: "$237.60",
+                },
+            },
+            {
+                listingId: "29c4e742-6230-37af-b614-2451d3a48116",
+                status: "INACTIVE",
+                amount: "260",
+                currencyCode: "USD",
+                createdAt: "2023-09-05T11:42:18.000Z",
+                updatedAt: "2023-09-05T11:42:18.000Z",
+                ask: {
+                    askExpiresAt: "2023-12-05T11:42:18.000Z",
+                },
+                fees: {
+                    transactionFee: "$26.00",
+                    paymentProcessingFee: "$5.20",
+                    estimatedPayout: "$228.80",
+                },
+            },
+        ],
     },
 };
 
@@ -132,16 +214,6 @@ export function RelistModal({ isOpen, onClose, product }) {
                                 Size: {data.productDetails.size}
                             </p>
                         </div>
-                        <Badge
-                            variant={
-                                data.listingData.status === "ACTIVE"
-                                    ? "success"
-                                    : "destructive"
-                            }
-                            className="capitalize mt-1"
-                        >
-                            {data.listingData.status.toLowerCase()}
-                        </Badge>
                         <div className="mt-2">
                             <p className="text-sm text-muted-foreground">
                                 Retail Price: {data.productDetails.retailPrice}
@@ -153,116 +225,171 @@ export function RelistModal({ isOpen, onClose, product }) {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 pt-4 border-t">
-                    <div className="space-y-4">
-                        <h4 className="font-medium">Market Data</h4>
-                        <div className="space-y-2">
-                            <div className="flex justify-between">
-                                <span className="text-sm text-muted-foreground">
-                                    Last Sale:
-                                </span>
-                                <span className="font-medium">
-                                    {data.marketData.lastSale}
-                                </span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-sm text-muted-foreground">
-                                    Highest Bid:
-                                </span>
-                                <span className="font-medium">
-                                    {data.marketData.highestBid}
-                                </span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-sm text-muted-foreground">
-                                    Lowest Ask:
-                                </span>
-                                <span className="font-medium">
-                                    {data.marketData.lowestAsk}
-                                </span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-sm text-muted-foreground">
-                                    Sales (72h):
-                                </span>
-                                <span className="font-medium">
-                                    {data.marketData.salesLast72Hrs}
-                                </span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-sm text-muted-foreground">
-                                    Volatility:
-                                </span>
-                                <span className="font-medium text-green-600">
-                                    {data.marketData.volatility}
-                                </span>
-                            </div>
+                <div className="pt-4 border-t">
+                    <h4 className="font-medium mb-4">Market Data</h4>
+                    <div className="grid grid-cols-2 gap-x-8 gap-y-2">
+                        <div className="flex justify-between">
+                            <span className="text-sm text-muted-foreground">
+                                Last Sale:
+                            </span>
+                            <span className="font-medium">
+                                {data.marketData.lastSale}
+                            </span>
                         </div>
-                    </div>
-
-                    <div className="space-y-4">
-                        <h4 className="font-medium">Your Listing</h4>
-                        <div className="space-y-2">
-                            <div className="flex justify-between">
-                                <span className="text-sm text-muted-foreground">
-                                    Ask Price:
-                                </span>
-                                <span className="font-medium">
-                                    {data.listingData.askPrice}
-                                </span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-sm text-muted-foreground">
-                                    Listed On:
-                                </span>
-                                <span className="font-medium">
-                                    {data.listingData.listedOn}
-                                </span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-sm text-muted-foreground">
-                                    Expires On:
-                                </span>
-                                <span className="font-medium">
-                                    {data.listingData.expiresOn}
-                                </span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-sm text-muted-foreground">
-                                    Est. Payout:
-                                </span>
-                                <span className="font-medium text-green-600">
-                                    {data.listingData.fees.estimatedPayout}
-                                </span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-sm text-muted-foreground">
-                                    Total Fees:
-                                </span>
-                                <span className="font-medium text-red-600">
-                                    {`$${(
-                                        parseFloat(
-                                            data.listingData.fees.transactionFee.replace(
-                                                "$",
-                                                ""
-                                            )
-                                        ) +
-                                        parseFloat(
-                                            data.listingData.fees.paymentProcessingFee.replace(
-                                                "$",
-                                                ""
-                                            )
-                                        )
-                                    ).toFixed(2)}`}
-                                </span>
-                            </div>
+                        <div className="flex justify-between">
+                            <span className="text-sm text-muted-foreground">
+                                Highest Bid:
+                            </span>
+                            <span className="font-medium">
+                                {data.marketData.highestBid}
+                            </span>
+                        </div>
+                        <div className="flex justify-between">
+                            <span className="text-sm text-muted-foreground">
+                                Lowest Ask:
+                            </span>
+                            <span className="font-medium">
+                                {data.marketData.lowestAsk}
+                            </span>
+                        </div>
+                        <div className="flex justify-between">
+                            <span className="text-sm text-muted-foreground">
+                                Average Sale:
+                            </span>
+                            <span className="font-medium">
+                                {data.marketData.averageSale}
+                            </span>
+                        </div>
+                        <div className="flex justify-between">
+                            <span className="text-sm text-muted-foreground">
+                                Sales (72h):
+                            </span>
+                            <span className="font-medium">
+                                {data.marketData.salesLast72Hrs}
+                            </span>
+                        </div>
+                        <div className="flex justify-between">
+                            <span className="text-sm text-muted-foreground">
+                                Volatility:
+                            </span>
+                            <span className="font-medium text-green-600">
+                                {data.marketData.volatility}
+                            </span>
                         </div>
                     </div>
                 </div>
 
+                <div className="pt-4 border-t">
+                    <h4 className="font-medium mb-4">
+                        Your Listings ({data.listingsData.count})
+                    </h4>
+
+                    {data.listingsData.listings.map((listing, index) => (
+                        <div
+                            key={listing.listingId}
+                            className={`p-4 rounded-lg border mb-4 ${
+                                index === 0 ? "border-blue-200" : ""
+                            }`}
+                        >
+                            <div className="flex justify-between items-center mb-3">
+                                <Badge
+                                    variant={
+                                        listing.status === "ACTIVE"
+                                            ? "success"
+                                            : "destructive"
+                                    }
+                                    className="capitalize"
+                                >
+                                    {listing.status.toLowerCase()}
+                                </Badge>
+                                {index === 0 && (
+                                    <span className="text-xs text-blue-600 font-medium">
+                                        Most Recent
+                                    </span>
+                                )}
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-x-8 gap-y-2">
+                                <div className="flex justify-between">
+                                    <span className="text-sm text-muted-foreground">
+                                        Ask Price:
+                                    </span>
+                                    <span className="font-medium">
+                                        ${listing.amount}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-sm text-muted-foreground">
+                                        Listed On:
+                                    </span>
+                                    <span className="font-medium">
+                                        {new Date(
+                                            listing.createdAt
+                                        ).toLocaleDateString()}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-sm text-muted-foreground">
+                                        Expires On:
+                                    </span>
+                                    <span className="font-medium">
+                                        {new Date(
+                                            listing.ask.askExpiresAt
+                                        ).toLocaleDateString()}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-sm text-muted-foreground">
+                                        Est. Payout:
+                                    </span>
+                                    <span className="font-medium text-green-600">
+                                        {listing.fees.estimatedPayout}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-sm text-muted-foreground">
+                                        Total Fees:
+                                    </span>
+                                    <span className="font-medium text-red-600">
+                                        {`$${(
+                                            parseFloat(
+                                                listing.fees.transactionFee.replace(
+                                                    "$",
+                                                    ""
+                                                )
+                                            ) +
+                                            parseFloat(
+                                                listing.fees.paymentProcessingFee.replace(
+                                                    "$",
+                                                    ""
+                                                )
+                                            )
+                                        ).toFixed(2)}`}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* <div className="mt-3 flex justify-end">
+                                {listing.status === "ACTIVE" ? (
+                                    <Button variant="outline" size="sm">
+                                        Cancel Listing
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        size="sm"
+                                        className="bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 border-none shadow-md transition-all duration-300"
+                                    >
+                                        Relist
+                                    </Button>
+                                )}
+                            </div> */}
+                        </div>
+                    ))}
+                </div>
+
                 <div className="pt-6 flex justify-end">
                     <Button className="bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 border-none shadow-md transition-all duration-300">
-                        List on {platform}
+                        Create New Listing on {platform}
                     </Button>
                 </div>
             </div>
@@ -271,7 +398,7 @@ export function RelistModal({ isOpen, onClose, product }) {
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-[650px] max-h-[85vh] flex flex-col">
+            <DialogContent className="sm:max-w-[850px] max-h-[85vh] flex flex-col">
                 <DialogHeader className="flex flex-row items-center justify-between">
                     <DialogTitle>Relist Options</DialogTitle>
                 </DialogHeader>
