@@ -194,8 +194,8 @@ export function RelistModal({ isOpen, onClose, product }) {
     const renderSingleItem = (data, platform) => {
         return (
             <div className="space-y-6">
-                <div className="flex items-start gap-4">
-                    <div className="w-1/3">
+                <div className="flex items-center gap-4">
+                    <div className="w-1/5">
                         <img
                             src={data.productDetails.image}
                             alt={data.productDetails.name}
