@@ -11,6 +11,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
+import { CreateListingModal } from "./create-listing-modal";
 
 // Mock data for a single item with detailed market and listing data
 const mockStockXData = {
@@ -186,10 +187,17 @@ const mockGoatData = {
 
 export function RelistModal({ isOpen, onClose, product }) {
     const [activeTab, setActiveTab] = useState("stockx");
+    const [createListingOpen, setCreateListingOpen] = useState(false);
+    const [selectedPlatform, setSelectedPlatform] = useState("");
 
     // Use product data if available, otherwise use mock data
     const stockxData = mockStockXData;
     const goatData = mockGoatData;
+
+    const handleCreateListingClick = (platform) => {
+        setSelectedPlatform(platform);
+        setCreateListingOpen(true);
+    };
 
     const renderSingleItem = (data, platform) => {
         return (
@@ -388,7 +396,10 @@ export function RelistModal({ isOpen, onClose, product }) {
                 </div>
 
                 <div className="pt-6 flex justify-end">
-                    <Button className="bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 border-none shadow-md transition-all duration-300">
+                    <Button
+                        className="bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 border-none shadow-md transition-all duration-300"
+                        onClick={() => handleCreateListingClick(platform)}
+                    >
                         Create New Listing on {platform}
                     </Button>
                 </div>
@@ -397,38 +408,48 @@ export function RelistModal({ isOpen, onClose, product }) {
     };
 
     return (
-        <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-[850px] max-h-[85vh] flex flex-col">
-                <DialogHeader className="flex flex-row items-center justify-between">
-                    <DialogTitle>Relist Options</DialogTitle>
-                </DialogHeader>
+        <>
+            <Dialog open={isOpen} onOpenChange={onClose}>
+                <DialogContent className="sm:max-w-[850px] max-h-[85vh] flex flex-col">
+                    <DialogHeader className="flex flex-row items-center justify-between">
+                        <DialogTitle>Relist Options</DialogTitle>
+                    </DialogHeader>
 
-                <Tabs
-                    defaultValue="stockx"
-                    className="w-full"
-                    value={activeTab}
-                    onValueChange={setActiveTab}
-                >
-                    <TabsList className="grid w-full grid-cols-2">
-                        <TabsTrigger value="stockx">
-                            StockX Listings
-                        </TabsTrigger>
-                        <TabsTrigger value="goat">Goat Listings</TabsTrigger>
-                    </TabsList>
+                    <Tabs
+                        defaultValue="stockx"
+                        className="w-full"
+                        value={activeTab}
+                        onValueChange={setActiveTab}
+                    >
+                        <TabsList className="grid w-full grid-cols-2">
+                            <TabsTrigger value="stockx">
+                                StockX Listings
+                            </TabsTrigger>
+                            <TabsTrigger value="goat">
+                                Goat Listings
+                            </TabsTrigger>
+                        </TabsList>
 
-                    <TabsContent value="stockx" className="mt-4">
-                        <ScrollArea className="max-h-[60vh] pr-4 overflow-y-auto">
-                            {renderSingleItem(stockxData, "StockX")}
-                        </ScrollArea>
-                    </TabsContent>
+                        <TabsContent value="stockx" className="mt-4">
+                            <ScrollArea className="max-h-[60vh] pr-4 overflow-y-auto">
+                                {renderSingleItem(stockxData, "StockX")}
+                            </ScrollArea>
+                        </TabsContent>
 
-                    <TabsContent value="goat" className="mt-4">
-                        <ScrollArea className="max-h-[60vh] pr-4 overflow-y-auto">
-                            {renderSingleItem(goatData, "GOAT")}
-                        </ScrollArea>
-                    </TabsContent>
-                </Tabs>
-            </DialogContent>
-        </Dialog>
+                        <TabsContent value="goat" className="mt-4">
+                            <ScrollArea className="max-h-[60vh] pr-4 overflow-y-auto">
+                                {renderSingleItem(goatData, "GOAT")}
+                            </ScrollArea>
+                        </TabsContent>
+                    </Tabs>
+                </DialogContent>
+            </Dialog>
+
+            <CreateListingModal
+                isOpen={createListingOpen}
+                onClose={() => setCreateListingOpen(false)}
+                platform={selectedPlatform}
+            />
+        </>
     );
 }
