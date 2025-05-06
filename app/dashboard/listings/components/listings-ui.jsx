@@ -158,6 +158,7 @@ export function ListingsUI({ token, initialPage = 1, initialStatus = "" }) {
 
                 <ErrorBoundaryWrapper>
                     <DataTable
+                        className="overflow-x-auto"
                         columns={columns(
                             token,
                             handleViewDetails,
