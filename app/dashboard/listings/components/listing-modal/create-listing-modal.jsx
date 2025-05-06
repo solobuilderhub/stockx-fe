@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
 import {
     Dialog,
     DialogClose,
@@ -19,11 +18,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover";
-import {
     Select,
     SelectContent,
     SelectItem,
@@ -31,7 +25,6 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 
 export function CreateListingModal({ isOpen, onClose, platform }) {
@@ -112,34 +105,30 @@ export function CreateListingModal({ isOpen, onClose, platform }) {
                             render={({ field }) => (
                                 <FormItem className="flex flex-col">
                                     <FormLabel>Expires At</FormLabel>
-                                    <Popover>
-                                        <PopoverTrigger asChild>
-                                            <FormControl>
-                                                <Button
-                                                    variant="outline"
-                                                    className="justify-start text-left font-normal"
-                                                >
-                                                    <CalendarIcon className="mr-2 h-4 w-4" />
-                                                    {field.value ? (
-                                                        format(
-                                                            field.value,
-                                                            "PPP"
-                                                        )
-                                                    ) : (
-                                                        <span>Pick a date</span>
-                                                    )}
-                                                </Button>
-                                            </FormControl>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-auto p-0">
-                                            <Calendar
-                                                mode="single"
-                                                selected={field.value}
-                                                onSelect={field.onChange}
-                                                initialFocus
-                                            />
-                                        </PopoverContent>
-                                    </Popover>
+                                    <FormControl>
+                                        <Input
+                                            type="date"
+                                            {...field}
+                                            value={
+                                                field.value
+                                                    ? format(
+                                                          field.value,
+                                                          "yyyy-MM-dd"
+                                                      )
+                                                    : format(
+                                                          new Date(),
+                                                          "yyyy-MM-dd"
+                                                      )
+                                            }
+                                            onChange={(e) => {
+                                                const date = new Date(
+                                                    e.target.value
+                                                );
+                                                field.onChange(date);
+                                            }}
+                                            className="w-full"
+                                        />
+                                    </FormControl>
                                 </FormItem>
                             )}
                         />
