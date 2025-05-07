@@ -1,5 +1,6 @@
 "use client";
 
+import { useListingBucket } from "@/app/context/listing-bucket-context";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,6 +12,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
+import { toast } from "sonner";
 import { CreateListingModal } from "./create-listing-modal";
 
 // Mock data for a single item with detailed market and listing data
@@ -130,6 +132,29 @@ const mockGoatData = {
             },
         },
     },
+    recentSales: [
+        {
+            purchased_at: "2025-05-07T06:05:55.579Z",
+            price_cents: "7100",
+            size: 10,
+            consigned: false,
+            catalog_id: "air-jordan-4-retro-thunder-2023",
+        },
+        {
+            purchased_at: "2025-05-07T05:33:17.430Z",
+            price_cents: "8300",
+            size: 10.5,
+            consigned: false,
+            catalog_id: "air-jordan-4-retro-thunder-2023",
+        },
+        {
+            purchased_at: "2025-05-07T04:47:33.117Z",
+            price_cents: "8300",
+            size: 6,
+            consigned: false,
+            catalog_id: "air-jordan-4-retro-thunder-2023",
+        },
+    ],
     listingsData: {
         count: 3,
         listings: [
@@ -189,6 +214,7 @@ export function RelistModal({ isOpen, onClose, product }) {
     const [activeTab, setActiveTab] = useState("stockx");
     const [createListingOpen, setCreateListingOpen] = useState(false);
     const [selectedPlatform, setSelectedPlatform] = useState("");
+    const { bucketItems, addToBucket, removeFromBucket } = useListingBucket();
 
     // Use product data if available, otherwise use mock data
     const stockxData = mockStockXData;
@@ -199,7 +225,40 @@ export function RelistModal({ isOpen, onClose, product }) {
         setCreateListingOpen(true);
     };
 
+    const handleBucketAction = (platform) => {
+        const data = platform === "StockX" ? stockxData : goatData;
+        const listingId = data.listingsData.listings[0].listingId;
+
+        // Check if item is already in bucket
+        const isInBucket = bucketItems.some(
+            (item) => item.listingId === listingId
+        );
+
+        if (isInBucket) {
+            // Remove from bucket
+            removeFromBucket(listingId);
+            toast.success(`Item removed from Listing Bucket`);
+        } else {
+            // Add to bucket
+            const itemToAdd = {
+                id: Date.now().toString(), // Generate a unique ID
+                platform,
+                listingId: listingId,
+                productDetails: data.productDetails,
+                marketData: data.marketData,
+                listingData: data.listingsData.listings[0],
+            };
+            addToBucket(itemToAdd);
+            toast.success(`Item added to Listing Bucket`);
+        }
+    };
+
     const renderSingleItem = (data, platform) => {
+        // Check if the current item is in the bucket
+        const isInBucket = bucketItems.some(
+            (item) => item.listingId === data.listingsData.listings[0].listingId
+        );
+
         return (
             <div className="space-y-6">
                 <div className="flex items-center gap-4">
@@ -286,6 +345,61 @@ export function RelistModal({ isOpen, onClose, product }) {
                         </div>
                     </div>
                 </div>
+
+                {platform === "GOAT" && data.recentSales && (
+                    <div className="pt-4 border-t">
+                        <h4 className="font-medium mb-4">Recent Sales (3)</h4>
+                        <div className="space-y-3">
+                            {data.recentSales.map((sale, index) => (
+                                <div
+                                    key={index}
+                                    className="p-3 rounded-lg border border-gray-200"
+                                >
+                                    <div className="grid grid-cols-3 gap-x-4">
+                                        <div>
+                                            <span className="text-sm text-muted-foreground block">
+                                                Date
+                                            </span>
+                                            <span className="font-medium">
+                                                {new Date(
+                                                    sale.purchased_at
+                                                ).toLocaleString()}
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <span className="text-sm text-muted-foreground block">
+                                                Price
+                                            </span>
+                                            <span className="font-medium">
+                                                $
+                                                {(
+                                                    parseInt(sale.price_cents) /
+                                                    100
+                                                ).toFixed(2)}
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <span className="text-sm text-muted-foreground block">
+                                                Size
+                                            </span>
+                                            <span className="font-medium">
+                                                US {sale.size}
+                                            </span>
+                                            {sale.consigned && (
+                                                <Badge
+                                                    className="ml-2 text-xs"
+                                                    variant="outline"
+                                                >
+                                                    Consigned
+                                                </Badge>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
                 <div className="pt-4 border-t">
                     <h4 className="font-medium mb-4">
@@ -376,32 +490,31 @@ export function RelistModal({ isOpen, onClose, product }) {
                                     </span>
                                 </div>
                             </div>
-
-                            {/* <div className="mt-3 flex justify-end">
-                                {listing.status === "ACTIVE" ? (
-                                    <Button variant="outline" size="sm">
-                                        Cancel Listing
-                                    </Button>
-                                ) : (
-                                    <Button
-                                        size="sm"
-                                        className="bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 border-none shadow-md transition-all duration-300"
-                                    >
-                                        Relist
-                                    </Button>
-                                )}
-                            </div> */}
                         </div>
                     ))}
                 </div>
 
                 <div className="pt-6 flex justify-end">
-                    <Button
-                        className="bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 border-none shadow-md transition-all duration-300"
-                        onClick={() => handleCreateListingClick(platform)}
-                    >
-                        Create New Listing on {platform}
-                    </Button>
+                    <div className="flex items-center gap-2">
+                        <Button
+                            className={`${
+                                isInBucket
+                                    ? "bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600"
+                                    : "bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
+                            } text-white border-none shadow-md transition-all duration-300`}
+                            onClick={() => handleBucketAction(platform)}
+                        >
+                            {isInBucket
+                                ? "Remove from Bucket"
+                                : "Add to Listing Bucket"}
+                        </Button>
+                        <Button
+                            className="bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 border-none shadow-md transition-all duration-300"
+                            onClick={() => handleCreateListingClick(platform)}
+                        >
+                            Create New Listing on {platform}
+                        </Button>
+                    </div>
                 </div>
             </div>
         );

@@ -149,7 +149,7 @@ export function ListingsUI({ token, initialPage = 1, initialStatus = "" }) {
 
                         <Button className="gap-1.5 bg-green-600 hover:bg-green-700">
                             <Plus size={16} />
-                            List Items
+                            Bulk List Items
                         </Button>
                     </div>
                 </div>
