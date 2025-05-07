@@ -17,6 +17,7 @@ import { useState } from "react";
 import { useListings } from "../hooks/useListings";
 import { ListingTabs } from "./ListingTabs";
 import { columns } from "./columns";
+import { BulkListingModal } from "./listing-modal/bulk-listing-modal";
 import { RelistModal } from "./listing-modal/relist-modal";
 import { OrderDetailsSheet } from "./order-details-sheet";
 
@@ -36,6 +37,9 @@ export function ListingsUI({ token, initialPage = 1, initialStatus = "" }) {
     // State for relist modal
     const [isRelistModalOpen, setIsRelistModalOpen] = useState(false);
     const [selectedRelistItem, setSelectedRelistItem] = useState(null);
+
+    // State for bulk listing modal
+    const [isBulkListingModalOpen, setIsBulkListingModalOpen] = useState(false);
 
     // Advanced filters
     const [priceRange, setPriceRange] = useState({ min: "", max: "" });
@@ -147,7 +151,10 @@ export function ListingsUI({ token, initialPage = 1, initialStatus = "" }) {
                             />
                         </div>
 
-                        <Button className="gap-1.5 bg-green-600 hover:bg-green-700">
+                        <Button
+                            className="gap-1.5 bg-green-600 hover:bg-green-700"
+                            onClick={() => setIsBulkListingModalOpen(true)}
+                        >
                             <Plus size={16} />
                             Bulk List Items
                         </Button>
@@ -191,6 +198,12 @@ export function ListingsUI({ token, initialPage = 1, initialStatus = "" }) {
                 isOpen={isRelistModalOpen}
                 onClose={() => setIsRelistModalOpen(false)}
                 product={selectedRelistItem}
+            />
+
+            {/* Bulk Listing Modal */}
+            <BulkListingModal
+                isOpen={isBulkListingModalOpen}
+                onClose={() => setIsBulkListingModalOpen(false)}
             />
         </div>
     );
