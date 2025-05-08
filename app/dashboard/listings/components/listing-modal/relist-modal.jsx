@@ -506,7 +506,7 @@ export function RelistModal({ isOpen, onClose, product }) {
                         >
                             {isInBucket
                                 ? "Remove from Bucket"
-                                : "Add to Listing Bucket"}
+                                : "Add to Bulk Listing"}
                         </Button>
                         <Button
                             className="bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 border-none shadow-md transition-all duration-300"
