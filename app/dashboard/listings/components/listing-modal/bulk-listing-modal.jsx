@@ -103,6 +103,7 @@ export function BulkListingModal({ isOpen, onClose }) {
                                 <TableHead>Amount</TableHead>
                                 <TableHead>Variant ID</TableHead>
                                 <TableHead>Currency</TableHead>
+                                <TableHead>Platform</TableHead>
                                 <TableHead>Active</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -130,12 +131,55 @@ export function BulkListingModal({ isOpen, onClose }) {
                                                     alt={
                                                         item.productDetails.name
                                                     }
-                                                    className="object-contain w-full h-full rounded-md"
+                                                    className="object-contain w-full h-full"
                                                 />
                                             </div>
                                         </TableCell>
-                                        <TableCell className="max-w-[200px] truncate font-medium">
-                                            {item.productDetails.name}
+                                        <TableCell className="max-w-[200px] font-medium">
+                                            {item.productDetails.name.length >
+                                            35
+                                                ? (() => {
+                                                      const name =
+                                                          item.productDetails
+                                                              .name;
+
+                                                      // Try to find natural breaking points like parentheses or spaces
+                                                      const parenIndex = name
+                                                          .substring(0, 35)
+                                                          .lastIndexOf("(");
+                                                      const lastSpaceIndex =
+                                                          name
+                                                              .substring(0, 35)
+                                                              .lastIndexOf(" ");
+
+                                                      // Prioritize breaking at parentheses, then spaces
+                                                      let breakIndex;
+                                                      if (parenIndex > 0) {
+                                                          breakIndex =
+                                                              parenIndex;
+                                                      } else if (
+                                                          lastSpaceIndex > 0
+                                                      ) {
+                                                          breakIndex =
+                                                              lastSpaceIndex;
+                                                      } else {
+                                                          breakIndex = 35;
+                                                      }
+
+                                                      return (
+                                                          <div>
+                                                              {name.substring(
+                                                                  0,
+                                                                  breakIndex
+                                                              )}
+                                                              <br />
+                                                              {name.substring(
+                                                                  breakIndex
+                                                              )}
+                                                          </div>
+                                                      );
+                                                  })()
+                                                : item.productDetails.name}
                                         </TableCell>
                                         <TableCell>
                                             {item.productDetails.retailPrice}
@@ -187,6 +231,11 @@ export function BulkListingModal({ isOpen, onClose }) {
                                                 disabled
                                                 className="w-20 bg-muted"
                                             />
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="w-16">
+                                                {item.platform}
+                                            </div>
                                         </TableCell>
                                         <TableCell>
                                             <Select

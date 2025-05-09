@@ -16,8 +16,9 @@ import {
     useSidebar,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
-import { BadgeCheck, ChevronsUpDown, LogOut } from "lucide-react";
+import { ChevronsUpDown, CircleUserRound, LogOut } from "lucide-react";
 import { signOut } from "next-auth/react";
+import Link from "next/link";
 
 function getUserInitials(name) {
     if (!name) return "?";
@@ -97,8 +98,13 @@ export function NavUser({ user }) {
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
                             <DropdownMenuItem>
-                                <BadgeCheck className="mr-2 h-4 w-4" />
-                                Account
+                                <Link
+                                    href="/dashboard/profile"
+                                    className="w-full flex items-center"
+                                >
+                                    <CircleUserRound className="mr-2 h-4 w-4" />
+                                    Account
+                                </Link>
                             </DropdownMenuItem>
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
