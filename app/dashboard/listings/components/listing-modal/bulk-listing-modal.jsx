@@ -115,8 +115,8 @@ export function BulkListingModal({ isOpen, onClose }) {
                                         colSpan={9}
                                         className="text-center py-8"
                                     >
-                                        No items in the listing bucket. Add
-                                        items from your listings.
+                                        No items in the bulk listing. Add items
+                                        from your listings.
                                     </TableCell>
                                 </TableRow>
                             ) : (
