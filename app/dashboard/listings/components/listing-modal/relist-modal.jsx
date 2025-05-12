@@ -225,7 +225,7 @@ export function RelistModal({ isOpen, onClose, product }) {
         setCreateListingOpen(true);
     };
 
-    const handleBucketAction = (platform) => {
+    const handleBulkListingAction = (platform) => {
         const data = platform === "StockX" ? stockxData : goatData;
         const listingId = data.listingsData.listings[0].listingId;
 
@@ -502,10 +502,10 @@ export function RelistModal({ isOpen, onClose, product }) {
                                     ? "bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600"
                                     : "bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
                             } text-white border-none shadow-md transition-all duration-300`}
-                            onClick={() => handleBucketAction(platform)}
+                            onClick={() => handleBulkListingAction(platform)}
                         >
                             {isInBucket
-                                ? "Remove from Bucket"
+                                ? "Remove from Bulk Listing"
                                 : "Add to Bulk Listing"}
                         </Button>
                         <Button

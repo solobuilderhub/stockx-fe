@@ -25,11 +25,12 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
+import { Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export function BulkListingModal({ isOpen, onClose }) {
-    const { bucketItems, clearBucket } = useListingBucket();
+    const { bucketItems, clearBucket, removeFromBucket } = useListingBucket();
     const [listingData, setListingData] = useState([]);
 
     // Initialize or update listingData when bucketItems changes
@@ -264,6 +265,15 @@ export function BulkListingModal({ isOpen, onClose }) {
                                                     </SelectItem>
                                                 </SelectContent>
                                             </Select>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Trash2
+                                                size={16}
+                                                className="hover:text-red-500 cursor-pointer"
+                                                onClick={() =>
+                                                    removeFromBucket(item.id)
+                                                }
+                                            />
                                         </TableCell>
                                     </TableRow>
                                 ))

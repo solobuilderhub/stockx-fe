@@ -23,9 +23,11 @@ export function ListingBucketProvider({ children }) {
         }
     };
 
-    const removeFromBucket = (listingId) => {
+    const removeFromBucket = (idOrListingId) => {
+        // Support removal by both id and listingId
         const newBucketItems = bucketItems.filter(
-            (item) => item.listingId !== listingId
+            (item) =>
+                item.id !== idOrListingId && item.listingId !== idOrListingId
         );
         setBucketItems(newBucketItems);
         console.log(
