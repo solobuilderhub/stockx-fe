@@ -1,9 +1,9 @@
 // components/auth/login-form.jsx
+import { cn } from "@/lib/utils";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { useState } from "react";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import { cn } from "@/lib/utils";
 
 export function LoginForm({ defaultEmail = "", onValidityChange }) {
     const [showPassword, setShowPassword] = useState(false);
@@ -20,17 +20,23 @@ export function LoginForm({ defaultEmail = "", onValidityChange }) {
         <div className="flex flex-col space-y-4">
             <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                    <div className={cn(
-                        "p-1.5 rounded-full transition-colors duration-200",
-                        focused === "email" ? "bg-primary/15 text-primary" : "text-muted-foreground"
-                    )}>
+                    <div
+                        className={cn(
+                            "p-1.5 rounded-full transition-colors duration-200",
+                            focused === "email"
+                                ? "bg-primary/15 text-primary"
+                                : "text-muted-foreground"
+                        )}
+                    >
                         <Mail className="w-4 h-4" />
                     </div>
-                    <Label 
-                        htmlFor="email" 
+                    <Label
+                        htmlFor="email"
                         className={cn(
                             "font-medium text-sm transition-colors duration-200",
-                            focused === "email" ? "text-primary" : "text-muted-foreground"
+                            focused === "email"
+                                ? "text-primary"
+                                : "text-muted-foreground"
                         )}
                     >
                         Email Address
@@ -52,17 +58,23 @@ export function LoginForm({ defaultEmail = "", onValidityChange }) {
 
             <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                    <div className={cn(
-                        "p-1.5 rounded-full transition-colors duration-200",
-                        focused === "password" ? "bg-primary/15 text-primary" : "text-muted-foreground"
-                    )}>
+                    <div
+                        className={cn(
+                            "p-1.5 rounded-full transition-colors duration-200",
+                            focused === "password"
+                                ? "bg-primary/15 text-primary"
+                                : "text-muted-foreground"
+                        )}
+                    >
                         <Lock className="w-4 h-4" />
                     </div>
-                    <Label 
-                        htmlFor="password" 
+                    <Label
+                        htmlFor="password"
                         className={cn(
                             "font-medium text-sm transition-colors duration-200",
-                            focused === "password" ? "text-primary" : "text-muted-foreground"
+                            focused === "password"
+                                ? "text-primary"
+                                : "text-muted-foreground"
                         )}
                     >
                         Password
@@ -85,9 +97,13 @@ export function LoginForm({ defaultEmail = "", onValidityChange }) {
                         onClick={() => setShowPassword(!showPassword)}
                         className={cn(
                             "absolute right-3 top-1/2 -translate-y-1/2 transition-colors duration-200",
-                            focused === "password" ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                            focused === "password"
+                                ? "text-primary"
+                                : "text-muted-foreground hover:text-foreground"
                         )}
-                        aria-label={showPassword ? "Hide password" : "Show password"}
+                        aria-label={
+                            showPassword ? "Hide password" : "Show password"
+                        }
                     >
                         {showPassword ? (
                             <EyeOff className="h-4 w-4" />
@@ -96,11 +112,11 @@ export function LoginForm({ defaultEmail = "", onValidityChange }) {
                         )}
                     </button>
                 </div>
-                {password && password.length < 6 && (
+                {/* {password && password.length < 6 && (
                     <p className="text-xs text-destructive mt-1 animate-in fade-in-50">
                         Password must be at least 6 characters
                     </p>
-                )}
+                )} */}
             </div>
         </div>
     );
