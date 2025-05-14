@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import OrganizationInfoForm from "./organization-info-form";
+import OrganizationInfo from "./organization-info";
 
 export default function SellerProfileClient({ initialData, token }) {
     const router = useRouter();
@@ -93,7 +93,7 @@ export default function SellerProfileClient({ initialData, token }) {
                 </div>
 
                 {/* Organization Information Form Component */}
-                <OrganizationInfoForm token={token} />
+                <OrganizationInfo token={token} />
             </div>
         </div>
     );

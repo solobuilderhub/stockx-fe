@@ -4,11 +4,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Check, Copy, Eye, EyeOff } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import CreateOrganizationForm from "./create-organization-form";
 
-export default function OrganizationInfoForm({ token }) {
+export default function OrganizationInfo({ token }) {
     const [organizations, setOrganizations] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [hasAccess, setHasAccess] = useState(true);
     const [visibleSecrets, setVisibleSecrets] = useState({});
     const [copyStatus, setCopyStatus] = useState({});
 
@@ -58,14 +60,25 @@ export default function OrganizationInfoForm({ token }) {
                     }
                 );
 
-                if (!response.ok) {
-                    throw new Error("Failed to fetch organization data");
-                }
-
                 const data = await response.json();
+
+                if (!response.ok) {
+                    // Check if it's a forbidden error
+                    if (
+                        response.status === 403 ||
+                        data.message?.includes("Forbidden")
+                    ) {
+                        setHasAccess(false);
+                        return;
+                    }
+                    throw new Error(
+                        data.message || "Failed to fetch organization data"
+                    );
+                }
 
                 if (data.success) {
                     setOrganizations(data.docs);
+                    setHasAccess(true);
                 } else {
                     throw new Error(
                         data.error || "Failed to fetch organization data"
@@ -100,6 +113,18 @@ export default function OrganizationInfoForm({ token }) {
         );
     }
 
+    // If user doesn't have access or no organizations, show the create form
+    if (!hasAccess || (organizations.length === 0 && !error)) {
+        return (
+            <div className="rounded-lg shadow-sm p-6 mb-6">
+                <h3 className="text-xl font-semibold mb-4">
+                    Create Organization
+                </h3>
+                <CreateOrganizationForm token={token} />
+            </div>
+        );
+    }
+
     if (error) {
         return (
             <div className="rounded-lg shadow-sm p-6 mb-6">
@@ -108,19 +133,6 @@ export default function OrganizationInfoForm({ token }) {
                 </h3>
                 <div className="text-red-500">
                     Error loading organization data. Please try again later.
-                </div>
-            </div>
-        );
-    }
-
-    if (organizations.length === 0) {
-        return (
-            <div className="rounded-lg shadow-sm p-6 mb-6">
-                <h3 className="text-xl font-semibold mb-4">
-                    Organization Information
-                </h3>
-                <div className="text-gray-500">
-                    No organizations found for your account.
                 </div>
             </div>
         );
