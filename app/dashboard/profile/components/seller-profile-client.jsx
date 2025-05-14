@@ -1,55 +1,46 @@
 "use client";
 
 import FormInput from "@/components/form-utils/form-input";
-import FormTextarea from "@/components/form-utils/form-textarea";
 import { Button } from "@/components/ui/button";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { updateSellerProfile } from "../actions";
+import OrganizationInfo from "./organization-info";
 
-export default function SellerProfileClient({ initialData }) {
+export default function SellerProfileClient({ initialData, token }) {
     const router = useRouter();
     const { update } = useSession();
 
-    const methods = useForm({
+    // Form for personal information
+    const personalMethods = useForm({
         defaultValues: {
             name: initialData.name || "",
             email: initialData.email || "",
             phone: initialData.phone || "",
             address: initialData.address || "",
-            businessInfo: {
-                name: initialData.businessInfo?.name || "",
-                description: initialData.businessInfo?.description || "",
-                whatsappNumber: initialData.businessInfo?.whatsappNumber || "",
-                address: initialData.businessInfo?.address || "",
-            },
         },
     });
 
-    const onSubmit = async (formData) => {
+    const onSubmitPersonalInfo = async (formData) => {
         try {
-            const response = await updateSellerProfile(
-                initialData._id,
-                formData
-            );
-
-            if (response.success) {
-                // Update session with new user data
-                await update({
-                    user: {
-                        ...initialData,
-                        ...response.data,
-                    },
-                });
-                toast.success("Profile updated successfully");
-            } else {
-                throw new Error(response.error);
-            }
+            console.log("Personal Information:", formData);
+            // Uncomment when API is ready
+            // const response = await updatePersonalProfile(initialData._id, formData);
+            // if (response.success) {
+            //     await update({
+            //         user: {
+            //             ...initialData,
+            //             ...response.data,
+            //         },
+            //     });
+            //     toast.success("Personal information updated successfully");
+            // } else {
+            //     throw new Error(response.error);
+            // }
         } catch (error) {
-            console.error("Failed to update profile:", error);
-            // You might want to show an error toast/notification here
+            console.error("Failed to update personal information:", error);
+            toast.error("Failed to update personal information");
         }
     };
 
@@ -59,17 +50,19 @@ export default function SellerProfileClient({ initialData }) {
                 <h2 className="text-2xl md:text-3xl mb-2">Your Profile</h2>
             </div>
 
-            <div className=" p-6 animate-scale-in">
-                <FormProvider {...methods}>
-                    <form
-                        onSubmit={methods.handleSubmit(onSubmit)}
-                        className="space-y-8"
-                    >
-                        {/* Personal Information Section */}
-                        <div className=" rounded-lg shadow-sm p-6 mb-6">
-                            <h3 className="text-xl font-semibold mb-4">
-                                Personal Information
-                            </h3>
+            <div className="animate-scale-in">
+                {/* Personal Information Form */}
+                <div className="rounded-lg shadow-sm p-6 mb-6">
+                    <h3 className="text-xl font-semibold mb-4">
+                        Personal Information
+                    </h3>
+                    <FormProvider {...personalMethods}>
+                        <form
+                            onSubmit={personalMethods.handleSubmit(
+                                onSubmitPersonalInfo
+                            )}
+                            className="space-y-6"
+                        >
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <FormInput
                                     name="name"
@@ -90,43 +83,17 @@ export default function SellerProfileClient({ initialData }) {
                                 />
                                 <FormInput name="address" label="Address" />
                             </div>
-                        </div>
-
-                        {/* Business Information Section */}
-                        <div className=" rounded-lg shadow-sm p-6 mb-6">
-                            <h3 className="text-xl font-semibold mb-4">
-                                Business Information
-                            </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <FormInput
-                                    name="businessInfo.name"
-                                    label="Business Name"
-                                    required
-                                />
-                                <FormInput
-                                    name="businessInfo.whatsappNumber"
-                                    label="WhatsApp Number"
-                                    required
-                                />
-                                <FormTextarea
-                                    name="businessInfo.description"
-                                    label="Business Description"
-                                    className="md:col-span-2"
-                                />
-                                <FormInput
-                                    name="businessInfo.address"
-                                    label="Business Address"
-                                    className="md:col-span-2"
-                                />
-                            </div>
-                            <div className="pt-6">
+                            <div className="pt-4">
                                 <Button type="submit" className="px-8">
-                                    Update Profile
+                                    Update Personal Info
                                 </Button>
                             </div>
-                        </div>
-                    </form>
-                </FormProvider>
+                        </form>
+                    </FormProvider>
+                </div>
+
+                {/* Organization Information Form Component */}
+                <OrganizationInfo token={token} />
             </div>
         </div>
     );
