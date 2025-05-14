@@ -10,7 +10,7 @@ import { TopProducts } from "./TopProducts";
 import { MonthlyTarget } from "./MonthlyTarget";
 import { SalesChart } from "./SalesChart";
 import { ActionItems } from "./ActionItems";
-import { OrderFulfillment } from "./OrderFulfillment";
+// import { OrderFulfillment } from "./OrderFulfillment";
 
 export default function DashboardUI({
   data,
@@ -102,7 +102,7 @@ export default function DashboardUI({
 
           <div className="space-y-8">
             <ActionItems />
-            <OrderFulfillment />
+            {/* <OrderFulfillment /> */}
           </div>
         </div>
       </ErrorBoundaryWrapper>
