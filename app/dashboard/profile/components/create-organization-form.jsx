@@ -30,6 +30,21 @@ const formSchema = z.object({
     inventory_sheet_config: z.object({
         sheetId: z.string().min(1, "Sheet ID is required"),
         sheetName: z.string().min(1, "Sheet Name is required"),
+        columnMap: z.object({
+            id: z.string().min(1, "Column is required"),
+            stockx_sku: z.string().min(1, "Column is required"),
+            goat_sku: z.string().min(1, "Column is required"),
+            stockx_size: z.string().min(1, "Column is required"),
+            retail_price: z.string().min(1, "Column is required"),
+            brand_wholesale: z.string().min(1, "Column is required"),
+            inventory_added_at: z.string().min(1, "Column is required"),
+            location_1: z.string().min(1, "Column is required"),
+            location_2: z.string().min(1, "Column is required"),
+            location_3: z.string().min(1, "Column is required"),
+            qty: z.string().min(1, "Column is required"),
+            goat_size_unit: z.string().min(1, "Column is required"),
+            goat_size: z.string().min(1, "Column is required"),
+        }),
     }),
 });
 
@@ -51,6 +66,21 @@ const CreateOrganizationForm = ({ token }) => {
             inventory_sheet_config: {
                 sheetId: "",
                 sheetName: "",
+                columnMap: {
+                    id: "A",
+                    stockx_sku: "C",
+                    goat_sku: "D",
+                    stockx_size: "E",
+                    retail_price: "F",
+                    brand_wholesale: "G",
+                    inventory_added_at: "H",
+                    location_1: "I",
+                    location_2: "J",
+                    location_3: "K",
+                    qty: "Q",
+                    goat_size_unit: "R",
+                    goat_size: "S",
+                },
             },
         },
     });
@@ -72,7 +102,7 @@ const CreateOrganizationForm = ({ token }) => {
 
             const result = await response.json();
 
-            if (response.ok && result.success) {
+            if (response.ok && result.status === "success") {
                 toast.success("Organization created successfully!");
                 // Reload the page to show the new organization
                 window.location.reload();
@@ -88,6 +118,38 @@ const CreateOrganizationForm = ({ token }) => {
             setLoading(false);
         }
     };
+
+    const columnFields = [
+        { key: "id", label: "ID Column", defaultValue: "A" },
+        { key: "stockx_sku", label: "StockX SKU Column", defaultValue: "C" },
+        { key: "goat_sku", label: "GOAT SKU Column", defaultValue: "D" },
+        { key: "stockx_size", label: "StockX Size Column", defaultValue: "E" },
+        {
+            key: "retail_price",
+            label: "Retail Price Column",
+            defaultValue: "F",
+        },
+        {
+            key: "brand_wholesale",
+            label: "Brand Wholesale Column",
+            defaultValue: "G",
+        },
+        {
+            key: "inventory_added_at",
+            label: "Inventory Added At Column",
+            defaultValue: "H",
+        },
+        { key: "location_1", label: "Location 1 Column", defaultValue: "I" },
+        { key: "location_2", label: "Location 2 Column", defaultValue: "J" },
+        { key: "location_3", label: "Location 3 Column", defaultValue: "K" },
+        { key: "qty", label: "Quantity Column", defaultValue: "Q" },
+        {
+            key: "goat_size_unit",
+            label: "GOAT Size Unit Column",
+            defaultValue: "R",
+        },
+        { key: "goat_size", label: "GOAT Size Column", defaultValue: "S" },
+    ];
 
     return (
         <Card>
@@ -236,6 +298,43 @@ const CreateOrganizationForm = ({ token }) => {
                                     </FormItem>
                                 )}
                             />
+
+                            {/* Column Mapping */}
+                            <div className="space-y-4">
+                                <h4 className="text-md font-medium">
+                                    Column Mapping
+                                </h4>
+                                <p className="text-sm text-gray-600">
+                                    Specify which column in your spreadsheet
+                                    corresponds to each data field
+                                </p>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    {columnFields.map((columnField) => (
+                                        <FormField
+                                            key={columnField.key}
+                                            control={form.control}
+                                            name={`inventory_sheet_config.columnMap.${columnField.key}`}
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>
+                                                        {columnField.label}
+                                                    </FormLabel>
+                                                    <FormControl>
+                                                        <Input
+                                                            placeholder={
+                                                                columnField.defaultValue
+                                                            }
+                                                            {...field}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
                         </div>
 
                         <Button
