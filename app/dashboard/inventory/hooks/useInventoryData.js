@@ -3,11 +3,18 @@
 import { useQuery } from "@tanstack/react-query";
 
 // Query function for fetching inventory data
-const fetchInventory = async ({ page, limit, searchQuery, filters, token }) => {
+const fetchInventory = async ({
+    page,
+    limit = 50,
+    searchQuery,
+    filters,
+    token,
+}) => {
     // Build query parameters
     const queryParams = new URLSearchParams({
         page,
         limit,
+        populate: "product", // Always populate product data
     });
 
     // Add search query if provided
@@ -39,7 +46,7 @@ const fetchInventory = async ({ page, limit, searchQuery, filters, token }) => {
     // Fetch data from API
     const apiUrl = `${
         process.env.NEXT_PUBLIC_API_URL
-    }/stockx/get-inventory-table-items?${queryParams.toString()}`;
+    }/inventory?${queryParams.toString()}`;
 
     const response = await fetch(apiUrl, {
         headers: {
@@ -66,7 +73,7 @@ const fetchInventory = async ({ page, limit, searchQuery, filters, token }) => {
 
 export function useInventoryData({
     page = 1,
-    limit = 20,
+    limit = 50,
     searchQuery = "",
     filters = null,
     token,
@@ -83,40 +90,43 @@ export function useInventoryData({
         staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
     });
 
-    console.log("queryData", queryData?.data);
-
     // Map API response to match table format
     const mappedData =
-        queryData?.data?.map((item) => ({
-            id: item.id,
-            image: item.image || "https://via.placeholder.com/150",
-            name: item["product-name"] || "No Name",
-            urlKey: item.urlKey || "",
-            stockxSku: item["stockx-sku"] || "",
-            goatSku: item["goat-sku"] || "",
-            size: item.size || "N/A",
-            quantity: item.quantity || 0,
-            dateAdded: new Date(
-                item["inventory-added-date"]
-            ).toLocaleDateString("en-GB"), // dd/mm/yyyy
-            warehouseLocation: item["location-1"] || "N/A",
-            brandWholesale: item["brand-wholesale"]
-                ? `$${item["brand-wholesale"].toFixed(2)}`
-                : "$0.00",
-            retailPrice: item["retail-price"]
-                ? `$${item["retail-price"].toFixed(2)}`
-                : "$0.00",
-        })) || [];
+        queryData?.docs?.map((item) => {
+            // Get size from stockx or goat object
+            const size =
+                item.stockx?.size ||
+                (item.goat?.size ? `US ${item.goat.size}` : "N/A");
 
-    // Extract pagination data
-    const pagination = queryData?.pagination
+            return {
+                id: item.id,
+                image: "", // Placeholder for image
+                name: item.product?.title || "No Name",
+                urlKey: item.product?.urlKey || "",
+                stockxSku: item.stockx?.sku || "",
+                goatSku: item.goat?.sku || "",
+                size: size,
+                quantity: item.quantity || 0,
+                dateAdded: new Date(item.inventory_added_at).toLocaleDateString(
+                    "en-GB"
+                ), // dd/mm/yyyy
+                warehouseLocation: item.location?.[0] || "N/A",
+                brandWholesale: item.product?.brand || "N/A",
+                retailPrice: item.retail_price
+                    ? `$${item.retail_price.toFixed(2)}`
+                    : "$0.00",
+            };
+        }) || [];
+
+    // Extract pagination data from the new response format
+    const pagination = queryData
         ? {
-              totalDocs: queryData.pagination.totalItems,
-              limit: queryData.pagination.itemsPerPage,
-              currentPage: queryData.pagination.currentPage,
-              totalPages: queryData.pagination.totalPages,
-              hasNextPage: queryData.pagination.hasNextPage,
-              hasPrevPage: queryData.pagination.hasPrevPage,
+              totalDocs: queryData.totalDocs || 0,
+              limit: queryData.limit || limit,
+              currentPage: queryData.page || page,
+              totalPages: queryData.totalPages || 0,
+              hasNextPage: queryData.hasNextPage || false,
+              hasPrevPage: queryData.hasPrevPage || false,
           }
         : {
               totalDocs: 0,
