@@ -11,6 +11,7 @@ import { InventoryTable } from "./InventoryTable";
 export function InventoryContent({
     token,
     initialPage = 1,
+    initialLimit = 50,
     handleViewDetails,
     handlePageChange,
 }) {
@@ -80,6 +81,7 @@ export function InventoryContent({
                         searchQuery={debouncedSearchQuery}
                         filters={appliedFilters}
                         currentPage={currentPage}
+                        itemsPerPage={initialLimit}
                         onPageChange={handleLocalPageChange}
                         handleViewDetails={handleViewDetails}
                         token={token}

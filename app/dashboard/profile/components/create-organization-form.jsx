@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -49,7 +49,7 @@ const formSchema = z.object({
 });
 
 const CreateOrganizationForm = ({ token }) => {
-    const [loading, setLoading] = useState(false);
+    const queryClient = useQueryClient();
 
     const form = useForm({
         resolver: zodResolver(formSchema),
@@ -85,9 +85,9 @@ const CreateOrganizationForm = ({ token }) => {
         },
     });
 
-    const onSubmit = async (data) => {
-        try {
-            setLoading(true);
+    // Use React Query mutation for form submission
+    const createOrganizationMutation = useMutation({
+        mutationFn: async (data) => {
             const response = await fetch(
                 `${process.env.NEXT_PUBLIC_API_URL}/organization`,
                 {
@@ -102,21 +102,37 @@ const CreateOrganizationForm = ({ token }) => {
 
             const result = await response.json();
 
-            if (response.ok && result.status === "success") {
-                toast.success("Organization created successfully!");
-                // Reload the page to show the new organization
-                window.location.reload();
-            } else {
+            if (!response.ok) {
                 throw new Error(
                     result.message || "Failed to create organization"
                 );
             }
-        } catch (error) {
+
+            if (result.status !== "success") {
+                throw new Error(
+                    result.message || "Failed to create organization"
+                );
+            }
+
+            return result.data;
+        },
+        onSuccess: () => {
+            toast.success("Organization created successfully!");
+
+            // Invalidate the organization query to trigger a refetch
+            queryClient.invalidateQueries({ queryKey: ["organization"] });
+
+            // Reload the page to show the new organization
+            window.location.reload();
+        },
+        onError: (error) => {
             console.error("Error creating organization:", error);
             toast.error(error.message || "Failed to create organization");
-        } finally {
-            setLoading(false);
-        }
+        },
+    });
+
+    const onSubmit = (data) => {
+        createOrganizationMutation.mutate(data);
     };
 
     const columnFields = [
@@ -167,10 +183,7 @@ const CreateOrganizationForm = ({ token }) => {
                                 <FormItem>
                                     <FormLabel>Organization Name</FormLabel>
                                     <FormControl>
-                                        <Input
-                                            placeholder="My Store"
-                                            {...field}
-                                        />
+                                        <Input {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -190,10 +203,7 @@ const CreateOrganizationForm = ({ token }) => {
                                     <FormItem>
                                         <FormLabel>Client ID</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                placeholder="6SjOHpVc2TdGQZOtHwy2rhFnS3sDr2UK"
-                                                {...field}
-                                            />
+                                            <Input {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -207,10 +217,7 @@ const CreateOrganizationForm = ({ token }) => {
                                     <FormItem>
                                         <FormLabel>Client Secret</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                placeholder="ulZ4bIb8t5orBt5HryvrWAksnwV_IbuXa15kdSuRof0_XyjofTVXuy-dKuyRS9Mx"
-                                                {...field}
-                                            />
+                                            <Input {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -224,10 +231,7 @@ const CreateOrganizationForm = ({ token }) => {
                                     <FormItem>
                                         <FormLabel>Refresh Token</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                placeholder="k3c4c8lwj_dlJwZIyMrKrR5hZpUfkdeOR_yxry0yzRSmK"
-                                                {...field}
-                                            />
+                                            <Input {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -248,10 +252,7 @@ const CreateOrganizationForm = ({ token }) => {
                                     <FormItem>
                                         <FormLabel>Authorization</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                placeholder="goatapi_VmggURPj0N9UJRFy8w2CfJebibBhjiRa1vvzYJ"
-                                                {...field}
-                                            />
+                                            <Input {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -272,10 +273,7 @@ const CreateOrganizationForm = ({ token }) => {
                                     <FormItem>
                                         <FormLabel>Sheet ID</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                placeholder="1pg6Wb2fggeysJr0_EosdO5gPWyB1bpGv4LsmO8yR-Fg"
-                                                {...field}
-                                            />
+                                            <Input {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -289,10 +287,7 @@ const CreateOrganizationForm = ({ token }) => {
                                     <FormItem>
                                         <FormLabel>Sheet Name</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                placeholder="inventory sheet"
-                                                {...field}
-                                            />
+                                            <Input {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -321,12 +316,7 @@ const CreateOrganizationForm = ({ token }) => {
                                                         {columnField.label}
                                                     </FormLabel>
                                                     <FormControl>
-                                                        <Input
-                                                            placeholder={
-                                                                columnField.defaultValue
-                                                            }
-                                                            {...field}
-                                                        />
+                                                        <Input {...field} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -340,9 +330,11 @@ const CreateOrganizationForm = ({ token }) => {
                         <Button
                             type="submit"
                             className="w-full"
-                            disabled={loading}
+                            disabled={createOrganizationMutation.isPending}
                         >
-                            {loading ? "Creating..." : "Create Organization"}
+                            {createOrganizationMutation.isPending
+                                ? "Creating..."
+                                : "Create Organization"}
                         </Button>
                     </form>
                 </Form>

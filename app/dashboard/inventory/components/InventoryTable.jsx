@@ -1,7 +1,6 @@
 "use client";
 
 import { DataTable } from "@/components/custom/ui/data-table";
-import React from "react";
 import { useInventoryData } from "../hooks/useInventoryData";
 import { inventoryColumns } from "./inventory-columns";
 
@@ -9,12 +8,11 @@ export function InventoryTable({
     searchQuery,
     filters,
     currentPage = 1,
+    itemsPerPage = 50,
     onPageChange,
     handleViewDetails,
     token,
 }) {
-    const [itemsPerPage] = React.useState(20);
-
     const { inventory, pagination, isLoading, error } = useInventoryData({
         page: currentPage,
         limit: itemsPerPage,
@@ -22,6 +20,7 @@ export function InventoryTable({
         filters,
         token,
     });
+
     const handlePageChangeInternal = (page) => {
         if (onPageChange) {
             onPageChange(page);
@@ -43,7 +42,7 @@ export function InventoryTable({
             isLoading={isLoading}
             pagination={{
                 totalDocs: pagination?.totalDocs || 0,
-                limit: pagination?.limit || 20,
+                limit: pagination?.limit || itemsPerPage,
                 currentPage: pagination?.currentPage || 1,
                 totalPages: pagination?.totalPages || 1,
                 hasNextPage: pagination?.hasNextPage || false,
