@@ -13,7 +13,8 @@ export function LoginForm({ defaultEmail = "", onValidityChange }) {
     const handlePasswordChange = (e) => {
         const newPassword = e.target.value;
         setPassword(newPassword);
-        onValidityChange?.(newPassword.length >= 6);
+        // Always consider the password valid regardless of length
+        onValidityChange?.(true);
     };
 
     return (
