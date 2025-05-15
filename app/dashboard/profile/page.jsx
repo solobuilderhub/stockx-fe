@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/custom/dashboard/page-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Suspense } from "react";
 import SellerProfileClient from "./components/seller-profile-client";
+import ProfileProvider from "./providers";
 
 export default async function ProfilePage(props) {
     const session = await auth();
@@ -28,23 +29,25 @@ export default async function ProfilePage(props) {
     ];
 
     return (
-        <div>
-            <PageHeader items={breadcrumbItems} />
-            <div className="space-y-6 p-6">
-                <Suspense
-                    fallback={
-                        <div className="space-y-8">
-                            <Skeleton className="h-[200px] w-full" />
-                            <Skeleton className="h-[400px] w-full" />
-                        </div>
-                    }
-                >
-                    <SellerProfileClient
-                        initialData={user}
-                        token={session?.accessToken}
-                    />
-                </Suspense>
+        <ProfileProvider>
+            <div>
+                <PageHeader items={breadcrumbItems} />
+                <div className="space-y-6 p-6">
+                    <Suspense
+                        fallback={
+                            <div className="space-y-8">
+                                <Skeleton className="h-[200px] w-full" />
+                                <Skeleton className="h-[400px] w-full" />
+                            </div>
+                        }
+                    >
+                        <SellerProfileClient
+                            initialData={user}
+                            token={session?.accessToken}
+                        />
+                    </Suspense>
+                </div>
             </div>
-        </div>
+        </ProfileProvider>
     );
 }

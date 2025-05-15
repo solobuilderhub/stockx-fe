@@ -13,6 +13,7 @@ export default async function InventoryPage(props) {
     const searchParams = await props.searchParams;
     const page = Number(searchParams.page) || 1;
     const status = searchParams.status || "";
+    const limit = 50; // Set default limit to 50
 
     const queryClient = getQueryClient();
 
@@ -30,6 +31,7 @@ export default async function InventoryPage(props) {
                         token={accessToken}
                         initialPage={page}
                         initialStatus={status}
+                        initialLimit={limit}
                     />
                 </Suspense>
             </div>

@@ -1,19 +1,72 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
+import { useQuery } from "@tanstack/react-query";
 import { Check, Copy, Eye, EyeOff } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import CreateOrganizationForm from "./create-organization-form";
 
 export default function OrganizationInfo({ token }) {
-    const [organization, setOrganization] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [hasAccess, setHasAccess] = useState(true);
-    const [shouldShowCreateForm, setShouldShowCreateForm] = useState(false);
     const [visibleSecrets, setVisibleSecrets] = useState({});
     const [copyStatus, setCopyStatus] = useState({});
+
+    // Use React Query to fetch organization data
+    const { data, isLoading, isError, error } = useQuery({
+        queryKey: ["organization"],
+        queryFn: async () => {
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/organization/mine`,
+                {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                if (
+                    response.status === 403 ||
+                    data.message?.includes("Forbidden")
+                ) {
+                    throw new Error(
+                        "Forbidden: You do not have access to this resource"
+                    );
+                }
+                throw new Error(
+                    data.message || "Failed to fetch organization data"
+                );
+            }
+
+            if (data.status === "success" && data.data) {
+                return data.data;
+            } else if (
+                data.status === "error" &&
+                data.message === "Organization not found"
+            ) {
+                throw new Error("Organization not found");
+            } else {
+                throw new Error(
+                    data.message || "Failed to fetch organization data"
+                );
+            }
+        },
+        retry: (failureCount, error) => {
+            // Don't retry for "Organization not found" or "Forbidden" errors
+            if (
+                error.message === "Organization not found" ||
+                error.message.includes("Forbidden")
+            ) {
+                return false;
+            }
+            return failureCount < 3;
+        },
+        enabled: !!token,
+    });
 
     const toggleSecretVisibility = (secretId) => {
         setVisibleSecrets((prev) => ({
@@ -46,74 +99,7 @@ export default function OrganizationInfo({ token }) {
             });
     };
 
-    useEffect(() => {
-        const fetchOrganizations = async () => {
-            try {
-                setLoading(true);
-                const response = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URL}/organization/mine`,
-                    {
-                        method: "GET",
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                            "Content-Type": "application/json",
-                        },
-                    }
-                );
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    // Check if it's a forbidden error
-                    if (
-                        response.status === 403 ||
-                        data.message?.includes("Forbidden")
-                    ) {
-                        setHasAccess(false);
-                        return;
-                    }
-                    throw new Error(
-                        data.message || "Failed to fetch organization data"
-                    );
-                }
-
-                if (data.status === "success" && data.data) {
-                    setOrganization(data.data);
-                    setHasAccess(true);
-                    setShouldShowCreateForm(false);
-                } else if (
-                    data.status === "error" &&
-                    data.message === "Organization not found"
-                ) {
-                    // Specifically handle "Organization not found" scenario
-                    setShouldShowCreateForm(true);
-                    setHasAccess(true); // User has access, but no organization yet
-                } else {
-                    throw new Error(
-                        data.message || "Failed to fetch organization data"
-                    );
-                }
-            } catch (error) {
-                console.error("Error fetching organization:", error);
-                // Check if the error message indicates "Organization not found"
-                if (error.message === "Organization not found") {
-                    setShouldShowCreateForm(true);
-                    setHasAccess(true);
-                } else {
-                    setError(error.message);
-                    toast.error("Failed to load organization data");
-                }
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        if (token) {
-            fetchOrganizations();
-        }
-    }, [token]);
-
-    if (loading) {
+    if (isLoading) {
         return (
             <div className="rounded-lg shadow-sm p-6 mb-6">
                 <h3 className="text-xl font-semibold mb-4">
@@ -128,19 +114,24 @@ export default function OrganizationInfo({ token }) {
         );
     }
 
-    // If user doesn't have access or should show create form, display the CreateOrganizationForm
-    if (!hasAccess || shouldShowCreateForm) {
-        return (
-            <div className="rounded-lg shadow-sm p-6 mb-6">
-                <h3 className="text-xl font-semibold mb-4">
-                    Create Organization
-                </h3>
-                <CreateOrganizationForm token={token} />
-            </div>
-        );
-    }
+    // Show create form if organization not found or user doesn't have access
+    if (isError) {
+        // Check if the error is due to not having an organization or forbidden access
+        if (
+            error.message === "Organization not found" ||
+            error.message.includes("Forbidden")
+        ) {
+            return (
+                <div className="rounded-lg shadow-sm p-6 mb-6">
+                    <h3 className="text-xl font-semibold mb-4">
+                        Create Organization
+                    </h3>
+                    <CreateOrganizationForm token={token} />
+                </div>
+            );
+        }
 
-    if (error) {
+        // For other errors, show error message
         return (
             <div className="rounded-lg shadow-sm p-6 mb-6">
                 <h3 className="text-xl font-semibold mb-4">
@@ -153,20 +144,7 @@ export default function OrganizationInfo({ token }) {
         );
     }
 
-    // No organization found, show create form
-    if (!organization) {
-        return (
-            <div className="rounded-lg shadow-sm p-6 mb-6">
-                <h3 className="text-xl font-semibold mb-4">
-                    Create Organization
-                </h3>
-                <CreateOrganizationForm token={token} />
-            </div>
-        );
-    }
-
-    // Render a single organization card
-    const org = organization;
+    const org = data;
 
     return (
         <div className="rounded-lg shadow-sm p-6 mb-6">

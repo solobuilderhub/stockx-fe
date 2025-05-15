@@ -2,13 +2,17 @@
 "use client";
 // import HeaderSection from "@/components/custom/dashboard/header-section";
 import ErrorBoundaryWrapper from "@/components/custom/error/error-boundary-wrapper";
-import { Package } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { InventoryContent } from "./InventoryContent";
 import { OrderDetailsSheet } from "./order-details-sheet";
 
-export function InventoryUi({ token, initialPage = 1, initialStatus = "" }) {
+export function InventoryUi({
+    token,
+    initialPage = 1,
+    initialStatus = "",
+    initialLimit = 50,
+}) {
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -44,6 +48,7 @@ export function InventoryUi({ token, initialPage = 1, initialStatus = "" }) {
                 <InventoryContent
                     token={token}
                     initialPage={currentPage}
+                    initialLimit={initialLimit}
                     handleViewDetails={handleViewDetails}
                     handlePageChange={handlePageChange}
                 />
