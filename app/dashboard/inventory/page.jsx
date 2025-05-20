@@ -6,8 +6,16 @@ import { Suspense } from "react";
 import { InventoryUi } from "./components/inventory-ui";
 
 export default async function InventoryPage(props) {
-    const session = await auth();
-    const { accessToken } = session;
+    let accessToken = "";
+
+    try {
+        // Try to get the session, but don't fail if we can't
+        const session = await auth();
+        accessToken = session?.accessToken || "";
+    } catch (error) {
+        console.error("Error getting session:", error);
+        // Continue with empty token, will use dummy data
+    }
 
     // Parse and validate search params
     const searchParams = await props.searchParams;

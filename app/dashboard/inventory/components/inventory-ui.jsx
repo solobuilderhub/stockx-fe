@@ -46,7 +46,7 @@ export function InventoryUi({
 
             <ErrorBoundaryWrapper>
                 <InventoryContent
-                    token={token}
+                    token={token || ""}
                     initialPage={currentPage}
                     initialLimit={initialLimit}
                     handleViewDetails={handleViewDetails}
