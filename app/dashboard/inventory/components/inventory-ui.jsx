@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { InventoryContent } from "./InventoryContent";
 import { OrderDetailsSheet } from "./order-details-sheet";
+import { InventoryDetailSheet } from "./inventory-drawer/InventoryDetailSheet";
 
 export function InventoryUi({
     token,
@@ -22,6 +23,8 @@ export function InventoryUi({
     // State for order details sheet
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [isSheetOpen, setIsSheetOpen] = useState(false);
+
+    const [selectedItem, setSelectedItem] = useState(null);
 
     const handlePageChange = (page) => {
         const params = new URLSearchParams(searchParams);
@@ -59,6 +62,11 @@ export function InventoryUi({
                 order={selectedOrder}
                 open={isSheetOpen}
                 onOpenChange={setIsSheetOpen}
+            />
+            <InventoryDetailSheet
+                open={isSheetOpen}
+                onOpenChange={setIsSheetOpen}
+                item={selectedItem}
             />
         </div>
     );
