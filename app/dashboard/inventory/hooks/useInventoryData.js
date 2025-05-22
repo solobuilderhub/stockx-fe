@@ -46,7 +46,7 @@ const fetchInventory = async ({
     // Fetch data from API
     const apiUrl = `${
         process.env.NEXT_PUBLIC_API_URL
-    }/inventory?${queryParams.toString()}`;
+    }/inventor?${queryParams.toString()}`;
 
     const response = await fetch(apiUrl, {
         headers: {
