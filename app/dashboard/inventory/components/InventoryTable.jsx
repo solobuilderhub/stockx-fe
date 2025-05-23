@@ -48,7 +48,7 @@ export function InventoryTable({
             )}
 
             <DataTable
-                columns={inventoryColumns()}
+                columns={inventoryColumns(handleViewDetails)}
                 data={inventory || []}
                 isLoading={isLoading}
                 pagination={{

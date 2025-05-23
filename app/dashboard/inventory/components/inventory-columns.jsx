@@ -8,7 +8,7 @@ import { Eye } from "lucide-react";
 import Link from "next/link";
 import FallbackImage from "./custom-image";
 
-export const inventoryColumns = () => [
+export const inventoryColumns = (onViewItem) => [
     {
         id: "select",
         header: ({ table }) => (
@@ -185,6 +185,7 @@ export const inventoryColumns = () => [
                     variant="ghost"
                     size="icon"
                     className="text-muted-foreground hover:text-primary"
+                    onClick={() => onViewItem(row.original)}
                 >
                     <Eye size={16} />
                 </Button>

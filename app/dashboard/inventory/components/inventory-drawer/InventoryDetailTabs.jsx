@@ -1,3 +1,5 @@
+"use client";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { InventoryItemDetails } from "./InventoryItemDetails";
 import { InventoryItemListings } from "./InventoryItemListings";

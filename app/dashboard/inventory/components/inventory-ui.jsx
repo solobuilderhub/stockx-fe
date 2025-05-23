@@ -1,18 +1,23 @@
-// app/profile/my-orders/components/orders-ui.jsx
 "use client";
 // import HeaderSection from "@/components/custom/dashboard/header-section";
 import ErrorBoundaryWrapper from "@/components/custom/error/error-boundary-wrapper";
+import { Button } from "@/components/ui/button";
+import { Table, TableBody } from "@/components/ui/table";
+import { Plus, RefreshCw } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { InventoryContent } from "./InventoryContent";
-import { OrderDetailsSheet } from "./order-details-sheet";
+import { useInventory } from "./inventory-drawer/hooks/use-inventory-data";
 import { InventoryDetailSheet } from "./inventory-drawer/InventoryDetailSheet";
+import { InventoryEmptyState } from "./inventory-drawer/InventoryEmptyState";
+import { InventoryTableHeader } from "./inventory-drawer/InventoryTableHeader";
+import { InventoryTableRow } from "./inventory-drawer/InventoryTableRow";
+import { OrderDetailsSheet } from "./order-details-sheet";
 
 export function InventoryUi({
     token,
     initialPage = 1,
     initialStatus = "",
-    initialLimit = 50,
+    initialLimit = 10,
 }) {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -24,7 +29,14 @@ export function InventoryUi({
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [isSheetOpen, setIsSheetOpen] = useState(false);
 
+    // State for inventory detail sheet
     const [selectedItem, setSelectedItem] = useState(null);
+    const [isDetailSheetOpen, setIsDetailSheetOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+
+    // Use our custom hook to fetch inventory data
+    const { data: inventoryItems, isLoading: isLoadingInventory } =
+        useInventory();
 
     const handlePageChange = (page) => {
         const params = new URLSearchParams(searchParams);
@@ -39,6 +51,29 @@ export function InventoryUi({
         setIsSheetOpen(true);
     };
 
+    const handleViewItem = (item) => {
+        setSelectedItem(item);
+        setIsDetailSheetOpen(true);
+    };
+
+    const handleRefreshInventory = () => {
+        setIsLoading(true);
+
+        // Simulate refreshing data
+        setTimeout(() => {
+            setIsLoading(false);
+        }, 1000);
+    };
+
+    if (isLoadingInventory) {
+        return (
+            <div className="flex justify-center items-center h-64">
+                <RefreshCw className="mr-2 h-6 w-6 animate-spin" />
+                <span>Loading inventory...</span>
+            </div>
+        );
+    }
+
     return (
         <div className="space-y-6">
             {/* <HeaderSection
@@ -48,13 +83,53 @@ export function InventoryUi({
             /> */}
 
             <ErrorBoundaryWrapper>
-                <InventoryContent
-                    token={token || ""}
-                    initialPage={currentPage}
-                    initialLimit={initialLimit}
-                    handleViewDetails={handleViewDetails}
-                    handlePageChange={handlePageChange}
-                />
+                <div className="flex justify-between items-center mb-6">
+                    <div>
+                        <h2 className="text-2xl font-bold">Inventory</h2>
+                        <p className="text-muted-foreground">
+                            {inventoryItems.length} items in your inventory
+                        </p>
+                    </div>
+
+                    <div className="flex gap-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleRefreshInventory}
+                            disabled={isLoading}
+                        >
+                            <RefreshCw
+                                className={`mr-2 h-4 w-4 ${
+                                    isLoading ? "animate-spin" : ""
+                                }`}
+                            />
+                            Refresh
+                        </Button>
+                        <Button size="sm">
+                            <Plus className="mr-2 h-4 w-4" />
+                            Add Item
+                        </Button>
+                    </div>
+                </div>
+
+                {inventoryItems && inventoryItems.length > 0 ? (
+                    <div className="border rounded-md">
+                        <Table>
+                            <InventoryTableHeader />
+                            <TableBody>
+                                {inventoryItems.map((item) => (
+                                    <InventoryTableRow
+                                        key={item.id}
+                                        item={item}
+                                        onViewItem={handleViewItem}
+                                    />
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
+                ) : (
+                    <InventoryEmptyState />
+                )}
             </ErrorBoundaryWrapper>
 
             {/* Order Details Sheet */}
@@ -64,8 +139,8 @@ export function InventoryUi({
                 onOpenChange={setIsSheetOpen}
             />
             <InventoryDetailSheet
-                open={isSheetOpen}
-                onOpenChange={setIsSheetOpen}
+                open={isDetailSheetOpen}
+                onOpenChange={setIsDetailSheetOpen}
                 item={selectedItem}
             />
         </div>

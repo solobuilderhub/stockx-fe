@@ -1,9 +1,9 @@
 // app/profile/my-orders/page.jsx
 import { auth } from "@/app/(auth)/auth";
 import { PageHeader } from "@/components/custom/dashboard/page-header";
-import { getQueryClient } from "@/lib/get-query-client";
 import { Suspense } from "react";
 import { InventoryUi } from "./components/inventory-ui";
+import { InventoryProvider } from "./components/InventoryProvider";
 
 export default async function InventoryPage(props) {
     let accessToken = "";
@@ -23,8 +23,6 @@ export default async function InventoryPage(props) {
     const status = searchParams.status || "";
     const limit = 50; // Set default limit to 50
 
-    const queryClient = getQueryClient();
-
     const breadcrumbItems = [
         { label: "Dashboard", href: "/dashboard" },
         { label: "Inventory", current: true },
@@ -35,12 +33,14 @@ export default async function InventoryPage(props) {
             <PageHeader items={breadcrumbItems} />
             <div className="space-y-6 p-6">
                 <Suspense fallback={<div>Loading...</div>}>
-                    <InventoryUi
-                        token={accessToken}
-                        initialPage={page}
-                        initialStatus={status}
-                        initialLimit={limit}
-                    />
+                    <InventoryProvider>
+                        <InventoryUi
+                            token={accessToken}
+                            initialPage={page}
+                            initialStatus={status}
+                            initialLimit={limit}
+                        />
+                    </InventoryProvider>
                 </Suspense>
             </div>
         </div>
