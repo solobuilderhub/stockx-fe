@@ -1,42 +1,11 @@
 "use client";
 
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogTitle,
-} from "@/components/ui/dialog";
-import { MarketDataCard } from "./MarketDataCard";
-// Removed: import { Variant } from '@/components/inventory-drawer/types';
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { X } from "lucide-react";
-import {
-    useGoatMarketData,
-    useStockXMarketData,
-} from "./hooks/use-market-data";
 
-// Removed TypeScript interface
-
+// This component is no longer used as market data is now shown directly in the variant accordion
 export function MarketDataDialog({ open, onOpenChange, variant }) {
-    // Use our custom hooks to fetch market data
-    const { data: stockXData, isLoading: isLoadingStockX } =
-        useStockXMarketData(variant);
-    const { data: goatData, isLoading: isLoadingGoat } =
-        useGoatMarketData(variant);
-
     if (!variant) return null;
-
-    // Format the current date and time
-    const formattedDate = new Date()
-        .toLocaleString("en-GB", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-            hour12: false,
-        })
-        .replace(",", "");
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -47,9 +16,10 @@ export function MarketDataDialog({ open, onOpenChange, variant }) {
                             <DialogTitle className="text-white text-lg font-medium m-0">
                                 Market Data for Size {variant.size}
                             </DialogTitle>
-                            <DialogDescription className="text-xs text-gray-400">
-                                Last Updated: {formattedDate}
-                            </DialogDescription>
+                            <p className="text-xs text-gray-400">
+                                This dialog is deprecated. Market data is now
+                                shown directly in the variant accordion.
+                            </p>
                         </div>
                         <button
                             onClick={() => onOpenChange(false)}
@@ -58,13 +28,6 @@ export function MarketDataDialog({ open, onOpenChange, variant }) {
                             <X size={18} />
                         </button>
                     </header>
-
-                    <MarketDataCard
-                        stockXData={stockXData}
-                        goatData={goatData}
-                        selectedSize={variant.size}
-                        isLoading={isLoadingStockX || isLoadingGoat}
-                    />
                 </div>
             </DialogContent>
         </Dialog>

@@ -3,7 +3,6 @@
 import { useToast } from "@/app/hooks/use-toast";
 import { Accordion } from "@/components/ui/accordion";
 import { useState } from "react";
-import { MarketDataDialog } from "./MarketDataDialog";
 import { VariantAccordionItem } from "./VariantAccordionItem";
 import { VariantListingsDialog } from "./VariantListingsDialog";
 
@@ -15,14 +14,7 @@ export function InventoryItemVariants({
 }) {
     const [selectedVariant, setSelectedVariant] = useState(null);
     const [showListingsDialog, setShowListingsDialog] = useState(false);
-    const [showMarketDataDialog, setShowMarketDataDialog] = useState(false);
     const { toast } = useToast();
-
-    // Function to handle viewing market data for a variant
-    const handleViewMarketData = (variant) => {
-        setSelectedVariant(variant);
-        setShowMarketDataDialog(true);
-    };
 
     // Function to handle viewing listings for a variant
     const handleViewListings = (variant) => {
@@ -67,7 +59,6 @@ export function InventoryItemVariants({
                                 key={variant.variantId}
                                 variant={variant}
                                 onListItem={handleListItem}
-                                onViewMarketData={handleViewMarketData}
                                 onViewListings={handleViewListings}
                                 onQuantityChange={handleQuantityChange}
                                 itemId={itemId}
@@ -90,15 +81,6 @@ export function InventoryItemVariants({
                     onOpenChange={(open) => setShowListingsDialog(open)}
                     variant={selectedVariant}
                     styleId={styleId}
-                />
-            )}
-
-            {/* Market Data Dialog */}
-            {selectedVariant && (
-                <MarketDataDialog
-                    open={showMarketDataDialog}
-                    onOpenChange={(open) => setShowMarketDataDialog(open)}
-                    variant={selectedVariant}
                 />
             )}
         </div>

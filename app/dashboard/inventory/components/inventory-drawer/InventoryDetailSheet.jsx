@@ -82,7 +82,7 @@ export function InventoryDetailSheet({ open, onOpenChange, item }) {
                     </div>
                 </SheetHeader>
 
-                <div className="py-6 overflow-y-auto">
+                <div className="py-6 overflow-y-auto px-10">
                     {isListingFormOpen ? (
                         <ListingForm
                             selectedPlatform={selectedPlatform}
