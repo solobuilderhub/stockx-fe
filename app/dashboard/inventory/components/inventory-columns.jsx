@@ -1,12 +1,14 @@
 // "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Checkbox } from "@/components/ui/checkbox";
 // import { urlKeyToImage } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Eye } from "lucide-react";
 import Link from "next/link";
 import FallbackImage from "./custom-image";
 
-export const inventoryColumns = () => [
+export const inventoryColumns = (onViewItem) => [
     {
         id: "select",
         header: ({ table }) => (
@@ -47,20 +49,20 @@ export const inventoryColumns = () => [
         ),
         enableSorting: false,
     },
-    {
-        accessorKey: "urlKey",
-        header: "",
-        cell: () => null,
-    },
-    {
-        accessorKey: "id",
-        header: "ID",
-        cell: ({ row }) => (
-            <p className="text-sm text-muted-foreground">
-                {row.getValue("id")}
-            </p>
-        ),
-    },
+    // {
+    //     accessorKey: "urlKey",
+    //     header: "",
+    //     cell: () => null,
+    // },
+    // {
+    //     accessorKey: "id",
+    //     header: "ID",
+    //     cell: ({ row }) => (
+    //         <p className="text-sm text-muted-foreground">
+    //             {row.getValue("id")}
+    //         </p>
+    //     ),
+    // },
     {
         accessorKey: "name",
         header: "Name",
@@ -75,26 +77,26 @@ export const inventoryColumns = () => [
                             target="_blank"
                             className="hover:underline"
                         >
-                            {row.getValue("name").length > 30
+                            {row.getValue("name").length > 50
                                 ? (() => {
                                       const name = row.getValue("name");
-                                      // Find the last space before 30 characters
+                                      // Find the last space before 50 characters
                                       const lastSpaceIndex = name
-                                          .substring(0, 30)
+                                          .substring(0, 50)
                                           .lastIndexOf(" ");
-                                      // If no space found, break at 30, otherwise break at the last space
+                                      // If no space found, break at 50, otherwise break at the last space
                                       const breakIndex =
                                           lastSpaceIndex > 0
                                               ? lastSpaceIndex
-                                              : 30;
+                                              : 50;
 
                                       return (
                                           <>
                                               {name.substring(0, breakIndex)}
                                               <br />
                                               {name.substring(
-                                                  breakIndex === 30
-                                                      ? 30
+                                                  breakIndex === 50
+                                                      ? 50
                                                       : breakIndex + 1
                                               )}
                                           </>
@@ -106,7 +108,7 @@ export const inventoryColumns = () => [
                         "No Name"
                     )}
                 </p>
-                <p className="text-xs text-muted-foreground mt-1">
+                {/* <p className="text-xs text-muted-foreground mt-1">
                     {row.original.stockxSku === row.original.goatSku ? (
                         `StockX SKU: ${row.original.stockxSku}`
                     ) : (
@@ -116,37 +118,37 @@ export const inventoryColumns = () => [
                             {`Goat SKU: ${row.original.goatSku}`}
                         </>
                     )}
-                </p>
+                </p> */}
             </div>
         ),
     },
-    {
-        accessorKey: "size",
-        header: "Size",
-    },
-    {
-        accessorKey: "quantity",
-        header: "Qty",
-    },
-    {
-        accessorKey: "dateAdded",
-        header: "Inventory added date",
-    },
-    {
-        accessorKey: "warehouseLocation",
-        header: "Warehouse location",
-    },
-    {
-        accessorKey: "brandWholesale",
-        header: "Brand Wholesale",
-        cell: ({ row }) => (
-            <p className="text-sm">{row.getValue("brandWholesale")}</p>
-        ),
-    },
-    {
-        accessorKey: "retailPrice",
-        header: "Retail Price",
-    },
+    // {
+    //     accessorKey: "size",
+    //     header: "Size",
+    // },
+    // {
+    //     accessorKey: "quantity",
+    //     header: "Qty",
+    // },
+    // {
+    //     accessorKey: "dateAdded",
+    //     header: "Inventory added date",
+    // },
+    // {
+    //     accessorKey: "warehouseLocation",
+    //     header: "Warehouse location",
+    // },
+    // {
+    //     accessorKey: "brandWholesale",
+    //     header: "Brand Wholesale",
+    //     cell: ({ row }) => (
+    //         <p className="text-sm">{row.getValue("brandWholesale")}</p>
+    //     ),
+    // },
+    // {
+    //     accessorKey: "retailPrice",
+    //     header: "Retail Price",
+    // },
     // {
     //     id: "actions",
     //     header: "",
@@ -157,4 +159,38 @@ export const inventoryColumns = () => [
     //     ),
     //     enableSorting: false,
     // },
+    {
+        accessorKey: "brand",
+        header: "Brand",
+        cell: ({ row }) => (
+            <div className="font-medium">{row.original.brandWholesale}</div>
+        ),
+    },
+    {
+        accessorKey: "stockxStyleId",
+        header: "Stockx Style Id",
+        cell: ({ row }) => <div>{row.original.stockxSku}</div>,
+    },
+    {
+        accessorKey: "goatStyleId",
+        header: "Goat Style Id",
+        cell: ({ row }) => <div>{row.original.goatSku}</div>,
+    },
+    {
+        accessorKey: "actions",
+        header: <div className="text-center">Actions</div>,
+        cell: ({ row }) => (
+            <div className="flex items-center justify-center">
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-muted-foreground hover:text-primary"
+                    onClick={() => onViewItem(row.original)}
+                >
+                    <Eye size={16} />
+                </Button>
+            </div>
+        ),
+        enableSorting: false,
+    },
 ];
