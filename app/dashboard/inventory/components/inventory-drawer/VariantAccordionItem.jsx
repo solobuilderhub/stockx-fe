@@ -90,7 +90,7 @@ export function VariantAccordionItem({
                         className="flex items-center gap-2"
                         onClick={handleStopPropagation}
                     >
-                        <Button
+                        {/* <Button
                             size="sm"
                             variant="outline"
                             className="gap-1 bg-secondary/40 text-foreground hover:bg-secondary hover:text-foreground border-secondary/30"
@@ -98,7 +98,7 @@ export function VariantAccordionItem({
                         >
                             <LineChart size={14} />
                             Market Data
-                        </Button>
+                        </Button> */}
 
                         <Button
                             size="sm"

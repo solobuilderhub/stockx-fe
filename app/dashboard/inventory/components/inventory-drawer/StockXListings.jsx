@@ -93,7 +93,7 @@ export function StockXListings({
                     Showing {filteredListings.length} active listings on StockX
                 </CardDescription>
             </CardHeader>
-            <CardContent className="p-0">
+            <CardContent className="p-4">
                 <Table>
                     <TableHeader>
                         <TableRow>

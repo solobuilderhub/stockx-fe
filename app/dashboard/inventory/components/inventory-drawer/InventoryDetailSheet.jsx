@@ -77,7 +77,7 @@ export function InventoryDetailSheet({ open, onOpenChange, item }) {
                             Inventory Details
                         </SheetTitle>
                         <SheetClose className="p-2 rounded-full hover:bg-secondary">
-                            <X size={20} />
+                            {/* <X size={20} /> */}
                         </SheetClose>
                     </div>
                 </SheetHeader>
@@ -111,6 +111,7 @@ export function InventoryDetailSheet({ open, onOpenChange, item }) {
                     <Button
                         variant="outline"
                         onClick={() => onOpenChange(false)}
+                        className="w-fit mx-auto"
                     >
                         Close
                     </Button>
