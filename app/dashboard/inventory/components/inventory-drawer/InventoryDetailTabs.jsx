@@ -13,7 +13,7 @@ export function InventoryDetailTabs({
 }) {
     return (
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
-            <TabsList className="grid grid-cols-3 mb-6 bg-secondary/10">
+            <TabsList className="grid grid-cols-3 mb-6 bg-secondary/10 w-full py-1">
                 <TabsTrigger
                     value="details"
                     className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary"
