@@ -80,7 +80,7 @@ export function GoatListings({
                     Showing {filteredListings.length} active listings on GOAT
                 </CardDescription>
             </CardHeader>
-            <CardContent className="p-0">
+            <CardContent className="p-4">
                 <Table>
                     <TableHeader>
                         <TableRow>
