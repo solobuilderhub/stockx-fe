@@ -79,6 +79,17 @@ export function MarketDataCard({
                                     ${stockXData.highestBidAmount}
                                 </div>
                             </div>
+                            <div className="bg-purple-900/20 rounded-lg p-3 border border-purple-800/30">
+                                <div className="flex items-center gap-2">
+                                    <div className="text-purple-400 text-xs font-medium uppercase tracking-wider">
+                                        Last Sold
+                                    </div>
+                                    <Info className="h-4 w-4 text-purple-400" />
+                                </div>
+                                <div className="mt-1 text-xl font-bold text-purple-300">
+                                    {formatPrice(stockXData.highestBidAmount)}
+                                </div>
+                            </div>
                         </div>
                     )}
                 </div>

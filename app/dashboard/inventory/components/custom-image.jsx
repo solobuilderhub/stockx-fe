@@ -58,8 +58,6 @@ const FallbackImage = ({ urlKey, alt }) => {
         });
 
         const capitalizedKey = capitalizedWords.join("-");
-        console.log(`Processing: ${urlKey} → ${capitalizedKey}`);
-
         // Format the base URL without extension
         const baseUrl = `https://images.stockx.com/images/${capitalizedKey}`;
 
@@ -71,14 +69,12 @@ const FallbackImage = ({ urlKey, alt }) => {
             const img = new Image();
 
             img.onload = () => {
-                console.log(`Success: ${url}`);
                 imageLoaded = true;
                 setImgSrc(url);
                 setIsLoading(false);
             };
 
             img.onerror = () => {
-                console.log(`Failed: ${url}`);
                 if (!imageLoaded) {
                     // Add small delay before trying next format
                     setTimeout(nextStep, 150);
@@ -121,17 +117,12 @@ const FallbackImage = ({ urlKey, alt }) => {
             const tryNextFormat = () => {
                 if (formatIndex >= formats.length - 1) {
                     // If we've tried all formats and none worked, use empty string
-                    console.log(`All formats failed for ${urlKey}`);
                     setImgSrc("");
                     setIsLoading(false);
                     return;
                 }
 
                 const currentFormat = formats[formatIndex];
-                console.log(
-                    `Trying 360 format #${formatIndex + 1}: ${currentFormat}`
-                );
-
                 loadWithDelay(currentFormat, () => {
                     formatIndex++;
                     tryNextFormat();

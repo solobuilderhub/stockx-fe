@@ -21,7 +21,6 @@ const fetchInventory = async ({
         const queryParams = new URLSearchParams({
             page,
             limit,
-            populate: "product", // Always populate product data
         });
 
         // Add search query if provided
@@ -53,7 +52,7 @@ const fetchInventory = async ({
         // Fetch data from API
         const apiUrl = `${
             process.env.NEXT_PUBLIC_API_URL
-        }/inventor?${queryParams.toString()}`;
+        }/product?${queryParams.toString()}`;
 
         const response = await fetch(apiUrl, {
             headers: {
@@ -119,44 +118,7 @@ export function useInventoryData({
         retry: false, // Don't retry on failure - just show dummy data
     });
 
-    // Map API response to match table format
-    const mappedData =
-        queryData?.docs?.map((item) => {
-            // Get size from stockx or goat object
-            const size =
-                item.stockx?.size ||
-                (item.goat?.size ? `US ${item.goat.size}` : "N/A") ||
-                item.size; // Include direct size from dummy data
-
-            return {
-                id: item.id,
-                image: item.image || "", // Placeholder for image
-                name: item.product?.title || item.name || "No Name",
-                urlKey: item.product?.urlKey || item.urlKey || "",
-                stockxSku: item.stockx?.sku || item.stockxSku || "",
-                goatSku: item.goat?.sku || item.goatSku || "",
-                size: size,
-                quantity: item.quantity || 0,
-                dateAdded:
-                    item.dateAdded ||
-                    (item.inventory_added_at
-                        ? new Date(item.inventory_added_at).toLocaleDateString(
-                              "en-GB"
-                          )
-                        : "N/A"), // dd/mm/yyyy
-                warehouseLocation:
-                    item.warehouseLocation || item.location?.[0] || "N/A",
-                brandWholesale:
-                    item.brandWholesale || item.product?.brand || "N/A",
-                retailPrice:
-                    item.retailPrice ||
-                    (item.retail_price
-                        ? `$${item.retail_price.toFixed(2)}`
-                        : "$0.00"),
-            };
-        }) || [];
-
-    // Extract pagination data from the new response format
+    // Extract pagination data from the response format
     const pagination = queryData
         ? {
               totalDocs: queryData.totalDocs || 0,
@@ -176,7 +138,7 @@ export function useInventoryData({
           };
 
     return {
-        inventory: mappedData,
+        inventory: queryData?.docs || [],
         pagination,
         isLoading,
         error: error?.message,

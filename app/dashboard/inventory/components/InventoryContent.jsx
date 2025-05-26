@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Filter, Search } from "lucide-react";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { FilterModal } from "./FilterModal";
 import { InventoryTable } from "./InventoryTable";
 // import { MasterInventoryUpload } from "./MasterInventoryUpload";
@@ -21,7 +22,7 @@ export function InventoryContent({
     const [appliedFilters, setAppliedFilters] = useState(null);
     const [currentPage, setCurrentPage] = useState(initialPage);
 
-    // Debounce search query with 300ms delay
+    // Debounce search query with 400ms delay
     useEffect(() => {
         const timer = setTimeout(() => {
             setDebouncedSearchQuery(searchQuery);
@@ -34,6 +35,17 @@ export function InventoryContent({
 
     const handleApplyFilters = (filters) => {
         setAppliedFilters(filters);
+        // Reset to first page when filters change
+        setCurrentPage(1);
+        if (handlePageChange) {
+            handlePageChange(1);
+        }
+
+        // Show toast notification
+        toast.success("Filters applied", {
+            description:
+                "Your inventory list has been updated with the selected filters",
+        });
     };
 
     const handleLocalPageChange = (page) => {
@@ -41,6 +53,11 @@ export function InventoryContent({
         if (handlePageChange) {
             handlePageChange(page);
         }
+    };
+
+    const handleClearSearch = () => {
+        setSearchQuery("");
+        setDebouncedSearchQuery("");
     };
 
     return (
@@ -51,7 +68,7 @@ export function InventoryContent({
                 <div className="bg-card rounded-xl p-6 shadow-sm">
                     <div className="lg:flex justify-between items-center mb-6">
                         <h2 className="text-xl font-semibold mb-6 lg:mb-0">
-                            Standard Listings
+                            Inventory Items
                         </h2>
                         <div className="flex items-center gap-3">
                             <Button
@@ -67,12 +84,20 @@ export function InventoryContent({
                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                                 <Input
                                     placeholder="Search by name or sku"
-                                    className="pl-9"
+                                    className="pl-9 pr-8"
                                     value={searchQuery}
                                     onChange={(e) =>
                                         setSearchQuery(e.target.value)
                                     }
                                 />
+                                {searchQuery && (
+                                    <button
+                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                        onClick={handleClearSearch}
+                                    >
+                                        ×
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </div>
