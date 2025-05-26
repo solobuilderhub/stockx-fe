@@ -21,8 +21,8 @@ export default async function InventoryPage(props) {
 
     // Parse and validate search params
     const searchParams = props.searchParams;
-    const page = Number(searchParams.page) || 1;
-    const limit = Number(searchParams.limit) || 50; // Set default limit to 50
+    const page = Number(searchParams?.page) || 1;
+    const limit = Number(searchParams?.limit) || 50; // Set default limit to 50
 
     const breadcrumbItems = [
         { label: "Dashboard", href: "/dashboard" },

@@ -4,74 +4,99 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Minus, Plus } from "lucide-react";
 import { useState } from "react";
-import { useUpdateInventoryQuantity } from "./hooks/use-inventory-data";
 
 export function InventoryQuantityControl({
-    initialQuantity,
+    initialQuantity = 1,
     variantId,
     onQuantityChange,
-    itemId = "1", // Default to first item if not provided
+    itemId,
+    variant,
 }) {
     const [quantity, setQuantity] = useState(initialQuantity);
-    const updateQuantity = useUpdateInventoryQuantity();
+    const [isUpdating, setIsUpdating] = useState(false);
 
-    const handleDecrease = () => {
-        if (quantity > 1) {
-            const newQuantity = quantity - 1;
-            setQuantity(newQuantity);
-            handleUpdateQuantity(newQuantity);
-        }
-    };
-
-    const handleIncrease = () => {
+    // Function to handle increment
+    const handleIncrement = (e) => {
+        e.stopPropagation();
         const newQuantity = quantity + 1;
         setQuantity(newQuantity);
-        handleUpdateQuantity(newQuantity);
+        handleUpdate(newQuantity);
     };
 
-    const handleChange = (e) => {
+    // Function to handle decrement
+    const handleDecrement = (e) => {
+        e.stopPropagation();
+        if (quantity > 0) {
+            const newQuantity = quantity - 1;
+            setQuantity(newQuantity);
+            handleUpdate(newQuantity);
+        }
+    };
+
+    // Function to handle manual input
+    const handleInputChange = (e) => {
+        e.stopPropagation();
         const value = parseInt(e.target.value);
-        if (!isNaN(value) && value >= 1) {
+        if (!isNaN(value) && value >= 0) {
             setQuantity(value);
-            handleUpdateQuantity(value);
+        } else if (e.target.value === "") {
+            setQuantity(0);
         }
     };
 
-    const handleUpdateQuantity = (newQuantity) => {
-        // Call the legacy handler if provided (for backwards compatibility)
-        if (onQuantityChange) {
-            onQuantityChange(variantId, newQuantity);
-        }
+    // Function to handle blur event (when input loses focus)
+    const handleBlur = () => {
+        handleUpdate(quantity);
+    };
 
-        // Use our new React Query mutation
-        updateQuantity.mutate({ itemId, variantId, newQuantity });
+    // Function to update quantity via API
+    const handleUpdate = (newQuantity) => {
+        setIsUpdating(true);
+
+        // Simulate API call with timeout
+        setTimeout(() => {
+            // Call the parent callback
+            onQuantityChange(variantId, newQuantity);
+            setIsUpdating(false);
+        }, 300);
     };
 
     return (
-        <div className="flex items-center border rounded-md">
+        <div
+            className="flex items-center h-8 w-32 rounded-md border border-input bg-background"
+            onClick={(e) => e.stopPropagation()}
+        >
             <Button
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 rounded-r-none border-r"
-                onClick={handleDecrease}
+                className="h-full aspect-square rounded-none"
+                onClick={handleDecrement}
+                disabled={quantity <= 0 || isUpdating}
             >
                 <Minus className="h-3 w-3" />
+                <span className="sr-only">Decrease</span>
             </Button>
             <Input
-                type="number"
+                type="text"
+                inputMode="numeric"
+                min={0}
                 value={quantity}
-                onChange={handleChange}
-                className="h-8 w-12 text-center border-none text-xs"
+                onChange={handleInputChange}
+                onBlur={handleBlur}
+                className="h-full border-none text-center focus-visible:ring-0 focus-visible:ring-offset-0"
+                disabled={isUpdating}
             />
             <Button
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 rounded-l-none border-l"
-                onClick={handleIncrease}
+                className="h-full aspect-square rounded-none"
+                onClick={handleIncrement}
+                disabled={isUpdating}
             >
                 <Plus className="h-3 w-3" />
+                <span className="sr-only">Increase</span>
             </Button>
         </div>
     );

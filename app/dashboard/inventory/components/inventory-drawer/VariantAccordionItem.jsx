@@ -24,14 +24,22 @@ export function VariantAccordionItem({
 }) {
     const [activeTab, setActiveTab] = useState("details");
 
-    const handleStopPropagation = (e) => {
-        e.stopPropagation();
-    };
+    // Important: Ensure we have a unique identifier for the accordion item
+    const accordionValue =
+        variant._id || variant.variantId || `variant-${Math.random()}`;
 
-    // Handle view market data by switching to the actions tab
+    // View market data handler
     const handleViewMarketData = (e) => {
+        e.preventDefault();
         e.stopPropagation();
         setActiveTab("actions");
+    };
+
+    // Handle view listings with proper stopPropagation
+    const handleViewListings = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onViewListings(variant);
     };
 
     // Format date helper function
@@ -56,7 +64,7 @@ export function VariantAccordionItem({
 
     return (
         <AccordionItem
-            value={variant.variantId}
+            value={accordionValue}
             className="border rounded-lg mb-2 overflow-hidden transition-all duration-200 hover:border-primary/30 hover:shadow-sm"
         >
             <AccordionTrigger className="px-4 py-3 hover:bg-secondary/5 [&[data-state=open]]:bg-secondary/10">
@@ -66,38 +74,39 @@ export function VariantAccordionItem({
                             variant="outline"
                             className="bg-secondary/30 text-foreground border-secondary"
                         >
-                            Size {variant.size}
+                            Size:{" "}
+                            {variant.variant?.stockx?.variantValue || "Unknown"}
                         </Badge>
 
-                        <div className="ml-2" onClick={handleStopPropagation}>
+                        <div
+                            className="ml-2"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                            }}
+                        >
                             <InventoryQuantityControl
-                                initialQuantity={variant.quantity || 1}
+                                initialQuantity={variant?.quantity || 1}
                                 variantId={variant.variantId}
                                 onQuantityChange={onQuantityChange}
                                 itemId={itemId}
+                                variant={variant}
                             />
                         </div>
                     </div>
 
                     <div
                         className="flex items-center gap-2"
-                        onClick={handleStopPropagation}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }}
                     >
-                        {/* <Button
-                            size="sm"
-                            variant="outline"
-                            className="gap-1 bg-secondary/40 text-foreground hover:bg-secondary hover:text-foreground border-secondary/30"
-                            onClick={handleViewMarketData}
-                        >
-                            <LineChart size={14} />
-                            Market Data
-                        </Button> */}
-
                         <Button
                             size="sm"
                             variant="outline"
                             className="gap-1 bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary border-primary/20"
-                            onClick={() => onViewListings(variant)}
+                            onClick={handleViewListings}
                         >
                             <Eye size={14} />
                             Listings
@@ -308,12 +317,14 @@ export function VariantAccordionItem({
                                         size="sm"
                                         variant="outline"
                                         className="gap-1.5 w-full bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary border-primary/20 mt-2"
-                                        onClick={() =>
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
                                             onListItem(
-                                                "goat",
+                                                "stockx",
                                                 variant.variantId
-                                            )
-                                        }
+                                            );
+                                        }}
                                     >
                                         <Truck size={14} />
                                         List on StockX
@@ -373,12 +384,14 @@ export function VariantAccordionItem({
                                         size="sm"
                                         variant="outline"
                                         className="gap-1.5 w-full bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary border-primary/20 mt-2"
-                                        onClick={() =>
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
                                             onListItem(
                                                 "goat",
                                                 variant.variantId
-                                            )
-                                        }
+                                            );
+                                        }}
                                     >
                                         <Truck size={14} />
                                         List on GOAT

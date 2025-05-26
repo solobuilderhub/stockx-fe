@@ -11,8 +11,18 @@ export function InventoryItemDetails({ item }) {
                         <span className="text-sm text-muted-foreground">
                             Colorway
                         </span>
-                        <span className="font-medium">
-                            {item.productAttributes?.colorway || "N/A"}
+                        <span
+                            className="font-medium"
+                            title={item.productAttributes?.colorway || "N/A"}
+                        >
+                            {item.productAttributes?.colorway
+                                ? item.productAttributes.colorway.length > 25
+                                    ? `${item.productAttributes.colorway.substring(
+                                          0,
+                                          25
+                                      )}...`
+                                    : item.productAttributes.colorway
+                                : "N/A"}
                         </span>
                     </div>
 

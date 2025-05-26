@@ -36,8 +36,8 @@ export function InventoryUi({
 
     const handleViewItem = async (item) => {
         const itemDetails = await getSingleItemDetails(item._id);
-        if (itemDetails.success && itemDetails.docs) {
-            setSelectedItem({ ...item, itemDetails: itemDetails.docs[0] });
+        if (itemDetails.success && itemDetails.docs?.length > 0) {
+            setSelectedItem({ ...item, itemDetails: itemDetails.docs });
         } else {
             setSelectedItem(item);
         }

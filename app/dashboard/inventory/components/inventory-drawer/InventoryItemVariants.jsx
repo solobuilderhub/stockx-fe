@@ -11,6 +11,7 @@ export function InventoryItemVariants({
     handleListItem,
     styleId,
     itemId = "1",
+    item,
 }) {
     const [selectedVariant, setSelectedVariant] = useState(null);
     const [showListingsDialog, setShowListingsDialog] = useState(false);
@@ -46,17 +47,17 @@ export function InventoryItemVariants({
                     Available Variants
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                    {variations?.length || 0} size variants available. Click on
-                    a variant to see detailed information.
+                    {item?.itemDetails?.length || 0} size variants available.
+                    Click on a variant to see detailed information.
                 </p>
             </div>
 
-            {variations && variations.length > 0 ? (
+            {item?.itemDetails?.length > 0 ? (
                 <div className="space-y-3">
                     <Accordion type="single" collapsible className="space-y-3">
-                        {variations.map((variant) => (
+                        {item?.itemDetails.map((variant) => (
                             <VariantAccordionItem
-                                key={variant.variantId}
+                                key={variant._id}
                                 variant={variant}
                                 onListItem={handleListItem}
                                 onViewListings={handleViewListings}

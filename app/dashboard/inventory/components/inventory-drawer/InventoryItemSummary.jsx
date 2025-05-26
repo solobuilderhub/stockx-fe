@@ -48,7 +48,7 @@ export function InventoryItemSummary({ item }) {
                         </p>
                         <p className="font-medium text-lg">
                             {item.itemDetails?.retail_price
-                                ? `$${item.itemDetails.retail_price}`
+                                ? `$${item.itemDetails[0].retail_price}`
                                 : "N/A"}
                         </p>
                     </div>
@@ -57,7 +57,7 @@ export function InventoryItemSummary({ item }) {
                             Warehouse Location
                         </p>
                         <p className="font-medium text-lg">
-                            {item.warehouseLocation || "N/A"}
+                            {item.itemDetails[0].location || "N/A"}
                         </p>
                     </div>
                     <div>
@@ -77,7 +77,7 @@ export function InventoryItemSummary({ item }) {
                             Total Quantity
                         </p>
                         <p className="font-medium text-lg">
-                            {item.itemDetails?.quantity || 0}
+                            {item.itemDetails[0].quantity || 0}
                         </p>
                     </div>
                 </div>
