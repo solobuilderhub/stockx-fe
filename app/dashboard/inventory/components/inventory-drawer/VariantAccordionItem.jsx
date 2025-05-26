@@ -8,15 +8,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-    Eye,
-    Info,
-    LineChart,
-    Tag,
-    TrendingDown,
-    TrendingUp,
-    Truck,
-} from "lucide-react";
+import { Eye, Info, TrendingDown, TrendingUp, Truck } from "lucide-react";
 import { useState } from "react";
 import { InventoryQuantityControl } from "./InventoryQuantityControl";
 // Removed: import { Variant } from '@/components/inventory-drawer/types';
@@ -51,8 +43,9 @@ export function VariantAccordionItem({
 
     // Static dummy market data
     const dummyStockXData = {
-        lowestAskAmount: "220",
-        highestBidAmount: "185",
+        lowestAskAmount: "$220",
+        highestBidAmount: "$185",
+        lastSoldAmount: "$210",
     };
 
     const dummyGoatData = {
@@ -275,12 +268,11 @@ export function VariantAccordionItem({
                                         <div className="bg-green-900/20 rounded-lg p-2 border border-green-800/30">
                                             <div className="flex items-center gap-1">
                                                 <div className="text-green-400 text-xs font-medium uppercase tracking-wider">
-                                                    Lowest Ask
+                                                    Lowest Price
                                                 </div>
                                                 <TrendingDown className="h-3 w-3 text-green-400" />
                                             </div>
-                                            <div className="mt-1 text-xl font-bold text-green-300">
-                                                $
+                                            <div className="mt-1 text-lg font-bold text-green-300">
                                                 {
                                                     dummyStockXData.lowestAskAmount
                                                 }
@@ -290,30 +282,40 @@ export function VariantAccordionItem({
                                         <div className="bg-blue-900/20 rounded-lg p-2 border border-blue-800/30">
                                             <div className="flex items-center gap-1">
                                                 <div className="text-blue-400 text-xs font-medium uppercase tracking-wider">
-                                                    Highest Bid
+                                                    Highest Offer
                                                 </div>
                                                 <TrendingUp className="h-3 w-3 text-blue-400" />
                                             </div>
-                                            <div className="mt-1 text-xl font-bold text-blue-300">
-                                                $
+                                            <div className="mt-1 text-lg font-bold text-blue-300">
                                                 {
                                                     dummyStockXData.highestBidAmount
                                                 }
                                             </div>
                                         </div>
                                     </div>
+                                    <div className="bg-purple-900/20 rounded-lg p-2 border border-purple-800/30 mt-2">
+                                        <div className="flex items-center gap-1">
+                                            <div className="text-purple-400 text-xs font-medium uppercase tracking-wider">
+                                                Last Sold
+                                            </div>
+                                            <Info className="h-3 w-3 text-purple-400" />
+                                        </div>
+                                        <div className="mt-1 text-lg font-bold text-purple-300">
+                                            {dummyStockXData.lastSoldAmount}
+                                        </div>
+                                    </div>
                                     <Button
                                         size="sm"
                                         variant="outline"
-                                        className="gap-1.5 w-full bg-secondary/20 text-foreground hover:bg-secondary hover:text-foreground border-secondary/30 mt-2"
+                                        className="gap-1.5 w-full bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary border-primary/20 mt-2"
                                         onClick={() =>
                                             onListItem(
-                                                "stockx",
+                                                "goat",
                                                 variant.variantId
                                             )
                                         }
                                     >
-                                        <Tag size={14} />
+                                        <Truck size={14} />
                                         List on StockX
                                     </Button>
                                 </div>
