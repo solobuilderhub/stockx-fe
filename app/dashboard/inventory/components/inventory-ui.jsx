@@ -2,16 +2,12 @@
 // import HeaderSection from "@/components/custom/dashboard/header-section";
 import ErrorBoundaryWrapper from "@/components/custom/error/error-boundary-wrapper";
 import { Button } from "@/components/ui/button";
-import { Table, TableBody } from "@/components/ui/table";
 import { Plus, RefreshCw } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { useInventory } from "./inventory-drawer/hooks/use-inventory-data";
+import { toast } from "sonner";
 import { InventoryDetailSheet } from "./inventory-drawer/InventoryDetailSheet";
-import { InventoryEmptyState } from "./inventory-drawer/InventoryEmptyState";
-import { InventoryTableHeader } from "./inventory-drawer/InventoryTableHeader";
-import { InventoryTableRow } from "./inventory-drawer/InventoryTableRow";
-import { OrderDetailsSheet } from "./order-details-sheet";
+import { InventoryContent } from "./InventoryContent";
 
 export function InventoryUi({
     token,
@@ -25,18 +21,10 @@ export function InventoryUi({
     const currentPage = Number(searchParams.get("page")) || initialPage;
     const status = searchParams.get("status") || initialStatus;
 
-    // State for order details sheet
-    const [selectedOrder, setSelectedOrder] = useState(null);
-    const [isSheetOpen, setIsSheetOpen] = useState(false);
-
     // State for inventory detail sheet
     const [selectedItem, setSelectedItem] = useState(null);
     const [isDetailSheetOpen, setIsDetailSheetOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-
-    // Use our custom hook to fetch inventory data
-    const { data: inventoryItems, isLoading: isLoadingInventory } =
-        useInventory();
 
     const handlePageChange = (page) => {
         const params = new URLSearchParams(searchParams);
@@ -46,33 +34,45 @@ export function InventoryUi({
         });
     };
 
-    const handleViewDetails = (order) => {
-        setSelectedOrder(order);
-        setIsSheetOpen(true);
+    const handleViewItem = async (item) => {
+        const itemDetails = await getSingleItemDetails(item._id);
+        if (itemDetails.success && itemDetails.docs?.length > 0) {
+            setSelectedItem({ ...item, itemDetails: itemDetails.docs });
+        } else {
+            setSelectedItem(item);
+        }
+        setIsDetailSheetOpen(true);
     };
 
-    const handleViewItem = (item) => {
-        setSelectedItem(item);
-        setIsDetailSheetOpen(true);
+    const getSingleItemDetails = async (id) => {
+        const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/inventory?product=${id}`,
+            {
+                headers: { Authorization: `Bearer ${token}` },
+                cache: "force-cache",
+            }
+        );
+        const data = await response.json();
+        return data;
     };
 
     const handleRefreshInventory = () => {
         setIsLoading(true);
+
+        // Invalidate React Query cache to force a refetch
+        // This would typically be done via queryClient.invalidateQueries(['inventory'])
+        // But for simplicity, we'll just refresh the page
+        router.refresh();
+
+        toast.success("Refreshing inventory data", {
+            description: "Fetching the latest inventory data from the server",
+        });
 
         // Simulate refreshing data
         setTimeout(() => {
             setIsLoading(false);
         }, 1000);
     };
-
-    if (isLoadingInventory) {
-        return (
-            <div className="flex justify-center items-center h-64">
-                <RefreshCw className="mr-2 h-6 w-6 animate-spin" />
-                <span>Loading inventory...</span>
-            </div>
-        );
-    }
 
     return (
         <div className="space-y-6">
@@ -87,7 +87,7 @@ export function InventoryUi({
                     <div>
                         <h2 className="text-2xl font-bold">Inventory</h2>
                         <p className="text-muted-foreground">
-                            {inventoryItems.length} items in your inventory
+                            Manage your product inventory
                         </p>
                     </div>
 
@@ -112,32 +112,15 @@ export function InventoryUi({
                     </div>
                 </div>
 
-                {inventoryItems && inventoryItems.length > 0 ? (
-                    <div className="border rounded-md">
-                        <Table>
-                            <InventoryTableHeader />
-                            <TableBody>
-                                {inventoryItems.map((item) => (
-                                    <InventoryTableRow
-                                        key={item.id}
-                                        item={item}
-                                        onViewItem={handleViewItem}
-                                    />
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </div>
-                ) : (
-                    <InventoryEmptyState />
-                )}
+                <InventoryContent
+                    token={token}
+                    initialPage={currentPage}
+                    initialLimit={initialLimit}
+                    handleViewDetails={handleViewItem}
+                    handlePageChange={handlePageChange}
+                />
             </ErrorBoundaryWrapper>
 
-            {/* Order Details Sheet */}
-            <OrderDetailsSheet
-                order={selectedOrder}
-                open={isSheetOpen}
-                onOpenChange={setIsSheetOpen}
-            />
             <InventoryDetailSheet
                 open={isDetailSheetOpen}
                 onOpenChange={setIsDetailSheetOpen}

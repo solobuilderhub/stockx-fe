@@ -6,11 +6,9 @@ import {
     Card,
     CardContent,
     CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import {
     Table,
     TableBody,
@@ -19,171 +17,169 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { DollarSign, ExternalLink, Eye } from "lucide-react";
-import { useState } from "react";
-import { formatPrice, formatTimeAgo, getStatusClass } from "./listing-utils";
-import { ListingOrderDetail } from "./ListingOrderDetail";
-
-// Removed TypeScript interfaces
+import { Pencil, RefreshCw, Trash2 } from "lucide-react";
 
 export function StockXListings({
-    listings,
+    listings = [],
+    isLoading = false,
     lastUpdated,
     filterByVariantId,
-    isLoading = false,
 }) {
-    const [selectedListing, setSelectedListing] = useState(null);
+    // Function to format date to readable format
+    const formatDate = (dateString) => {
+        if (!dateString) return "N/A";
+        const date = new Date(dateString);
+        return date.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+        });
+    };
 
-    // Filter listings by variant if provided
+    // Filter listings by variant ID if provided
     const filteredListings = filterByVariantId
         ? listings.filter(
               (listing) => listing.variant.variantId === filterByVariantId
           )
         : listings;
 
-    // Get a status badge component based on status string
+    // Status badge color mapping
     const getStatusBadge = (status) => {
-        return (
-            <Badge variant="outline" className={getStatusClass(status)}>
-                {status}
-            </Badge>
-        );
-    };
-
-    // Convert listing to order format for detail view
-    const getOrderFromListing = (listing) => {
-        // This function transforms a listing into an order format
-        // In a real app, you might fetch the actual order from an API
-        return {
-            askId: listing.ask.askId,
-            listingId: listing.listingId,
-            amount: listing.amount,
-            currencyCode: listing.currencyCode,
-            createdAt: listing.createdAt,
-            updatedAt: listing.updatedAt,
-            variant: listing.variant,
-            product: listing.product,
-            status: listing.status,
-            inventoryType: listing.inventoryType,
+        const statusMap = {
+            ACTIVE: {
+                variant: "outline",
+                className: "bg-green-100 text-green-800 border-green-300",
+            },
+            PENDING: {
+                variant: "outline",
+                className: "bg-yellow-100 text-yellow-800 border-yellow-300",
+            },
+            SOLD: {
+                variant: "outline",
+                className: "bg-blue-100 text-blue-800 border-blue-300",
+            },
+            CANCELED: {
+                variant: "outline",
+                className: "bg-red-100 text-red-800 border-red-300",
+            },
         };
-    };
 
-    if (isLoading) {
         return (
-            <Card>
-                <CardHeader className="pb-2">
-                    <CardTitle className="text-lg">StockX Listings</CardTitle>
-                    <CardDescription>Loading listings...</CardDescription>
-                </CardHeader>
-                <CardContent className="p-4 text-center">
-                    <div className="animate-pulse flex flex-col items-center">
-                        <div className="h-6 bg-secondary/30 rounded w-3/4 mb-2"></div>
-                        <div className="h-6 bg-secondary/30 rounded w-1/2"></div>
-                    </div>
-                </CardContent>
-            </Card>
+            statusMap[status] || {
+                variant: "outline",
+                className: "bg-gray-100 text-gray-800 border-gray-300",
+            }
         );
-    }
+    };
 
     return (
         <Card>
-            <CardHeader className="pb-2">
-                <CardTitle className="text-lg">StockX Listings</CardTitle>
-                <CardDescription>
-                    Showing {filteredListings.length} active listings on StockX
-                </CardDescription>
+            <CardHeader>
+                <div className="flex justify-between items-center">
+                    <div>
+                        <CardTitle>StockX Listings</CardTitle>
+                        <CardDescription>
+                            {isLoading
+                                ? "Loading listings..."
+                                : `${filteredListings.length} listings found`}
+                        </CardDescription>
+                    </div>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-1"
+                        disabled={isLoading}
+                    >
+                        <RefreshCw size={14} />
+                        Refresh
+                    </Button>
+                </div>
             </CardHeader>
-            <CardContent className="p-4">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Size</TableHead>
-                            <TableHead>Price</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>Listed</TableHead>
-                            <TableHead>Expires</TableHead>
-                            <TableHead className="text-right">
-                                Actions
-                            </TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {filteredListings.map((listing) => (
-                            <TableRow key={listing.listingId}>
-                                <TableCell className="font-medium">
-                                    US {listing.variant.variantValue}
-                                </TableCell>
-                                <TableCell className="font-medium">
-                                    {formatPrice(listing.amount)}
-                                </TableCell>
-                                <TableCell>
-                                    {getStatusBadge(listing.status)}
-                                </TableCell>
-                                <TableCell>
-                                    {formatTimeAgo(listing.createdAt)}
-                                </TableCell>
-                                <TableCell>
-                                    {formatTimeAgo(listing.ask.askExpiresAt)}
-                                </TableCell>
-                                <TableCell className="text-right">
-                                    <div className="flex justify-end gap-2">
-                                        <Dialog>
-                                            <DialogTrigger asChild>
+            <CardContent>
+                {isLoading ? (
+                    <div className="flex justify-center items-center h-40">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                    </div>
+                ) : filteredListings.length === 0 ? (
+                    <div className="text-center py-10 border rounded-md">
+                        <p className="text-muted-foreground">
+                            No StockX listings found for this variant
+                        </p>
+                    </div>
+                ) : (
+                    <div className="border rounded-md overflow-hidden">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Price</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead>Size</TableHead>
+                                    <TableHead>Created</TableHead>
+                                    <TableHead>Actions</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {filteredListings.map((listing) => (
+                                    <TableRow key={listing.listingId}>
+                                        <TableCell className="font-medium">
+                                            ${listing.amount}
+                                        </TableCell>
+                                        <TableCell>
+                                            <Badge
+                                                variant={
+                                                    getStatusBadge(
+                                                        listing.status
+                                                    ).variant
+                                                }
+                                                className={
+                                                    getStatusBadge(
+                                                        listing.status
+                                                    ).className
+                                                }
+                                            >
+                                                {listing.status}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell>
+                                            {listing.variant.variantValue}
+                                        </TableCell>
+                                        <TableCell>
+                                            {formatDate(listing.createdAt)}
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex gap-2">
                                                 <Button
-                                                    size="sm"
-                                                    variant="outline"
-                                                    className="h-8 w-8 p-0"
-                                                    onClick={() =>
-                                                        setSelectedListing(
-                                                            listing
-                                                        )
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    disabled={
+                                                        listing.status !==
+                                                        "ACTIVE"
                                                     }
                                                 >
-                                                    <Eye className="h-4 w-4" />
+                                                    <Pencil size={14} />
                                                 </Button>
-                                            </DialogTrigger>
-                                            <DialogContent className="w-full max-w-3xl">
-                                                {selectedListing && (
-                                                    <ListingOrderDetail
-                                                        order={getOrderFromListing(
-                                                            selectedListing
-                                                        )}
-                                                        platform="stockx"
-                                                        onClose={() =>
-                                                            setSelectedListing(
-                                                                null
-                                                            )
-                                                        }
-                                                    />
-                                                )}
-                                            </DialogContent>
-                                        </Dialog>
-                                        <Button
-                                            size="sm"
-                                            variant="outline"
-                                            className="h-8 w-8 p-0"
-                                        >
-                                            <DollarSign className="h-4 w-4" />
-                                        </Button>
-                                        <Button
-                                            size="sm"
-                                            variant="outline"
-                                            className="h-8 w-8 p-0"
-                                        >
-                                            <ExternalLink className="h-4 w-4" />
-                                        </Button>
-                                    </div>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </CardContent>
-            <CardFooter className="bg-muted/50 p-2">
-                <div className="text-xs text-muted-foreground w-full text-center">
-                    Last updated {formatTimeAgo(lastUpdated)}
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    disabled={
+                                                        listing.status !==
+                                                        "ACTIVE"
+                                                    }
+                                                >
+                                                    <Trash2 size={14} />
+                                                </Button>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
+                )}
+                <div className="text-xs text-muted-foreground mt-2 text-right">
+                    Last updated: {formatDate(lastUpdated)}
                 </div>
-            </CardFooter>
+            </CardContent>
         </Card>
     );
 }
