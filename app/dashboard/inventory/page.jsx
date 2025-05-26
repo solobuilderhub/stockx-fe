@@ -5,6 +5,8 @@ import { Suspense } from "react";
 import { InventoryUi } from "./components/inventory-ui";
 import { InventoryProvider } from "./components/InventoryProvider";
 
+export const dynamic = "force-dynamic"; // Force dynamic rendering to ensure fresh data
+
 export default async function InventoryPage(props) {
     let accessToken = "";
 
@@ -18,10 +20,9 @@ export default async function InventoryPage(props) {
     }
 
     // Parse and validate search params
-    const searchParams = await props.searchParams;
+    const searchParams = props.searchParams;
     const page = Number(searchParams.page) || 1;
-    const status = searchParams.status || "";
-    const limit = 50; // Set default limit to 50
+    const limit = Number(searchParams.limit) || 50; // Set default limit to 50
 
     const breadcrumbItems = [
         { label: "Dashboard", href: "/dashboard" },
@@ -32,12 +33,17 @@ export default async function InventoryPage(props) {
         <div>
             <PageHeader items={breadcrumbItems} />
             <div className="space-y-6 p-6">
-                <Suspense fallback={<div>Loading...</div>}>
+                <Suspense
+                    fallback={
+                        <div className="flex justify-center items-center h-64">
+                            Loading inventory...
+                        </div>
+                    }
+                >
                     <InventoryProvider>
                         <InventoryUi
                             token={accessToken}
                             initialPage={page}
-                            initialStatus={status}
                             initialLimit={limit}
                         />
                     </InventoryProvider>

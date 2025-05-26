@@ -33,17 +33,16 @@ export const inventoryColumns = (onViewItem) => [
         enableHiding: false,
     },
     {
-        accessorKey: "image",
+        accessorKey: "",
         header: "Image",
         cell: ({ row }) => (
             <Avatar className="h-14 w-14 rounded">
                 <FallbackImage
-                    urlKey={row.getValue("urlKey")}
-                    alt={row.getValue("name")}
+                    urlKey={row.original.urlKey}
+                    alt={row.original.title}
                 />
                 <AvatarFallback className="bg-secondary text-xs">
-                    {row.getValue("name")?.substring(0, 2)?.toUpperCase() ||
-                        "NA"}
+                    {row.original.title?.substring(0, 2)?.toUpperCase() || "NA"}
                 </AvatarFallback>
             </Avatar>
         ),
@@ -64,22 +63,20 @@ export const inventoryColumns = (onViewItem) => [
     //     ),
     // },
     {
-        accessorKey: "name",
+        accessorKey: "title",
         header: "Name",
         cell: ({ row }) => (
             <div>
                 <p className="font-medium">
-                    {row.getValue("name") !== "No Name" ? (
+                    {row.getValue("title") ? (
                         <Link
-                            href={`https://stockx.com/${row.getValue(
-                                "urlKey"
-                            )}`}
+                            href={`https://stockx.com/${row.original.urlKey}`}
                             target="_blank"
                             className="hover:underline"
                         >
-                            {row.getValue("name").length > 50
+                            {row.getValue("title").length > 50
                                 ? (() => {
-                                      const name = row.getValue("name");
+                                      const name = row.getValue("title");
                                       // Find the last space before 50 characters
                                       const lastSpaceIndex = name
                                           .substring(0, 50)
@@ -102,23 +99,19 @@ export const inventoryColumns = (onViewItem) => [
                                           </>
                                       );
                                   })()
-                                : row.getValue("name")}
+                                : row.getValue("title")}
                         </Link>
                     ) : (
                         "No Name"
                     )}
                 </p>
-                {/* <p className="text-xs text-muted-foreground mt-1">
-                    {row.original.stockxSku === row.original.goatSku ? (
-                        `StockX SKU: ${row.original.stockxSku}`
-                    ) : (
-                        <>
-                            {`StockX SKU: ${row.original.stockxSku}`}
-                            <br />
-                            {`Goat SKU: ${row.original.goatSku}`}
-                        </>
+                <p className="text-xs text-muted-foreground mt-1">
+                    {row.original.goat?.name && (
+                        <span className="block">
+                            GOAT: {row.original.goat.name}
+                        </span>
                     )}
-                </p> */}
+                </p>
             </div>
         ),
     },
@@ -130,10 +123,19 @@ export const inventoryColumns = (onViewItem) => [
     //     accessorKey: "quantity",
     //     header: "Qty",
     // },
-    // {
-    //     accessorKey: "dateAdded",
-    //     header: "Inventory added date",
-    // },
+    {
+        accessorKey: "createdAt",
+        header: "Added Date",
+        cell: ({ row }) => (
+            <div>
+                {row.original.createdAt
+                    ? new Date(row.original.createdAt).toLocaleDateString(
+                          "en-GB"
+                      )
+                    : "-"}
+            </div>
+        ),
+    },
     // {
     //     accessorKey: "warehouseLocation",
     //     header: "Warehouse location",
@@ -163,18 +165,18 @@ export const inventoryColumns = (onViewItem) => [
         accessorKey: "brand",
         header: "Brand",
         cell: ({ row }) => (
-            <div className="font-medium">{row.original.brandWholesale}</div>
+            <div className="font-medium">{row.getValue("brand")}</div>
         ),
     },
     {
-        accessorKey: "stockxStyleId",
+        accessorKey: "stockx.styleId",
         header: "Stockx Style Id",
-        cell: ({ row }) => <div>{row.original.stockxSku}</div>,
+        cell: ({ row }) => <div>{row.original.stockx?.styleId || "-"}</div>,
     },
     {
-        accessorKey: "goatStyleId",
+        accessorKey: "goat.sku",
         header: "Goat Style Id",
-        cell: ({ row }) => <div>{row.original.goatSku}</div>,
+        cell: ({ row }) => <div>{row.original.goat?.sku || "-"}</div>,
     },
     {
         accessorKey: "actions",

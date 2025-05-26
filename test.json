@@ -1,0 +1,47 @@
+{
+    "success": true,
+    "docs": [
+        {
+            "stockx": {
+                "productId": "dee258d3-4473-4dd4-83f2-07f0b67097a7",
+                "styleId": "S85962"
+            },
+            "goat": {
+                "catalog_id": "pro-model-mid-j-s85962",
+                "name": "Pro Model Mid J 'White Black'",
+                "sku": "S85962",
+                "product_category": "PRODUCT_CATEGORY_SHOES",
+                "product_type": "sneakers"
+            },
+            "_id": "68329b2405f4dc596c90d0e9",
+            "title": "adidas Pro Model White Core Black (GS)",
+            "brand": "adidas",
+            "normalizedStyleId": "S85962",
+            "styleId": "S85962",
+            "urlKey": "adidas-pro-model-white-core-black-gs",
+            "productAttributes": {
+                "color": null,
+                "gender": "kids",
+                "releaseDate": null,
+                "retailPrice": null,
+                "season": null,
+                "colorway": "White/Core Black",
+                "category": "sneakers",
+                "_id": "68329b2405f4dc596c90d0ea"
+            },
+            "platform": ["stockx", "goat"],
+            "createdAt": "2025-05-25T04:23:00.052Z",
+            "updatedAt": "2025-05-25T04:23:00.052Z",
+            "__v": 0
+        }
+    ],
+    "totalDocs": 1510,
+    "limit": 10,
+    "totalPages": 151,
+    "page": 1,
+    "pagingCounter": 1,
+    "hasPrevPage": false,
+    "hasNextPage": true,
+    "prevPage": null,
+    "nextPage": 2
+}
