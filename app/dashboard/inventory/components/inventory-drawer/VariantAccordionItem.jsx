@@ -146,7 +146,13 @@ export function VariantAccordionItem({
                                                 Date Added
                                             </span>
                                             <span className="text-sm font-medium">
-                                                {formatDate(variant.dateAdded)}
+                                                {variant.inventory_added_at
+                                                    ? new Date(
+                                                          variant.inventory_added_at
+                                                      ).toLocaleDateString(
+                                                          "en-GB"
+                                                      )
+                                                    : "N/A"}
                                             </span>
                                         </div>
                                         <div className="border rounded-md p-3 bg-secondary/10">
@@ -154,7 +160,7 @@ export function VariantAccordionItem({
                                                 Retail Price
                                             </span>
                                             <span className="text-sm font-medium">
-                                                ${variant.retailPrice || "N/A"}
+                                                ${variant.retail_price || "N/A"}
                                             </span>
                                         </div>
                                         <div className="border rounded-md p-3 bg-secondary/10">
@@ -163,8 +169,12 @@ export function VariantAccordionItem({
                                             </span>
                                             <span className="text-sm font-medium">
                                                 $
-                                                {variant.wholesalePrice ||
-                                                    "N/A"}
+                                                {variant.retail_price
+                                                    ? (
+                                                          variant.retail_price *
+                                                          0.55
+                                                      ).toFixed(2)
+                                                    : "N/A"}
                                             </span>
                                         </div>
                                         <div className="border rounded-md p-3 bg-secondary/10">
@@ -188,21 +198,21 @@ export function VariantAccordionItem({
                                                     variant="outline"
                                                     className="justify-center"
                                                 >
-                                                    {variant.warehouseLocation1 ||
+                                                    {variant.location[0] ||
                                                         "N/A"}
                                                 </Badge>
                                                 <Badge
                                                     variant="outline"
                                                     className="justify-center"
                                                 >
-                                                    {variant.warehouseLocation2 ||
+                                                    {variant.location[1] ||
                                                         "N/A"}
                                                 </Badge>
                                                 <Badge
                                                     variant="outline"
                                                     className="justify-center"
                                                 >
-                                                    {variant.warehouseLocation3 ||
+                                                    {variant.location[2] ||
                                                         "N/A"}
                                                 </Badge>
                                             </div>
@@ -218,7 +228,7 @@ export function VariantAccordionItem({
                                                     </span>
                                                     <span className="text-sm font-medium">
                                                         {variant.totalSoldStockX ||
-                                                            0}
+                                                            "N/A"}
                                                     </span>
                                                 </div>
                                                 <div className="flex flex-col">
@@ -227,7 +237,7 @@ export function VariantAccordionItem({
                                                     </span>
                                                     <span className="text-sm font-medium">
                                                         {variant.totalSoldGoat ||
-                                                            0}
+                                                            "N/A"}
                                                     </span>
                                                 </div>
                                             </div>
