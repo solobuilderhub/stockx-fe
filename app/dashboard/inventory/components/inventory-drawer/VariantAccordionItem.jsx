@@ -8,6 +8,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Eye, Info, TrendingDown, TrendingUp, Truck } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
 import { InventoryQuantityControl } from "./InventoryQuantityControl";
 // Removed: import { Variant } from '@/components/inventory-drawer/types';
 
@@ -20,6 +22,9 @@ export function VariantAccordionItem({
     onQuantityChange,
     itemId = "1",
 }) {
+    const { data: session } = useSession();
+    const [stockXMarketData, setStockXMarketData] = useState(null);
+    const [goatMarketData, setGoatMarketData] = useState(null);
     // Important: Ensure we have a unique identifier for the accordion item
     const accordionValue =
         variant._id || variant.variantId || `variant-${Math.random()}`;
@@ -56,6 +61,66 @@ export function VariantAccordionItem({
         highestOfferPrice: "$180",
         lastSoldPrice: "$210",
     };
+
+    useEffect(() => {
+        const fetchMarketData = async () => {
+            try {
+                // Prepare headers with authentication if available
+                const headers = {
+                    "Content-Type": "application/json",
+                };
+
+                if (session?.accessToken) {
+                    headers.Authorization = `Bearer ${session.accessToken}`;
+                }
+
+                const stockXResponse = await fetch(
+                    `${process.env.NEXT_PUBLIC_API_URL}/stockx/market/${variant?.variant?.stockx?.productId}/${variant?.variant?.stockx?.variantId}`,
+                    { headers }
+                );
+
+                if (stockXResponse.ok) {
+                    const stockXData = await stockXResponse.json();
+                    setStockXMarketData(stockXData);
+                } else {
+                    console.error(
+                        "StockX API error:",
+                        stockXResponse.status,
+                        stockXResponse.statusText
+                    );
+                }
+
+                const goatResponse = await fetch(
+                    `${process.env.NEXT_PUBLIC_API_URL}/goat/market/${variant?.variant?.goat?.catalog_id}/${variant?.variant?.stockx?.variantValue}`
+                    // { headers }
+                );
+
+                if (goatResponse.ok) {
+                    const goatData = await goatResponse.json();
+                    setGoatMarketData(goatData);
+                } else {
+                    console.error(
+                        "GOAT API error:",
+                        goatResponse.status,
+                        goatResponse.statusText
+                    );
+                }
+            } catch (error) {
+                console.error("Error fetching market data:", error);
+            }
+        };
+
+        // Only fetch if we have the required variant data
+        if (
+            variant?.variant?.stockx?.productId &&
+            variant?.variant?.stockx?.variantId
+        ) {
+            fetchMarketData();
+        }
+    }, [variant._id, session?.accessToken]);
+
+    console.log("stockXMarketData", stockXMarketData);
+    console.log("goatMarketData", goatMarketData);
 
     return (
         <AccordionItem

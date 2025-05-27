@@ -6,6 +6,7 @@ import { Plus, RefreshCw } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { TokenProvider } from "../context/TokenContext";
 import { InventoryDetailSheet } from "./inventory-drawer/InventoryDetailSheet";
 import { InventoryContent } from "./InventoryContent";
 
@@ -75,57 +76,59 @@ export function InventoryUi({
     };
 
     return (
-        <div className="space-y-6">
-            {/* <HeaderSection
-                icon={Package}
-                title="Inventory"
-                description="View and manage your inventory"
-            /> */}
+        <TokenProvider token={token}>
+            <div className="space-y-6">
+                {/* <HeaderSection
+                    icon={Package}
+                    title="Inventory"
+                    description="View and manage your inventory"
+                /> */}
 
-            <ErrorBoundaryWrapper>
-                <div className="flex justify-between items-center mb-6">
-                    <div>
-                        <h2 className="text-2xl font-bold">Inventory</h2>
-                        <p className="text-muted-foreground">
-                            Manage your product inventory
-                        </p>
+                <ErrorBoundaryWrapper>
+                    <div className="flex justify-between items-center mb-6">
+                        <div>
+                            <h2 className="text-2xl font-bold">Inventory</h2>
+                            <p className="text-muted-foreground">
+                                Manage your product inventory
+                            </p>
+                        </div>
+
+                        <div className="flex gap-2">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handleRefreshInventory}
+                                disabled={isLoading}
+                            >
+                                <RefreshCw
+                                    className={`mr-2 h-4 w-4 ${
+                                        isLoading ? "animate-spin" : ""
+                                    }`}
+                                />
+                                Refresh
+                            </Button>
+                            <Button size="sm">
+                                <Plus className="mr-2 h-4 w-4" />
+                                Add Item
+                            </Button>
+                        </div>
                     </div>
 
-                    <div className="flex gap-2">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={handleRefreshInventory}
-                            disabled={isLoading}
-                        >
-                            <RefreshCw
-                                className={`mr-2 h-4 w-4 ${
-                                    isLoading ? "animate-spin" : ""
-                                }`}
-                            />
-                            Refresh
-                        </Button>
-                        <Button size="sm">
-                            <Plus className="mr-2 h-4 w-4" />
-                            Add Item
-                        </Button>
-                    </div>
-                </div>
+                    <InventoryContent
+                        token={token}
+                        initialPage={currentPage}
+                        initialLimit={initialLimit}
+                        handleViewDetails={handleViewItem}
+                        handlePageChange={handlePageChange}
+                    />
+                </ErrorBoundaryWrapper>
 
-                <InventoryContent
-                    token={token}
-                    initialPage={currentPage}
-                    initialLimit={initialLimit}
-                    handleViewDetails={handleViewItem}
-                    handlePageChange={handlePageChange}
+                <InventoryDetailSheet
+                    open={isDetailSheetOpen}
+                    onOpenChange={setIsDetailSheetOpen}
+                    item={selectedItem}
                 />
-            </ErrorBoundaryWrapper>
-
-            <InventoryDetailSheet
-                open={isDetailSheetOpen}
-                onOpenChange={setIsDetailSheetOpen}
-                item={selectedItem}
-            />
-        </div>
+            </div>
+        </TokenProvider>
     );
 }
