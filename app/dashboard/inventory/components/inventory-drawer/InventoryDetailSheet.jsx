@@ -16,7 +16,6 @@ import { InventoryItemSummary } from "./InventoryItemSummary";
 import { ListingForm } from "./ListingForm";
 
 export function InventoryDetailSheet({ open, onOpenChange, item }) {
-    console.log(item);
     const { toast } = useToast();
     const [activeTab, setActiveTab] = useState("details");
     const [selectedPlatform, setSelectedPlatform] = useState(null);

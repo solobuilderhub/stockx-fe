@@ -31,9 +31,10 @@ export function InventoryItemDetails({ item }) {
                             Release Date
                         </span>
                         <span className="font-medium">
-                            {new Date(
-                                item.productAttributes?.releaseDate
-                            ).toLocaleDateString("en-GB") || "N/A"}
+                            {item.productAttributes?.releaseDate &&
+                                new Date(
+                                    item.productAttributes?.releaseDate
+                                ).toLocaleDateString("en-GB")}
                         </span>
                     </div>
                 </div>
