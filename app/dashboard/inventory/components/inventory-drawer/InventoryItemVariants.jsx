@@ -2,8 +2,7 @@
 
 import { useToast } from "@/app/hooks/use-toast";
 import { Accordion } from "@/components/ui/accordion";
-import { useEffect, useState } from "react";
-import { useToken } from "../../context/TokenContext";
+import { useState } from "react";
 import { VariantAccordionItem } from "./VariantAccordionItem";
 import { VariantListingsDialog } from "./VariantListingsDialog";
 
