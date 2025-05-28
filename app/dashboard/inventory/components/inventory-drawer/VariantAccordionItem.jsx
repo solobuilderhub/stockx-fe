@@ -27,7 +27,6 @@ export function VariantAccordionItem({
     const [stockXMarketData, setStockXMarketData] = useState(null);
     const [goatMarketData, setGoatMarketData] = useState(null);
     const token = useToken();
-    console.log("token", token);
     // Important: Ensure we have a unique identifier for the accordion item
     const accordionValue =
         variant._id || variant.variantId || `variant-${Math.random()}`;
