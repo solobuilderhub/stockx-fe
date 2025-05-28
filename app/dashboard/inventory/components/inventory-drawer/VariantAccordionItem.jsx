@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Eye, Info, TrendingDown, TrendingUp, Truck } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+import { useToken } from "../../context/TokenContext";
 import { InventoryQuantityControl } from "./InventoryQuantityControl";
 // Removed: import { Variant } from '@/components/inventory-drawer/types';
 
@@ -25,6 +26,8 @@ export function VariantAccordionItem({
     const { data: session } = useSession();
     const [stockXMarketData, setStockXMarketData] = useState(null);
     const [goatMarketData, setGoatMarketData] = useState(null);
+    const token = useToken();
+    console.log("token", token);
     // Important: Ensure we have a unique identifier for the accordion item
     const accordionValue =
         variant._id || variant.variantId || `variant-${Math.random()}`;
@@ -68,11 +71,8 @@ export function VariantAccordionItem({
                 // Prepare headers with authentication if available
                 const headers = {
                     "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
                 };
-
-                if (session?.accessToken) {
-                    headers.Authorization = `Bearer ${session.accessToken}`;
-                }
 
                 const stockXResponse = await fetch(
                     `${process.env.NEXT_PUBLIC_API_URL}/stockx/market/${variant?.variant?.stockx?.productId}/${variant?.variant?.stockx?.variantId}`,
@@ -81,7 +81,7 @@ export function VariantAccordionItem({
 
                 if (stockXResponse.ok) {
                     const stockXData = await stockXResponse.json();
-                    setStockXMarketData(stockXData);
+                    setStockXMarketData(stockXData?.data?.marketData);
                 } else {
                     console.error(
                         "StockX API error:",
@@ -91,13 +91,13 @@ export function VariantAccordionItem({
                 }
 
                 const goatResponse = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URL}/goat/market/${variant?.variant?.goat?.catalog_id}/${variant?.variant?.stockx?.variantValue}`
-                    // { headers }
+                    `${process.env.NEXT_PUBLIC_API_URL}/goat/market/${variant?.variant?.goat?.catalog_id}/?size=${variant?.variant?.stockx?.variantValue}`,
+                    { headers }
                 );
 
                 if (goatResponse.ok) {
                     const goatData = await goatResponse.json();
-                    setGoatMarketData(goatData);
+                    setGoatMarketData(goatData?.data?.data?.variants[0]);
                 } else {
                     console.error(
                         "GOAT API error:",
@@ -321,36 +321,39 @@ export function VariantAccordionItem({
                                 <div className="bg-green-900/20 rounded-lg p-2 border border-green-800/30">
                                     <div className="flex items-center gap-1">
                                         <div className="text-green-400 text-xs font-medium uppercase tracking-wider">
-                                            Lowest Price
+                                            Lowest Ask Amount
                                         </div>
                                         <TrendingDown className="h-3 w-3 text-green-400" />
                                     </div>
                                     <div className="mt-1 text-lg font-bold text-green-300">
-                                        {dummyStockXData.lowestAskAmount}
+                                        {stockXMarketData?.lowestAskAmount ||
+                                            "N/A"}
                                     </div>
                                 </div>
 
                                 <div className="bg-blue-900/20 rounded-lg p-2 border border-blue-800/30">
                                     <div className="flex items-center gap-1">
                                         <div className="text-blue-400 text-xs font-medium uppercase tracking-wider">
-                                            Highest Offer
+                                            Highest Bid Amount
                                         </div>
                                         <TrendingUp className="h-3 w-3 text-blue-400" />
                                     </div>
                                     <div className="mt-1 text-lg font-bold text-blue-300">
-                                        {dummyStockXData.highestBidAmount}
+                                        {stockXMarketData?.highestBidAmount ||
+                                            "N/A"}
                                     </div>
                                 </div>
                             </div>
                             <div className="bg-purple-900/20 rounded-lg p-2 border border-purple-800/30 mt-2">
                                 <div className="flex items-center gap-1">
                                     <div className="text-purple-400 text-xs font-medium uppercase tracking-wider">
-                                        Last Sold
+                                        Flex Lowest Ask Amount
                                     </div>
                                     <Info className="h-3 w-3 text-purple-400" />
                                 </div>
                                 <div className="mt-1 text-lg font-bold text-purple-300">
-                                    {dummyStockXData.lastSoldAmount}
+                                    {stockXMarketData?.flexLowestAskAmount ||
+                                        "N/A"}
                                 </div>
                             </div>
                             <Button
@@ -381,36 +384,42 @@ export function VariantAccordionItem({
                                 <div className="bg-green-900/20 rounded-lg p-2 border border-green-800/30">
                                     <div className="flex items-center gap-1">
                                         <div className="text-green-400 text-xs font-medium uppercase tracking-wider">
-                                            Lowest Price
+                                            Lowest Listing Price Cents
                                         </div>
                                         <TrendingDown className="h-3 w-3 text-green-400" />
                                     </div>
                                     <div className="mt-1 text-lg font-bold text-green-300">
-                                        {dummyGoatData.lowestListingPrice}
+                                        {goatMarketData?.availability
+                                            ?.lowest_listing_price_cents ||
+                                            "N/A"}
                                     </div>
                                 </div>
 
                                 <div className="bg-blue-900/20 rounded-lg p-2 border border-blue-800/30">
                                     <div className="flex items-center gap-1">
                                         <div className="text-blue-400 text-xs font-medium uppercase tracking-wider">
-                                            Highest Offer
+                                            Highest Offer Price Cents
                                         </div>
                                         <TrendingUp className="h-3 w-3 text-blue-400" />
                                     </div>
                                     <div className="mt-1 text-lg font-bold text-blue-300">
-                                        {dummyGoatData.highestOfferPrice}
+                                        {goatMarketData?.availability
+                                            ?.highest_offer_price_cents ||
+                                            "N/A"}
                                     </div>
                                 </div>
                             </div>
                             <div className="bg-purple-900/20 rounded-lg p-2 border border-purple-800/30 mt-2">
                                 <div className="flex items-center gap-1">
                                     <div className="text-purple-400 text-xs font-medium uppercase tracking-wider">
-                                        Last Sold
+                                        Last Sold Listing Price Cents
                                     </div>
                                     <Info className="h-3 w-3 text-purple-400" />
                                 </div>
                                 <div className="mt-1 text-lg font-bold text-purple-300">
-                                    {dummyGoatData.lastSoldPrice}
+                                    {goatMarketData?.availability
+                                        ?.last_sold_listing_price_cents ||
+                                        "N/A"}
                                 </div>
                             </div>
                             <Button
