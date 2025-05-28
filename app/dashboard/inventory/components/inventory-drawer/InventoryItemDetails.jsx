@@ -26,7 +26,7 @@ export function InventoryItemDetails({ item }) {
                         </span>
                     </div>
 
-                    <div className="flex justify-between py-1 border-b border-border/50">
+                    {/* <div className="flex justify-between py-1 border-b border-border/50">
                         <span className="text-sm text-muted-foreground">
                             Release Date
                         </span>
@@ -36,7 +36,7 @@ export function InventoryItemDetails({ item }) {
                                     item.productAttributes?.releaseDate
                                 ).toLocaleDateString("en-GB")}
                         </span>
-                    </div>
+                    </div> */}
                 </div>
             </div>
 
