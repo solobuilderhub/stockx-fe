@@ -37,14 +37,14 @@ export function ListingForm({
                 <Avatar className="h-20 w-20 rounded-md">
                     <AvatarImage src={item.image} alt={item.name} />
                     <AvatarFallback className="bg-secondary text-xl">
-                        {item.name.substring(0, 2).toUpperCase()}
+                        {item?.name?.substring(0, 2).toUpperCase()}
                     </AvatarFallback>
                 </Avatar>
 
                 <div>
                     <h3 className="font-medium">{item.name}</h3>
                     <p className="text-sm text-muted-foreground">
-                        {item.styleId}
+                        {item?.styleId}
                     </p>
                     {selectedVariant && (
                         <Badge className="mt-2">

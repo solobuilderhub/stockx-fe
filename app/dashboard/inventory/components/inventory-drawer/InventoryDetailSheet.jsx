@@ -69,7 +69,7 @@ export function InventoryDetailSheet({ open, onOpenChange, item }) {
 
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
-            <SheetContent className="w-full sm:max-w-md md:max-w-lg lg:max-w-4xl overflow-y-auto">
+            <SheetContent className="w-full sm:max-w-md md:max-w-lg lg:max-w-4xl overflow-y-hidden">
                 <SheetHeader className="border-b pb-4">
                     <div className="flex items-center justify-between">
                         <SheetTitle className="text-xl font-bold">
