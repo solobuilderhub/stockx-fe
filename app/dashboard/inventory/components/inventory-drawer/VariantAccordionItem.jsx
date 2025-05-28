@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Eye, Info, TrendingDown, TrendingUp, Truck } from "lucide-react";
+import { Eye, Info, TrendingDown, TrendingUp } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useToken } from "../../context/TokenContext";
@@ -122,9 +122,10 @@ export function VariantAccordionItem({
         }
     }, [variant._id, session?.accessToken]);
 
-    console.log("stockXMarketData", stockXMarketData);
-    console.log("goatMarketData", goatMarketData);
+    // console.log("stockXMarketData", stockXMarketData);
+    // console.log("goatMarketData", goatMarketData);
 
+    console.log("variant", variant);
     return (
         <AccordionItem
             value={accordionValue}
@@ -257,10 +258,16 @@ export function VariantAccordionItem({
                                 </div>
                                 <div className="border rounded-md p-3 bg-secondary/10">
                                     <span className="text-muted-foreground text-xs block mb-1">
-                                        Total Sold
+                                        {/* Total Sold */}
+                                        Release Date
                                     </span>
                                     <div className="grid grid-cols-2 gap-2 mt-1">
-                                        <div className="flex flex-col">
+                                        {variant.product?.productAttributes
+                                            ?.releaseDate &&
+                                            new Date(
+                                                variant.product?.productAttributes?.releaseDate
+                                            ).toLocaleDateString("en-GB")}
+                                        {/* <div className="flex flex-col">
                                             <span className="text-xs text-muted-foreground">
                                                 StockX
                                             </span>
@@ -276,7 +283,7 @@ export function VariantAccordionItem({
                                             <span className="text-sm font-medium">
                                                 {variant.totalSoldGoat || "N/A"}
                                             </span>
-                                        </div>
+                                        </div> */}
                                     </div>
                                 </div>
                             </div>
@@ -284,8 +291,8 @@ export function VariantAccordionItem({
                     </div>
 
                     {/* Quick Actions Section */}
-                    <h3 className="text-sm font-medium mb-3">Quick Actions</h3>
-                    <div className="grid grid-cols-2 gap-3 text-sm mb-4">
+                    {/* <h3 className="text-sm font-medium mb-3">Quick Actions</h3> */}
+                    {/* <div className="grid grid-cols-2 gap-3 text-sm mb-4">
                         <div className="border rounded-md p-3 bg-secondary/10">
                             <span className="text-muted-foreground block mb-1">
                                 StockX:
@@ -308,7 +315,7 @@ export function VariantAccordionItem({
                                 0 active
                             </Badge>
                         </div>
-                    </div>
+                    </div> */}
 
                     <div className="grid grid-cols-2 gap-3">
                         {/* StockX Market Data Card */}
@@ -362,7 +369,7 @@ export function VariantAccordionItem({
                                         : "N/A"}
                                 </div>
                             </div>
-                            <Button
+                            {/* <Button
                                 size="sm"
                                 variant="outline"
                                 className="gap-1.5 w-full bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary border-primary/20 mt-2"
@@ -374,7 +381,7 @@ export function VariantAccordionItem({
                             >
                                 <Truck size={14} />
                                 List on StockX
-                            </Button>
+                            </Button> */}
                         </div>
 
                         {/* GOAT Market Data Card */}
@@ -390,7 +397,7 @@ export function VariantAccordionItem({
                                 <div className="bg-green-900/20 rounded-lg p-2 border border-green-800/30">
                                     <div className="flex items-center gap-1">
                                         <div className="text-green-400 text-xs font-medium uppercase tracking-wider">
-                                            Lowest Listing Price Cents
+                                            Lowest Listing Price
                                         </div>
                                         <TrendingDown className="h-3 w-3 text-green-400" />
                                     </div>
@@ -409,7 +416,7 @@ export function VariantAccordionItem({
                                 <div className="bg-blue-900/20 rounded-lg p-2 border border-blue-800/30">
                                     <div className="flex items-center gap-1">
                                         <div className="text-blue-400 text-xs font-medium uppercase tracking-wider">
-                                            Highest Offer Price Cents
+                                            Highest Offer Price
                                         </div>
                                         <TrendingUp className="h-3 w-3 text-blue-400" />
                                     </div>
@@ -428,7 +435,7 @@ export function VariantAccordionItem({
                             <div className="bg-purple-900/20 rounded-lg p-2 border border-purple-800/30 mt-2">
                                 <div className="flex items-center gap-1">
                                     <div className="text-purple-400 text-xs font-medium uppercase tracking-wider">
-                                        Last Sold Listing Price Cents
+                                        Last Sold Listing Price
                                     </div>
                                     <Info className="h-3 w-3 text-purple-400" />
                                 </div>
@@ -443,7 +450,7 @@ export function VariantAccordionItem({
                                         : "N/A"}
                                 </div>
                             </div>
-                            <Button
+                            {/* <Button
                                 size="sm"
                                 variant="outline"
                                 className="gap-1.5 w-full bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary border-primary/20 mt-2"
@@ -455,7 +462,7 @@ export function VariantAccordionItem({
                             >
                                 <Truck size={14} />
                                 List on GOAT
-                            </Button>
+                            </Button> */}
                         </div>
                     </div>
                 </div>
