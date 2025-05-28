@@ -330,8 +330,9 @@ export function VariantAccordionItem({
                                         <TrendingDown className="h-3 w-3 text-green-400" />
                                     </div>
                                     <div className="mt-1 text-lg font-bold text-green-300">
-                                        {stockXMarketData?.lowestAskAmount ||
-                                            "N/A"}
+                                        {stockXMarketData?.lowestAskAmount
+                                            ? `$${stockXMarketData.lowestAskAmount}`
+                                            : "N/A"}
                                     </div>
                                 </div>
 
@@ -343,8 +344,9 @@ export function VariantAccordionItem({
                                         <TrendingUp className="h-3 w-3 text-blue-400" />
                                     </div>
                                     <div className="mt-1 text-lg font-bold text-blue-300">
-                                        {stockXMarketData?.highestBidAmount ||
-                                            "N/A"}
+                                        {stockXMarketData?.highestBidAmount
+                                            ? `$${stockXMarketData.highestBidAmount}`
+                                            : "N/A"}
                                     </div>
                                 </div>
                             </div>
@@ -356,8 +358,9 @@ export function VariantAccordionItem({
                                     <Info className="h-3 w-3 text-purple-400" />
                                 </div>
                                 <div className="mt-1 text-lg font-bold text-purple-300">
-                                    {stockXMarketData?.flexLowestAskAmount ||
-                                        "N/A"}
+                                    {stockXMarketData?.flexLowestAskAmount
+                                        ? `$${stockXMarketData.flexLowestAskAmount}`
+                                        : "N/A"}
                                 </div>
                             </div>
                             <Button
@@ -394,8 +397,13 @@ export function VariantAccordionItem({
                                     </div>
                                     <div className="mt-1 text-lg font-bold text-green-300">
                                         {goatMarketData?.availability
-                                            ?.lowest_listing_price_cents ||
-                                            "N/A"}
+                                            ?.lowest_listing_price_cents
+                                            ? `$${(
+                                                  goatMarketData.availability
+                                                      .lowest_listing_price_cents /
+                                                  100
+                                              ).toFixed(0)}`
+                                            : "N/A"}
                                     </div>
                                 </div>
 
@@ -408,8 +416,13 @@ export function VariantAccordionItem({
                                     </div>
                                     <div className="mt-1 text-lg font-bold text-blue-300">
                                         {goatMarketData?.availability
-                                            ?.highest_offer_price_cents ||
-                                            "N/A"}
+                                            ?.highest_offer_price_cents
+                                            ? `$${(
+                                                  goatMarketData.availability
+                                                      .highest_offer_price_cents /
+                                                  100
+                                              ).toFixed(0)}`
+                                            : "N/A"}
                                     </div>
                                 </div>
                             </div>
@@ -422,8 +435,13 @@ export function VariantAccordionItem({
                                 </div>
                                 <div className="mt-1 text-lg font-bold text-purple-300">
                                     {goatMarketData?.availability
-                                        ?.last_sold_listing_price_cents ||
-                                        "N/A"}
+                                        ?.last_sold_listing_price_cents
+                                        ? `$${(
+                                              goatMarketData.availability
+                                                  .last_sold_listing_price_cents /
+                                              100
+                                          ).toFixed(0)}`
+                                        : "N/A"}
                                 </div>
                             </div>
                             <Button
