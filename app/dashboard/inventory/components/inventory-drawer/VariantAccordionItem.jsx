@@ -76,7 +76,9 @@ export function VariantAccordionItem({
 
                 const stockXResponse = await fetch(
                     `${process.env.NEXT_PUBLIC_API_URL}/stockx/market/${variant?.variant?.stockx?.productId}/${variant?.variant?.stockx?.variantId}`,
-                    { headers }
+                    { headers },
+                    { cache: "force-cache" },
+                    { next: { revalidate: 86400 } }
                 );
 
                 if (stockXResponse.ok) {
@@ -92,7 +94,9 @@ export function VariantAccordionItem({
 
                 const goatResponse = await fetch(
                     `${process.env.NEXT_PUBLIC_API_URL}/goat/market/${variant?.variant?.goat?.catalog_id}/?size=${variant?.variant?.stockx?.variantValue}`,
-                    { headers }
+                    { headers },
+                    { cache: "force-cache" },
+                    { next: { revalidate: 86400 } }
                 );
 
                 if (goatResponse.ok) {
