@@ -2,7 +2,8 @@
 
 import { useToast } from "@/app/hooks/use-toast";
 import { Accordion } from "@/components/ui/accordion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useToken } from "../../context/TokenContext";
 import { VariantAccordionItem } from "./VariantAccordionItem";
 import { VariantListingsDialog } from "./VariantListingsDialog";
 
@@ -15,7 +16,31 @@ export function InventoryItemVariants({
 }) {
     const [selectedVariant, setSelectedVariant] = useState(null);
     const [showListingsDialog, setShowListingsDialog] = useState(false);
+    // const [variantData, setVariantData] = useState(null);
     const { toast } = useToast();
+    // const token = useToken();
+
+    // console.log(item);
+
+    // useEffect(() => {
+    //     const fetchVariantData = async () => {
+    //         const response = await fetch(
+    //             `${process.env.NEXT_PUBLIC_API_URL}/inventory?product=${item._id}`,
+    //             {
+    //                 headers: {
+    //                     Authorization: `Bearer ${token}`,
+    //                 },
+    //             },
+    //             { cache: "force-cache" },
+    //             { next: { revalidate: 86400 } }
+    //         );
+    //         const data = await response.json();
+    //         setVariantData(data?.docs);
+    //     };
+    //     fetchVariantData();
+    // }, [item._id]);
+
+    // console.log("variantData", variantData);
 
     // Function to handle viewing listings for a variant
     const handleViewListings = (variant) => {

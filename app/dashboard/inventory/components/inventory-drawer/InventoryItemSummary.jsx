@@ -41,7 +41,7 @@ export function InventoryItemSummary({ item }) {
                 </div>
 
                 {/* Product information grid */}
-                <div className="grid grid-cols-2 gap-6 mt-4">
+                {/* <div className="grid grid-cols-2 gap-6 mt-4">
                     <div>
                         <p className="text-sm text-muted-foreground">
                             Retail Price
@@ -80,7 +80,7 @@ export function InventoryItemSummary({ item }) {
                             {item.itemDetails[0].quantity || 0}
                         </p>
                     </div>
-                </div>
+                </div> */}
 
                 {/* Additional product attributes */}
                 {/* <div className="grid grid-cols-2 gap-3 mt-4">
