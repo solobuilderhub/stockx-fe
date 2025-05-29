@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Eye, Info, TrendingDown, TrendingUp } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useToken } from "../../context/TokenContext";
 import { InventoryQuantityControl } from "./InventoryQuantityControl";
 // Removed: import { Variant } from '@/components/inventory-drawer/types';
@@ -22,10 +22,13 @@ export function VariantAccordionItem({
     onViewListings,
     onQuantityChange,
     itemId = "1",
+    stockXMarketData,
+    goatMarketData,
+    setStockXMarketData,
+    setGoatMarketData,
 }) {
     const { data: session } = useSession();
-    const [stockXMarketData, setStockXMarketData] = useState(null);
-    const [goatMarketData, setGoatMarketData] = useState(null);
+
     const token = useToken();
     // Important: Ensure we have a unique identifier for the accordion item
     const accordionValue =
@@ -125,7 +128,6 @@ export function VariantAccordionItem({
     // console.log("stockXMarketData", stockXMarketData);
     // console.log("goatMarketData", goatMarketData);
 
-    console.log("variant", variant);
     return (
         <AccordionItem
             value={accordionValue}
@@ -139,7 +141,13 @@ export function VariantAccordionItem({
                             className="bg-secondary/30 text-foreground border-secondary"
                         >
                             Size:{" "}
-                            {variant.variant?.stockx?.variantValue || "Unknown"}
+                            {variant.variant?.stockx?.variantValue
+                                ? variant.variant.stockx.variantValue
+                                : variant.variant?.general?.size
+                                ? `${variant.variant.general.size} ${
+                                      variant.variant.general.size_unit || ""
+                                  }`
+                                : "Unknown"}
                         </Badge>
 
                         <div
@@ -263,10 +271,11 @@ export function VariantAccordionItem({
                                     </span>
                                     <div className="grid grid-cols-2 gap-2 mt-1">
                                         {variant.product?.productAttributes
-                                            ?.releaseDate &&
-                                            new Date(
-                                                variant.product?.productAttributes?.releaseDate
-                                            ).toLocaleDateString("en-GB")}
+                                            ?.releaseDate
+                                            ? new Date(
+                                                  variant.product?.productAttributes?.releaseDate
+                                              ).toLocaleDateString("en-GB")
+                                            : "N/A"}
                                         {/* <div className="flex flex-col">
                                             <span className="text-xs text-muted-foreground">
                                                 StockX
@@ -403,7 +412,9 @@ export function VariantAccordionItem({
                                     </div>
                                     <div className="mt-1 text-lg font-bold text-green-300">
                                         {goatMarketData?.availability
-                                            ?.lowest_listing_price_cents
+                                            ?.lowest_listing_price_cents &&
+                                        goatMarketData.availability
+                                            .lowest_listing_price_cents != 0
                                             ? `$${(
                                                   goatMarketData.availability
                                                       .lowest_listing_price_cents /
@@ -422,7 +433,9 @@ export function VariantAccordionItem({
                                     </div>
                                     <div className="mt-1 text-lg font-bold text-blue-300">
                                         {goatMarketData?.availability
-                                            ?.highest_offer_price_cents
+                                            ?.highest_offer_price_cents &&
+                                        goatMarketData.availability
+                                            .highest_offer_price_cents != 0
                                             ? `$${(
                                                   goatMarketData.availability
                                                       .highest_offer_price_cents /
@@ -441,7 +454,9 @@ export function VariantAccordionItem({
                                 </div>
                                 <div className="mt-1 text-lg font-bold text-purple-300">
                                     {goatMarketData?.availability
-                                        ?.last_sold_listing_price_cents
+                                        ?.last_sold_listing_price_cents &&
+                                    goatMarketData.availability
+                                        .last_sold_listing_price_cents != 0
                                         ? `$${(
                                               goatMarketData.availability
                                                   .last_sold_listing_price_cents /

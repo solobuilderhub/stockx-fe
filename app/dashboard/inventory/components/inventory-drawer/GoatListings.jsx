@@ -17,7 +17,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { Pencil, RefreshCw, Trash2 } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 
 export function GoatListings({
     listings = [],
@@ -90,8 +90,8 @@ export function GoatListings({
                         className="gap-1"
                         disabled={isLoading}
                     >
-                        <RefreshCw size={14} />
-                        Refresh
+                        <Plus size={14} />
+                        Create Listing in GOAT
                     </Button>
                 </div>
             </CardHeader>
