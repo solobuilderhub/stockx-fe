@@ -15,11 +15,11 @@ export function InventoryItemVariants({
 }) {
     const [selectedVariant, setSelectedVariant] = useState(null);
     const [showListingsDialog, setShowListingsDialog] = useState(false);
+    const [stockXMarketData, setStockXMarketData] = useState(null);
+    const [goatMarketData, setGoatMarketData] = useState(null);
     // const [variantData, setVariantData] = useState(null);
     const { toast } = useToast();
     // const token = useToken();
-
-    // console.log(item);
 
     // useEffect(() => {
     //     const fetchVariantData = async () => {
@@ -51,9 +51,6 @@ export function InventoryItemVariants({
     const handleQuantityChange = (variantId, newQuantity) => {
         // In a real app, this would update the backend via our hooks
         // The actual API call is now handled in the InventoryQuantityControl component
-        console.log(
-            `Updated quantity for variant ${variantId} to ${newQuantity}`
-        );
 
         // For backward compatibility, still show a toast notification
         toast({
@@ -87,6 +84,10 @@ export function InventoryItemVariants({
                                 onViewListings={handleViewListings}
                                 onQuantityChange={handleQuantityChange}
                                 itemId={itemId}
+                                stockXMarketData={stockXMarketData}
+                                goatMarketData={goatMarketData}
+                                setStockXMarketData={setStockXMarketData}
+                                setGoatMarketData={setGoatMarketData}
                             />
                         ))}
                     </Accordion>
@@ -106,6 +107,9 @@ export function InventoryItemVariants({
                     onOpenChange={(open) => setShowListingsDialog(open)}
                     variant={selectedVariant}
                     styleId={styleId}
+                    item={item}
+                    stockXMarketData={stockXMarketData}
+                    goatMarketData={goatMarketData}
                 />
             )}
         </div>
