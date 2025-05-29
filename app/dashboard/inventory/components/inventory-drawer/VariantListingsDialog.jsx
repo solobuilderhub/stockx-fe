@@ -159,7 +159,7 @@ export function VariantListingsDialog({
                                 Product ID: {stockXMarketData.productId}
                             </Badge>
                             <Badge variant="outline">
-                                Product ID: {stockXMarketData.variantId}
+                                Variant ID: {stockXMarketData.variantId}
                             </Badge>
                         </div>
                     </div>
