@@ -17,25 +17,53 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { Pencil, RefreshCw, Trash2 } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useToken } from "../../context/TokenContext";
 
 export function StockXListings({
     listings = [],
     isLoading = false,
     lastUpdated,
     filterByVariantId,
+    variantId,
 }) {
     // Function to format date to readable format
+    const [stockXListings, setStockXListings] = useState([]);
+    const token = useToken();
     const formatDate = (dateString) => {
         if (!dateString) return "N/A";
         const date = new Date(dateString);
-        return date.toLocaleDateString("en-US", {
+        return date.toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "2-digit",
             year: "numeric",
-            month: "short",
-            day: "numeric",
         });
     };
 
+    useEffect(() => {
+        if (variantId) {
+            const fetchStockXListings = async () => {
+                const response = await fetch(
+                    `${process.env.NEXT_PUBLIC_API_URL}/stockx/listings?variantIds=${variantId}&fromDate=2025-01-01`,
+                    {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${token}`,
+                        },
+                    },
+                    { cache: "force-cache" },
+                    { next: { revalidate: 60 * 60 * 24 } }
+                );
+                const data = await response.json();
+                setStockXListings(data?.data?.listings);
+            };
+            fetchStockXListings();
+        }
+    }, [variantId]);
+
+    console.log("stockXListings", stockXListings);
     // Filter listings by variant ID if provided
     const filteredListings = filterByVariantId
         ? listings.filter(
@@ -81,7 +109,9 @@ export function StockXListings({
                         <CardDescription>
                             {isLoading
                                 ? "Loading listings..."
-                                : `${filteredListings.length} listings found`}
+                                : `${
+                                      stockXListings?.length || 0
+                                  } listings found`}
                         </CardDescription>
                     </div>
                     <Button
@@ -90,8 +120,8 @@ export function StockXListings({
                         className="gap-1"
                         disabled={isLoading}
                     >
-                        <RefreshCw size={14} />
-                        Refresh
+                        <Plus size={14} />
+                        Create Listing in StockX
                     </Button>
                 </div>
             </CardHeader>
@@ -100,7 +130,7 @@ export function StockXListings({
                     <div className="flex justify-center items-center h-40">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                     </div>
-                ) : filteredListings.length === 0 ? (
+                ) : !stockXListings || stockXListings.length === 0 ? (
                     <div className="text-center py-10 border rounded-md">
                         <p className="text-muted-foreground">
                             No StockX listings found for this variant
@@ -111,18 +141,30 @@ export function StockXListings({
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead>Price</TableHead>
+                                    <TableHead>Amount</TableHead>
+                                    <TableHead>Variant Name</TableHead>
+                                    <TableHead>Variant Value</TableHead>
+                                    <TableHead>Listing ID</TableHead>
                                     <TableHead>Status</TableHead>
-                                    <TableHead>Size</TableHead>
-                                    <TableHead>Created</TableHead>
+                                    <TableHead>Created At</TableHead>
+                                    <TableHead>Updated At</TableHead>
                                     <TableHead>Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {filteredListings.map((listing) => (
+                                {stockXListings.map((listing) => (
                                     <TableRow key={listing.listingId}>
                                         <TableCell className="font-medium">
                                             ${listing.amount}
+                                        </TableCell>
+                                        <TableCell>
+                                            {listing.variant.variantName}
+                                        </TableCell>
+                                        <TableCell>
+                                            {listing.variant.variantValue}
+                                        </TableCell>
+                                        <TableCell>
+                                            {listing.listingId}
                                         </TableCell>
                                         <TableCell>
                                             <Badge
@@ -141,10 +183,10 @@ export function StockXListings({
                                             </Badge>
                                         </TableCell>
                                         <TableCell>
-                                            {listing.variant.variantValue}
+                                            {formatDate(listing.createdAt)}
                                         </TableCell>
                                         <TableCell>
-                                            {formatDate(listing.createdAt)}
+                                            {formatDate(listing.updatedAt)}
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex gap-2">
