@@ -18,13 +18,19 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Pencil, Plus, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useToken } from "../../context/TokenContext";
 
 export function GoatListings({
     listings = [],
     isLoading = false,
     lastUpdated,
     filterByVariantId,
+    size,
+    styleId,
 }) {
+    const [goatListings, setGoatListings] = useState([]);
+    const token = useToken();
     // Function to format date to readable format
     const formatDate = (dateString) => {
         if (!dateString) return "N/A";
@@ -35,6 +41,30 @@ export function GoatListings({
             day: "numeric",
         });
     };
+
+    useEffect(() => {
+        if (styleId && size) {
+            const fetchGoatListings = async () => {
+                const response = await fetch(
+                    `${process.env.NEXT_PUBLIC_API_URL}/goat/listings?searchTerm=${styleId}&size=${size}`,
+                    {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${token}`,
+                        },
+                    },
+                    { cache: "force-cache" },
+                    { next: { revalidate: 60 * 60 * 24 } }
+                );
+                const data = await response.json();
+                setGoatListings(data?.data?.listings);
+            };
+            fetchGoatListings();
+        }
+    }, [styleId, size]);
+
+    console.log("goatListings", goatListings);
 
     // Filter listings by variant ID if provided
     const filteredListings = filterByVariantId

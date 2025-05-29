@@ -18,14 +18,19 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Pencil, Plus, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useToken } from "../../context/TokenContext";
 
 export function StockXListings({
     listings = [],
     isLoading = false,
     lastUpdated,
     filterByVariantId,
+    variantId,
 }) {
     // Function to format date to readable format
+    const [stockXListings, setStockXListings] = useState([]);
+    const token = useToken();
     const formatDate = (dateString) => {
         if (!dateString) return "N/A";
         const date = new Date(dateString);
@@ -36,6 +41,29 @@ export function StockXListings({
         });
     };
 
+    useEffect(() => {
+        if (variantId) {
+            const fetchStockXListings = async () => {
+                const response = await fetch(
+                    `${process.env.NEXT_PUBLIC_API_URL}/stockx/listings?variantIds=${variantId}&fromDate=2025-01-01`,
+                    {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${token}`,
+                        },
+                    },
+                    { cache: "force-cache" },
+                    { next: { revalidate: 60 * 60 * 24 } }
+                );
+                const data = await response.json();
+                setStockXListings(data?.data?.listings);
+            };
+            fetchStockXListings();
+        }
+    }, [variantId]);
+
+    console.log("stockXListings", stockXListings);
     // Filter listings by variant ID if provided
     const filteredListings = filterByVariantId
         ? listings.filter(

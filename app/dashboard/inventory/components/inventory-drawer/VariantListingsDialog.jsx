@@ -294,6 +294,7 @@ export function VariantListingsDialog({
                             isLoading={isLoadingStockX}
                             lastUpdated={new Date().toISOString()}
                             filterByVariantId={variant.variantId}
+                            variantId={stockXMarketData?.variantId}
                         />
                     </TabsContent>
 
@@ -304,6 +305,8 @@ export function VariantListingsDialog({
                             isLoading={isLoadingGoat}
                             lastUpdated={new Date().toISOString()}
                             filterByVariantId={variant.variantId}
+                            styleId={styleId}
+                            size={goatMarketData?.size}
                         />
                     </TabsContent>
                 </Tabs>
