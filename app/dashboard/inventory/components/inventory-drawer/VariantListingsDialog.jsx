@@ -270,8 +270,8 @@ export function VariantListingsDialog({
     };
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="min-w-3xl">
+        <Dialog open={open} onOpenChange={onOpenChange} className="min-w-7xl">
+            <DialogContent className="min-w-7xl">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
                         Listings for Size {variant.size}
