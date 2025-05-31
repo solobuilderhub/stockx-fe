@@ -22,7 +22,11 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useToken } from "../../context/TokenContext";
 import { CreateListingModal } from "./CreateListingModal";
-import { useCreateListing, useStockXListings } from "./hooks/use-listings-data";
+import {
+    useCreateListing,
+    useStockXListings,
+    useUpdateListing,
+} from "./hooks/use-listings-data";
 
 export function StockXListings({
     listings = [],
@@ -39,8 +43,9 @@ export function StockXListings({
     const [editMode, setEditMode] = useState(false);
     const [editingListing, setEditingListing] = useState(null);
 
-    // Use the create listing mutation
+    // Use the create and update listing mutations
     const createListingMutation = useCreateListing("stockx", token);
+    const updateListingMutation = useUpdateListing("stockx", token);
 
     // Function to format date to readable format
     const formatDate = (dateString) => {
@@ -97,9 +102,12 @@ export function StockXListings({
     const handleSubmitListing = async (formData) => {
         try {
             if (editMode) {
-                console.log("Updating StockX Listing:", formData);
-                // TODO: Implement update functionality
-                toast.info("Update functionality not yet implemented");
+                // Update existing listing
+                const result = await updateListingMutation.mutateAsync(
+                    formData
+                );
+                toast.success("StockX listing updated successfully!");
+                handleModalClose(); // Close modal only on success
             } else {
                 // Create new listing
                 const result = await createListingMutation.mutateAsync(
@@ -126,7 +134,8 @@ export function StockXListings({
     };
 
     const isLoadingData = isLoading || isLoadingStockX;
-    const isSubmitting = createListingMutation.isPending;
+    const isSubmitting =
+        createListingMutation.isPending || updateListingMutation.isPending;
 
     return (
         <>

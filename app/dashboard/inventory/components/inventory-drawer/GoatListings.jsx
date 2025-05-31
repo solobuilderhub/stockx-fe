@@ -22,7 +22,11 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useToken } from "../../context/TokenContext";
 import { CreateListingModal } from "./CreateListingModal";
-import { useCreateListing, useGoatListings } from "./hooks/use-listings-data";
+import {
+    useCreateListing,
+    useGoatListings,
+    useUpdateListing,
+} from "./hooks/use-listings-data";
 
 export function GoatListings({
     listings = [],
@@ -43,8 +47,9 @@ export function GoatListings({
     const [editMode, setEditMode] = useState(false);
     const [editingListing, setEditingListing] = useState(null);
 
-    // Use the create listing mutation
+    // Use the create and update listing mutations
     const createListingMutation = useCreateListing("goat", token);
+    const updateListingMutation = useUpdateListing("goat", token);
 
     // Function to format date to dd/mm/yyyy format
     const formatDate = (dateString) => {
@@ -106,9 +111,12 @@ export function GoatListings({
     const handleSubmitListing = async (formData) => {
         try {
             if (editMode) {
-                console.log("Updating GOAT Listing:", formData);
-                // TODO: Implement update functionality
-                toast.info("Update functionality not yet implemented");
+                // Update existing listing
+                const result = await updateListingMutation.mutateAsync(
+                    formData
+                );
+                toast.success("GOAT listing updated successfully!");
+                handleModalClose(); // Close modal only on success
             } else {
                 // Create new listing
                 const result = await createListingMutation.mutateAsync(
@@ -135,7 +143,8 @@ export function GoatListings({
     };
 
     const isLoadingData = isLoading || isLoadingGoat;
-    const isSubmitting = createListingMutation.isPending;
+    const isSubmitting =
+        createListingMutation.isPending || updateListingMutation.isPending;
 
     return (
         <>
