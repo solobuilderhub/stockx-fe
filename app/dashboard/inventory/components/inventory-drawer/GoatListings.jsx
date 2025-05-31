@@ -18,7 +18,9 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Pencil, Plus, Trash2 } from "lucide-react";
+import { useState } from "react";
 import { useToken } from "../../context/TokenContext";
+import { CreateListingModal } from "./CreateListingModal";
 import { useGoatListings } from "./hooks/use-listings-data";
 
 export function GoatListings({
@@ -35,6 +37,8 @@ export function GoatListings({
         styleId,
         token
     );
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     // Function to format date to dd/mm/yyyy format
     const formatDate = (dateString) => {
@@ -81,122 +85,151 @@ export function GoatListings({
         );
     };
 
+    const handleCreateListing = () => {
+        setIsModalOpen(true);
+    };
+
+    const handleSubmitListing = (formData) => {
+        console.log("GOAT Listing Data:", formData);
+        // TODO: Add API call to create listing
+    };
+
     const isLoadingData = isLoading || isLoadingGoat;
 
     return (
-        <Card>
-            <CardHeader>
-                <div className="flex justify-between items-center">
-                    <div>
-                        <CardTitle>GOAT Listings</CardTitle>
-                        <CardDescription>
-                            {isLoadingData
-                                ? "Loading listings..."
-                                : `${goatListings?.length || 0} listings found`}
-                        </CardDescription>
+        <>
+            <Card>
+                <CardHeader>
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <CardTitle>GOAT Listings</CardTitle>
+                            <CardDescription>
+                                {isLoadingData
+                                    ? "Loading listings..."
+                                    : `${
+                                          goatListings?.length || 0
+                                      } listings found`}
+                            </CardDescription>
+                        </div>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="gap-1"
+                            disabled={isLoadingData}
+                            onClick={handleCreateListing}
+                        >
+                            <Plus size={14} />
+                            Create Listing in GOAT
+                        </Button>
                     </div>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        className="gap-1"
-                        disabled={isLoadingData}
-                    >
-                        <Plus size={14} />
-                        Create Listing in GOAT
-                    </Button>
-                </div>
-            </CardHeader>
-            <CardContent>
-                {isLoadingData ? (
-                    <div className="flex justify-center items-center h-40">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                    </div>
-                ) : !goatListings || goatListings.length === 0 ? (
-                    <div className="text-center py-10 border rounded-md">
-                        <p className="text-muted-foreground">
-                            No GOAT listings found for this variant
-                        </p>
-                    </div>
-                ) : (
-                    <div className="border rounded-md overflow-hidden">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Size</TableHead>
-                                    <TableHead>Size Unit</TableHead>
-                                    <TableHead>Created At</TableHead>
-                                    <TableHead>Updated At</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead>Price</TableHead>
-                                    <TableHead>Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {goatListings.map((listing) => (
-                                    <TableRow key={listing.id}>
-                                        <TableCell>{listing.size}</TableCell>
-                                        <TableCell>
-                                            {listing.size_unit}
-                                        </TableCell>
-                                        <TableCell>
-                                            {formatDate(listing.created_at)}
-                                        </TableCell>
-                                        <TableCell>
-                                            {formatDate(listing.updated_at)}
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge
-                                                variant={
-                                                    getStatusBadge(
-                                                        listing.status
-                                                    ).variant
-                                                }
-                                                className={
-                                                    getStatusBadge(
-                                                        listing.status
-                                                    ).className
-                                                }
-                                            >
-                                                {listing.status}
-                                            </Badge>
-                                        </TableCell>
-                                        <TableCell className="font-medium">
-                                            {formatPrice(listing.price_cents)}
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex gap-2">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    disabled={
-                                                        listing.status !==
-                                                        "LISTING_STATUS_ACTIVE"
-                                                    }
-                                                >
-                                                    <Pencil size={14} />
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    disabled={
-                                                        listing.status !==
-                                                        "LISTING_STATUS_ACTIVE"
-                                                    }
-                                                >
-                                                    <Trash2 size={14} />
-                                                </Button>
-                                            </div>
-                                        </TableCell>
+                </CardHeader>
+                <CardContent>
+                    {isLoadingData ? (
+                        <div className="flex justify-center items-center h-40">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                        </div>
+                    ) : !goatListings || goatListings.length === 0 ? (
+                        <div className="text-center py-10 border rounded-md">
+                            <p className="text-muted-foreground">
+                                No GOAT listings found for this variant
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="border rounded-md overflow-hidden">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Size</TableHead>
+                                        <TableHead>Size Unit</TableHead>
+                                        <TableHead>Created At</TableHead>
+                                        <TableHead>Updated At</TableHead>
+                                        <TableHead>Status</TableHead>
+                                        <TableHead>Price</TableHead>
+                                        <TableHead>Actions</TableHead>
                                     </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
+                                </TableHeader>
+                                <TableBody>
+                                    {goatListings.map((listing) => (
+                                        <TableRow key={listing.id}>
+                                            <TableCell>
+                                                {listing.size}
+                                            </TableCell>
+                                            <TableCell>
+                                                {listing.size_unit}
+                                            </TableCell>
+                                            <TableCell>
+                                                {formatDate(listing.created_at)}
+                                            </TableCell>
+                                            <TableCell>
+                                                {formatDate(listing.updated_at)}
+                                            </TableCell>
+                                            <TableCell>
+                                                <Badge
+                                                    variant={
+                                                        getStatusBadge(
+                                                            listing.status
+                                                        ).variant
+                                                    }
+                                                    className={
+                                                        getStatusBadge(
+                                                            listing.status
+                                                        ).className
+                                                    }
+                                                >
+                                                    {listing.status}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell className="font-medium">
+                                                {formatPrice(
+                                                    listing.price_cents
+                                                )}
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="flex gap-2">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        disabled={
+                                                            listing.status !==
+                                                            "LISTING_STATUS_ACTIVE"
+                                                        }
+                                                    >
+                                                        <Pencil size={14} />
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        disabled={
+                                                            listing.status !==
+                                                            "LISTING_STATUS_ACTIVE"
+                                                        }
+                                                    >
+                                                        <Trash2 size={14} />
+                                                    </Button>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    )}
+                    <div className="text-xs text-muted-foreground mt-2 text-right">
+                        Last updated: {formatDate(lastUpdated)}
                     </div>
-                )}
-                <div className="text-xs text-muted-foreground mt-2 text-right">
-                    Last updated: {formatDate(lastUpdated)}
-                </div>
-            </CardContent>
-        </Card>
+                </CardContent>
+            </Card>
+
+            <CreateListingModal
+                open={isModalOpen}
+                onOpenChange={setIsModalOpen}
+                platform="goat"
+                variantData={{
+                    catalogId: styleId,
+                    size: size,
+                }}
+                onSubmit={handleSubmitListing}
+            />
+        </>
     );
 }

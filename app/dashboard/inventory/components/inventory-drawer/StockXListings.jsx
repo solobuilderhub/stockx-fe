@@ -18,7 +18,9 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Pencil, Plus, Trash2 } from "lucide-react";
+import { useState } from "react";
 import { useToken } from "../../context/TokenContext";
+import { CreateListingModal } from "./CreateListingModal";
 import { useStockXListings } from "./hooks/use-listings-data";
 
 export function StockXListings({
@@ -31,6 +33,8 @@ export function StockXListings({
     const token = useToken();
     const { data: stockXListings, isLoading: isLoadingStockX } =
         useStockXListings(variantId, token);
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     // Function to format date to readable format
     const formatDate = (dateString) => {
@@ -72,130 +76,152 @@ export function StockXListings({
         );
     };
 
+    const handleCreateListing = () => {
+        setIsModalOpen(true);
+    };
+
+    const handleSubmitListing = (formData) => {
+        console.log("StockX Listing Data:", formData);
+        // TODO: Add API call to create listing
+    };
+
     const isLoadingData = isLoading || isLoadingStockX;
 
     return (
-        <Card>
-            <CardHeader>
-                <div className="flex justify-between items-center">
-                    <div>
-                        <CardTitle>StockX Listings</CardTitle>
-                        <CardDescription>
-                            {isLoadingData
-                                ? "Loading listings..."
-                                : `${
-                                      stockXListings?.length || 0
-                                  } listings found`}
-                        </CardDescription>
+        <>
+            <Card>
+                <CardHeader>
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <CardTitle>StockX Listings</CardTitle>
+                            <CardDescription>
+                                {isLoadingData
+                                    ? "Loading listings..."
+                                    : `${
+                                          stockXListings?.length || 0
+                                      } listings found`}
+                            </CardDescription>
+                        </div>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="gap-1"
+                            disabled={isLoadingData}
+                            onClick={handleCreateListing}
+                        >
+                            <Plus size={14} />
+                            Create Listing in StockX
+                        </Button>
                     </div>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        className="gap-1"
-                        disabled={isLoadingData}
-                    >
-                        <Plus size={14} />
-                        Create Listing in StockX
-                    </Button>
-                </div>
-            </CardHeader>
-            <CardContent>
-                {isLoadingData ? (
-                    <div className="flex justify-center items-center h-40">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                    </div>
-                ) : !stockXListings || stockXListings.length === 0 ? (
-                    <div className="text-center py-10 border rounded-md">
-                        <p className="text-muted-foreground">
-                            No StockX listings found for this variant
-                        </p>
-                    </div>
-                ) : (
-                    <div className="border rounded-md overflow-hidden">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Amount</TableHead>
-                                    <TableHead>Variant Name</TableHead>
-                                    <TableHead>Variant Value</TableHead>
-                                    <TableHead>Listing ID</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead>Created At</TableHead>
-                                    <TableHead>Updated At</TableHead>
-                                    <TableHead>Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {stockXListings.map((listing) => (
-                                    <TableRow key={listing.listingId}>
-                                        <TableCell className="font-medium">
-                                            ${listing.amount}
-                                        </TableCell>
-                                        <TableCell>
-                                            {listing.variant.variantName}
-                                        </TableCell>
-                                        <TableCell>
-                                            {listing.variant.variantValue}
-                                        </TableCell>
-                                        <TableCell>
-                                            {listing.listingId}
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge
-                                                variant={
-                                                    getStatusBadge(
-                                                        listing.status
-                                                    ).variant
-                                                }
-                                                className={
-                                                    getStatusBadge(
-                                                        listing.status
-                                                    ).className
-                                                }
-                                            >
-                                                {listing.status}
-                                            </Badge>
-                                        </TableCell>
-                                        <TableCell>
-                                            {formatDate(listing.createdAt)}
-                                        </TableCell>
-                                        <TableCell>
-                                            {formatDate(listing.updatedAt)}
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex gap-2">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    disabled={
-                                                        listing.status !==
-                                                        "ACTIVE"
-                                                    }
-                                                >
-                                                    <Pencil size={14} />
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    disabled={
-                                                        listing.status !==
-                                                        "ACTIVE"
-                                                    }
-                                                >
-                                                    <Trash2 size={14} />
-                                                </Button>
-                                            </div>
-                                        </TableCell>
+                </CardHeader>
+                <CardContent>
+                    {isLoadingData ? (
+                        <div className="flex justify-center items-center h-40">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                        </div>
+                    ) : !stockXListings || stockXListings.length === 0 ? (
+                        <div className="text-center py-10 border rounded-md">
+                            <p className="text-muted-foreground">
+                                No StockX listings found for this variant
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="border rounded-md overflow-hidden">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Amount</TableHead>
+                                        <TableHead>Variant Name</TableHead>
+                                        <TableHead>Variant Value</TableHead>
+                                        <TableHead>Listing ID</TableHead>
+                                        <TableHead>Status</TableHead>
+                                        <TableHead>Created At</TableHead>
+                                        <TableHead>Updated At</TableHead>
+                                        <TableHead>Actions</TableHead>
                                     </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
+                                </TableHeader>
+                                <TableBody>
+                                    {stockXListings.map((listing) => (
+                                        <TableRow key={listing.listingId}>
+                                            <TableCell className="font-medium">
+                                                ${listing.amount}
+                                            </TableCell>
+                                            <TableCell>
+                                                {listing.variant.variantName}
+                                            </TableCell>
+                                            <TableCell>
+                                                {listing.variant.variantValue}
+                                            </TableCell>
+                                            <TableCell>
+                                                {listing.listingId}
+                                            </TableCell>
+                                            <TableCell>
+                                                <Badge
+                                                    variant={
+                                                        getStatusBadge(
+                                                            listing.status
+                                                        ).variant
+                                                    }
+                                                    className={
+                                                        getStatusBadge(
+                                                            listing.status
+                                                        ).className
+                                                    }
+                                                >
+                                                    {listing.status}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell>
+                                                {formatDate(listing.createdAt)}
+                                            </TableCell>
+                                            <TableCell>
+                                                {formatDate(listing.updatedAt)}
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="flex gap-2">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        disabled={
+                                                            listing.status !==
+                                                            "ACTIVE"
+                                                        }
+                                                    >
+                                                        <Pencil size={14} />
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        disabled={
+                                                            listing.status !==
+                                                            "ACTIVE"
+                                                        }
+                                                    >
+                                                        <Trash2 size={14} />
+                                                    </Button>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    )}
+                    <div className="text-xs text-muted-foreground mt-2 text-right">
+                        Last updated: {formatDate(lastUpdated)}
                     </div>
-                )}
-                <div className="text-xs text-muted-foreground mt-2 text-right">
-                    Last updated: {formatDate(lastUpdated)}
-                </div>
-            </CardContent>
-        </Card>
+                </CardContent>
+            </Card>
+
+            <CreateListingModal
+                open={isModalOpen}
+                onOpenChange={setIsModalOpen}
+                platform="stockx"
+                variantData={{
+                    variantId: variantId,
+                }}
+                onSubmit={handleSubmitListing}
+            />
+        </>
     );
 }
