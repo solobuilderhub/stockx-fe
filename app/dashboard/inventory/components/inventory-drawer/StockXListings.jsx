@@ -211,10 +211,9 @@ export function StockXListings({
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>Amount</TableHead>
                                         <TableHead>Variant Name</TableHead>
-                                        <TableHead>Variant Value</TableHead>
-                                        <TableHead>Listing ID</TableHead>
+                                        <TableHead>Size</TableHead>
+                                        <TableHead>Amount</TableHead>
                                         <TableHead>Status</TableHead>
                                         <TableHead>Created At</TableHead>
                                         <TableHead>Updated At</TableHead>
@@ -224,17 +223,14 @@ export function StockXListings({
                                 <TableBody>
                                     {stockXListings.map((listing) => (
                                         <TableRow key={listing.listingId}>
-                                            <TableCell className="font-medium">
-                                                ${listing.amount}
-                                            </TableCell>
                                             <TableCell>
                                                 {listing.variant.variantName}
                                             </TableCell>
                                             <TableCell>
                                                 {listing.variant.variantValue}
                                             </TableCell>
-                                            <TableCell>
-                                                {listing.listingId}
+                                            <TableCell className="font-medium">
+                                                ${listing.amount}
                                             </TableCell>
                                             <TableCell>
                                                 <Badge
