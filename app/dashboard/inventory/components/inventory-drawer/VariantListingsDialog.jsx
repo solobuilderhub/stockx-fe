@@ -177,9 +177,7 @@ export function VariantListingsDialog({
                     </div>
                     <div className="mt-4 pt-4 border-t">
                         <div className="flex flex-wrap gap-2">
-                            <Badge variant="outline">
-                                Size: {goatMarketData.size}
-                            </Badge>
+                            <Badge variant="outline">Size: {goatSize}</Badge>
                             <Badge variant="outline">
                                 Product Condition:{" "}
                                 {goatMarketData.product_condition?.replace(
