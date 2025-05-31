@@ -1,258 +1,181 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiClient } from "../utils/apiClient";
-
-// Mock StockX listing data
-const mockStockXListings = [
-    {
-        amount: "148",
-        ask: {
-            askId: "14632361809866143310",
-            askCreatedAt: "2025-04-10T19:30:56.000Z",
-            askUpdatedAt: "2025-04-10T19:30:56.000Z",
-            askExpiresAt: "2026-04-10T19:30:46.000Z",
-        },
-        order: null,
-        product: {
-            productId: "3414f48d-e8bf-463f-9e6b-9d8520a202b9",
-            productName: 'Timberland 6" Boot Black Nubuck Premium',
-            styleId: "TB00073-009",
-        },
-        variant: {
-            variantId: "7f70b1d5-f9a2-4eff-af46-b19c3a68af5e",
-            variantName: "Timberland-6-Black-Nubuck:9",
-            variantValue: "9",
-        },
-        currencyCode: "USD",
-        listingId: "f9c5e3f5-0762-4a9d-aebb-e74a2cdca53d",
-        status: "ACTIVE",
-        inventoryType: "STANDARD",
-        createdAt: "2025-04-10T19:30:55.251Z",
-        updatedAt: "2025-04-10T19:31:00.225Z",
-        authenticationDetails: null,
-        batch: {
-            batchId: "52591f34-524e-42b1-a571-133ad0f6574e",
-            taskId: "c34445fb-9730-4ce1-b7b6-20439351cc50",
-        },
-        initiatedShipments: null,
-    },
-    {
-        amount: "155",
-        ask: {
-            askId: "14632361809866143311",
-            askCreatedAt: "2025-04-12T14:20:16.000Z",
-            askUpdatedAt: "2025-04-12T14:20:16.000Z",
-            askExpiresAt: "2026-04-12T14:20:16.000Z",
-        },
-        order: null,
-        product: {
-            productId: "3414f48d-e8bf-463f-9e6b-9d8520a202b9",
-            productName: 'Timberland 6" Boot Black Nubuck Premium',
-            styleId: "TB00073-009",
-        },
-        variant: {
-            variantId: "8f70b1d5-f9a2-4eff-af46-b19c3a68af5e",
-            variantName: "Timberland-6-Black-Nubuck:10",
-            variantValue: "10",
-        },
-        currencyCode: "USD",
-        listingId: "g9c5e3f5-0762-4a9d-aebb-e74a2cdca53d",
-        status: "ACTIVE",
-        inventoryType: "STANDARD",
-        createdAt: "2025-04-12T14:20:16.251Z",
-        updatedAt: "2025-04-12T14:20:20.225Z",
-        authenticationDetails: null,
-        batch: {
-            batchId: "52591f34-524e-42b1-a571-133ad0f6574e",
-            taskId: "c34445fb-9730-4ce1-b7b6-20439351cc50",
-        },
-        initiatedShipments: null,
-    },
-    {
-        amount: "162",
-        ask: {
-            askId: "14632361809866143312",
-            askCreatedAt: "2025-04-14T10:15:30.000Z",
-            askUpdatedAt: "2025-04-14T10:15:30.000Z",
-            askExpiresAt: "2026-04-14T10:15:30.000Z",
-        },
-        order: null,
-        product: {
-            productId: "3414f48d-e8bf-463f-9e6b-9d8520a202b9",
-            productName: 'Timberland 6" Boot Black Nubuck Premium',
-            styleId: "TB00073-009",
-        },
-        variant: {
-            variantId: "9f70b1d5-f9a2-4eff-af46-b19c3a68af5e",
-            variantName: "Timberland-6-Black-Nubuck:11",
-            variantValue: "11",
-        },
-        currencyCode: "USD",
-        listingId: "h9c5e3f5-0762-4a9d-aebb-e74a2cdca53d",
-        status: "PENDING",
-        inventoryType: "STANDARD",
-        createdAt: "2025-04-14T10:15:30.251Z",
-        updatedAt: "2025-04-14T10:15:35.225Z",
-        authenticationDetails: null,
-        batch: {
-            batchId: "52591f34-524e-42b1-a571-133ad0f6574e",
-            taskId: "c34445fb-9730-4ce1-b7b6-20439351cc50",
-        },
-        initiatedShipments: null,
-    },
-];
-
-// Mock GOAT listing data
-const mockGoatListings = [
-    {
-        amount: "140",
-        order: null,
-        product: {
-            productId: "air-jordan-13-retro-wheat-2023-414571-171",
-            productName: "Air Jordan 13 Retro Wheat (2023)",
-            styleId: "414571-171",
-        },
-        variant: {
-            variantId: "size-9-us-men",
-            variantName: "US 9 Men",
-            variantValue: "9",
-        },
-        currencyCode: "USD",
-        listingId: "019553af-bc11-7893-9b5b-591785703a49",
-        status: "ACTIVE",
-        inventoryType: "STANDARD",
-        createdAt: "2025-03-01T21:49:40.323Z",
-        updatedAt: "2025-04-05T02:29:48.904Z",
-    },
-    {
-        amount: "150",
-        order: null,
-        product: {
-            productId: "air-jordan-13-retro-wheat-2023-414571-171",
-            productName: "Air Jordan 13 Retro Wheat (2023)",
-            styleId: "414571-171",
-        },
-        variant: {
-            variantId: "size-10-us-men",
-            variantName: "US 10 Men",
-            variantValue: "10",
-        },
-        currencyCode: "USD",
-        listingId: "119553af-bc11-7893-9b5b-591785703b50",
-        status: "ACTIVE",
-        inventoryType: "STANDARD",
-        createdAt: "2025-03-05T10:23:15.323Z",
-        updatedAt: "2025-04-07T08:15:22.904Z",
-    },
-    {
-        amount: "155",
-        order: {
-            id: "ord-123456",
-            status: "SHIPPED",
-            created_at: "2025-03-12T14:35:22.323Z",
-            updated_at: "2025-03-15T09:12:48.904Z",
-            tracking: {
-                carrier: "FedEx",
-                tracking_number: "FDX123456789",
-                tracking_url:
-                    "https://www.fedex.com/track?tracknum=FDX123456789",
-            },
-            payout: {
-                amount_cents: 13500,
-                currency: "USD",
-            },
-        },
-        product: {
-            productId: "air-jordan-13-retro-wheat-2023-414571-171",
-            productName: "Air Jordan 13 Retro Wheat (2023)",
-            styleId: "414571-171",
-        },
-        variant: {
-            variantId: "size-11-us-men",
-            variantName: "US 11 Men",
-            variantValue: "11",
-        },
-        currencyCode: "USD",
-        listingId: "219553af-bc11-7893-9b5b-591785703b51",
-        status: "SOLD",
-        inventoryType: "STANDARD",
-        createdAt: "2025-03-10T16:45:30.323Z",
-        updatedAt: "2025-03-15T09:12:48.904Z",
-    },
-];
 
 // Query keys for React Query
 export const listingsKeys = {
     all: ["listings"],
     stockx: () => [...listingsKeys.all, "stockx"],
-    stockxByVariant: (variantId) => [...listingsKeys.stockx(), variantId],
+    stockxByVariant: (variantId) => [
+        ...listingsKeys.stockx(),
+        "variant",
+        variantId,
+    ],
     goat: () => [...listingsKeys.all, "goat"],
-    goatBySize: (size) => [...listingsKeys.goat(), size],
+    goatBySize: (size, styleId) => [
+        ...listingsKeys.goat(),
+        "variant",
+        size,
+        styleId,
+    ],
 };
 
 /**
  * Hook to fetch StockX listings for a variant
  */
-export const useStockXListings = (variantId) => {
+export const useStockXListings = (variantId, token) => {
     return useQuery({
         queryKey: listingsKeys.stockxByVariant(variantId || ""),
         queryFn: async () => {
-            if (!variantId) return [];
+            if (!variantId || !token) return [];
 
-            // In a real app, we would fetch data from an API
-            const response = await apiClient.get(
-                "/api/stockx/listings",
-                mockStockXListings
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/stockx/listings?variantIds=${variantId}&fromDate=2025-01-01`,
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
             );
-            return response.data;
+
+            if (!response.ok) {
+                throw new Error("Failed to fetch StockX listings");
+            }
+
+            const data = await response.json();
+            return data?.data?.listings || [];
         },
-        enabled: !!variantId,
+        enabled: !!variantId && !!token,
     });
 };
 
 /**
- * Hook to fetch GOAT listings by size
+ * Hook to fetch GOAT listings by size and styleId
  */
-export const useGoatListings = (size) => {
+export const useGoatListings = (size, styleId, token) => {
     return useQuery({
-        queryKey: listingsKeys.goatBySize(size || ""),
+        queryKey: listingsKeys.goatBySize(size || "", styleId || ""),
         queryFn: async () => {
-            if (!size) return [];
+            if (!size || !styleId || !token) return [];
 
-            const response = await apiClient.get(
-                "/api/goat/listings",
-                mockGoatListings
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/goat/listings?searchTerm=${styleId}&size=${size}`,
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
             );
-            return response.data;
+
+            if (!response.ok) {
+                throw new Error("Failed to fetch GOAT listings");
+            }
+
+            const data = await response.json();
+            return data?.data?.listings || [];
         },
-        enabled: !!size,
+        enabled: !!size && !!styleId && !!token,
     });
 };
 
 /**
  * Hook to create a new listing with optimistic updates
  */
-export const useCreateListing = (platform) => {
+export const useCreateListing = (platform, token) => {
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: async (listingData) => {
-            const response = await apiClient.post(
-                `/api/${platform}/listings`,
-                listingData,
-                platform === "stockx"
-                    ? mockStockXListings[0]
-                    : mockGoatListings[0]
-            );
-            return response.data;
+            if (!token) {
+                throw new Error("Authentication token is required");
+            }
+
+            let apiUrl, requestBody;
+
+            if (platform === "stockx") {
+                apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/stockx/listings/`;
+                requestBody = {
+                    amount: listingData.amount,
+                    variantId: listingData.variantId,
+                    currencyCode: listingData.currencyCode,
+                    active: listingData.active,
+                };
+            } else if (platform === "goat") {
+                apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/goat/listings/`;
+                requestBody = {
+                    catalogId: listingData.catalogId,
+                    priceCents: listingData.priceCents,
+                    condition: listingData.condition,
+                    packagingCondition: listingData.packagingCondition,
+                    size: listingData.size,
+                    sizeUnit: listingData.sizeUnit,
+                    activate: listingData.activate,
+                };
+            } else {
+                throw new Error(`Unsupported platform: ${platform}`);
+            }
+
+            const response = await fetch(apiUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(requestBody),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => null);
+                throw new Error(
+                    errorData?.message || `Failed to create ${platform} listing`
+                );
+            }
+
+            const data = await response.json();
+
+            // Check if the response indicates success
+            if (data.status !== "success") {
+                // Extract error message from the response or use a default message
+                const errorMessage =
+                    data.message ||
+                    data.error ||
+                    data.data?.error ||
+                    `Failed to create ${platform} listing: Operation was not successful`;
+                throw new Error(errorMessage);
+            }
+
+            // Additional check for data.success if it exists
+            if (data.data && data.data.success === false) {
+                const errorMessage =
+                    data.data.error ||
+                    data.data.message ||
+                    `Failed to create ${platform} listing: Operation failed`;
+                throw new Error(errorMessage);
+            }
+
+            return data;
         },
         onMutate: async (newListing) => {
-            // For optimistic updates, we would:
-            // 1. Cancel any outgoing refetches
-            // 2. Snapshot the previous value
-            // 3. Optimistically update the cache
             return { previousListing: null };
+        },
+        onSuccess: (data, variables, context) => {
+            // Invalidate and refetch relevant queries on success
+            if (platform === "stockx") {
+                queryClient.invalidateQueries({
+                    queryKey: listingsKeys.stockx(),
+                });
+            } else if (platform === "goat") {
+                queryClient.invalidateQueries({
+                    queryKey: listingsKeys.goat(),
+                });
+            }
+        },
+        onError: (error, variables, context) => {
+            console.error(`Failed to create ${platform} listing:`, error);
         },
         onSettled: (data, error, variables, context) => {
             // Always refetch after error or success to ensure cache is up to date
@@ -260,7 +183,215 @@ export const useCreateListing = (platform) => {
                 queryClient.invalidateQueries({
                     queryKey: listingsKeys.stockx(),
                 });
+            } else if (platform === "goat") {
+                queryClient.invalidateQueries({
+                    queryKey: listingsKeys.goat(),
+                });
+            }
+        },
+    });
+};
+
+/**
+ * Hook to update an existing listing
+ */
+export const useUpdateListing = (platform, token) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (listingData) => {
+            if (!token) {
+                throw new Error("Authentication token is required");
+            }
+
+            if (!listingData.id && !listingData.listingId) {
+                throw new Error("Listing ID is required for updates");
+            }
+
+            const listingId = listingData.id || listingData.listingId;
+            let apiUrl, requestBody;
+
+            if (platform === "stockx") {
+                apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/stockx/listings/${listingId}`;
+                requestBody = {
+                    amount: listingData.amount,
+                    currencyCode: listingData.currencyCode,
+                };
+            } else if (platform === "goat") {
+                apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/goat/listings/${listingId}`;
+                requestBody = {
+                    price_cents: listingData.priceCents,
+                    size: listingData.size,
+                    size_unit: listingData.sizeUnit,
+                };
             } else {
+                throw new Error(`Unsupported platform: ${platform}`);
+            }
+
+            const response = await fetch(apiUrl, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(requestBody),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => null);
+                throw new Error(
+                    errorData?.message || `Failed to update ${platform} listing`
+                );
+            }
+
+            const data = await response.json();
+
+            // Check if the response indicates success
+            if (data.status !== "success") {
+                // Extract error message from the response or use a default message
+                const errorMessage =
+                    data.message ||
+                    data.error ||
+                    data.data?.error ||
+                    `Failed to update ${platform} listing: Operation was not successful`;
+                throw new Error(errorMessage);
+            }
+
+            // Additional check for data.success if it exists
+            if (data.data && data.data.success === false) {
+                const errorMessage =
+                    data.data.error ||
+                    data.data.message ||
+                    `Failed to update ${platform} listing: Operation failed`;
+                throw new Error(errorMessage);
+            }
+
+            return data;
+        },
+        onMutate: async (updatedListing) => {
+            return { previousListing: null };
+        },
+        onSuccess: (data, variables, context) => {
+            // Invalidate and refetch relevant queries on success
+            if (platform === "stockx") {
+                queryClient.invalidateQueries({
+                    queryKey: listingsKeys.stockx(),
+                });
+            } else if (platform === "goat") {
+                queryClient.invalidateQueries({
+                    queryKey: listingsKeys.goat(),
+                });
+            }
+        },
+        onError: (error, variables, context) => {
+            console.error(`Failed to update ${platform} listing:`, error);
+        },
+        onSettled: (data, error, variables, context) => {
+            // Always refetch after error or success to ensure cache is up to date
+            if (platform === "stockx") {
+                queryClient.invalidateQueries({
+                    queryKey: listingsKeys.stockx(),
+                });
+            } else if (platform === "goat") {
+                queryClient.invalidateQueries({
+                    queryKey: listingsKeys.goat(),
+                });
+            }
+        },
+    });
+};
+
+/**
+ * Hook to delete an existing listing
+ */
+export const useDeleteListing = (platform, token) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (listing) => {
+            if (!token) {
+                throw new Error("Authentication token is required");
+            }
+
+            if (!listing.id && !listing.listingId) {
+                throw new Error("Listing ID is required for deletion");
+            }
+
+            const listingId = listing.id || listing.listingId;
+            let apiUrl;
+
+            if (platform === "stockx") {
+                apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/stockx/listings/${listingId}`;
+            } else if (platform === "goat") {
+                apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/goat/listings/${listingId}`;
+            } else {
+                throw new Error(`Unsupported platform: ${platform}`);
+            }
+
+            const response = await fetch(apiUrl, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => null);
+                throw new Error(
+                    errorData?.message || `Failed to delete ${platform} listing`
+                );
+            }
+
+            const data = await response.json();
+
+            // Check if the response indicates success
+            if (data.status !== "success") {
+                // Extract error message from the response or use a default message
+                const errorMessage =
+                    data.message ||
+                    data.error ||
+                    data.data?.error ||
+                    `Failed to delete ${platform} listing: Operation was not successful`;
+                throw new Error(errorMessage);
+            }
+
+            // Additional check for data.success if it exists
+            if (data.data && data.data.success === false) {
+                const errorMessage =
+                    data.data.error ||
+                    data.data.message ||
+                    `Failed to delete ${platform} listing: Operation failed`;
+                throw new Error(errorMessage);
+            }
+
+            return data;
+        },
+        onMutate: async (deletedListing) => {
+            return { previousListing: null };
+        },
+        onSuccess: (data, variables, context) => {
+            // Invalidate and refetch relevant queries on success
+            if (platform === "stockx") {
+                queryClient.invalidateQueries({
+                    queryKey: listingsKeys.stockx(),
+                });
+            } else if (platform === "goat") {
+                queryClient.invalidateQueries({
+                    queryKey: listingsKeys.goat(),
+                });
+            }
+        },
+        onError: (error, variables, context) => {
+            console.error(`Failed to delete ${platform} listing:`, error);
+        },
+        onSettled: (data, error, variables, context) => {
+            // Always refetch after error or success to ensure cache is up to date
+            if (platform === "stockx") {
+                queryClient.invalidateQueries({
+                    queryKey: listingsKeys.stockx(),
+                });
+            } else if (platform === "goat") {
                 queryClient.invalidateQueries({
                     queryKey: listingsKeys.goat(),
                 });
