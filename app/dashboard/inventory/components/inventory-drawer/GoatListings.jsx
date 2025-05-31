@@ -22,8 +22,10 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useToken } from "../../context/TokenContext";
 import { CreateListingModal } from "./CreateListingModal";
+import { DeleteListingModal } from "./DeleteListingModal";
 import {
     useCreateListing,
+    useDeleteListing,
     useGoatListings,
     useUpdateListing,
 } from "./hooks/use-listings-data";
@@ -47,9 +49,14 @@ export function GoatListings({
     const [editMode, setEditMode] = useState(false);
     const [editingListing, setEditingListing] = useState(null);
 
-    // Use the create and update listing mutations
+    // Delete modal state
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [deletingListing, setDeletingListing] = useState(null);
+
+    // Use the create, update, and delete listing mutations
     const createListingMutation = useCreateListing("goat", token);
     const updateListingMutation = useUpdateListing("goat", token);
+    const deleteListingMutation = useDeleteListing("goat", token);
 
     // Function to format date to dd/mm/yyyy format
     const formatDate = (dateString) => {
@@ -108,6 +115,24 @@ export function GoatListings({
         setIsModalOpen(true);
     };
 
+    const handleDeleteListing = (listing) => {
+        setDeletingListing(listing);
+        setIsDeleteModalOpen(true);
+    };
+
+    const handleConfirmDelete = async (listing) => {
+        try {
+            await deleteListingMutation.mutateAsync(listing);
+            toast.success("GOAT listing deleted successfully!");
+            setIsDeleteModalOpen(false);
+            setDeletingListing(null);
+        } catch (error) {
+            // Error handling - modal stays open
+            toast.error(`Failed to delete listing: ${error.message}`);
+            // Don't close modal on error
+        }
+    };
+
     const handleSubmitListing = async (formData) => {
         try {
             if (editMode) {
@@ -142,9 +167,15 @@ export function GoatListings({
         setEditingListing(null);
     };
 
+    const handleDeleteModalClose = () => {
+        setIsDeleteModalOpen(false);
+        setDeletingListing(null);
+    };
+
     const isLoadingData = isLoading || isLoadingGoat;
     const isSubmitting =
         createListingMutation.isPending || updateListingMutation.isPending;
+    const isDeleting = deleteListingMutation.isPending;
 
     return (
         <>
@@ -258,6 +289,11 @@ export function GoatListings({
                                                             listing.status !==
                                                             "LISTING_STATUS_ACTIVE"
                                                         }
+                                                        onClick={() =>
+                                                            handleDeleteListing(
+                                                                listing
+                                                            )
+                                                        }
                                                     >
                                                         <Trash2 size={14} />
                                                     </Button>
@@ -287,6 +323,15 @@ export function GoatListings({
                 listingData={editingListing}
                 onSubmit={handleSubmitListing}
                 isSubmitting={isSubmitting}
+            />
+
+            <DeleteListingModal
+                open={isDeleteModalOpen}
+                onOpenChange={handleDeleteModalClose}
+                platform="goat"
+                listing={deletingListing}
+                onConfirm={handleConfirmDelete}
+                isDeleting={isDeleting}
             />
         </>
     );

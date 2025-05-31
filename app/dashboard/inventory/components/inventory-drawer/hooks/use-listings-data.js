@@ -300,3 +300,102 @@ export const useUpdateListing = (platform, token) => {
         },
     });
 };
+
+/**
+ * Hook to delete an existing listing
+ */
+export const useDeleteListing = (platform, token) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (listing) => {
+            if (!token) {
+                throw new Error("Authentication token is required");
+            }
+
+            if (!listing.id && !listing.listingId) {
+                throw new Error("Listing ID is required for deletion");
+            }
+
+            const listingId = listing.id || listing.listingId;
+            let apiUrl;
+
+            if (platform === "stockx") {
+                apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/stockx/listings/${listingId}`;
+            } else if (platform === "goat") {
+                apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/goat/listings/${listingId}`;
+            } else {
+                throw new Error(`Unsupported platform: ${platform}`);
+            }
+
+            const response = await fetch(apiUrl, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => null);
+                throw new Error(
+                    errorData?.message || `Failed to delete ${platform} listing`
+                );
+            }
+
+            const data = await response.json();
+
+            // Check if the response indicates success
+            if (data.status !== "success") {
+                // Extract error message from the response or use a default message
+                const errorMessage =
+                    data.message ||
+                    data.error ||
+                    data.data?.error ||
+                    `Failed to delete ${platform} listing: Operation was not successful`;
+                throw new Error(errorMessage);
+            }
+
+            // Additional check for data.success if it exists
+            if (data.data && data.data.success === false) {
+                const errorMessage =
+                    data.data.error ||
+                    data.data.message ||
+                    `Failed to delete ${platform} listing: Operation failed`;
+                throw new Error(errorMessage);
+            }
+
+            return data;
+        },
+        onMutate: async (deletedListing) => {
+            return { previousListing: null };
+        },
+        onSuccess: (data, variables, context) => {
+            // Invalidate and refetch relevant queries on success
+            if (platform === "stockx") {
+                queryClient.invalidateQueries({
+                    queryKey: listingsKeys.stockx(),
+                });
+            } else if (platform === "goat") {
+                queryClient.invalidateQueries({
+                    queryKey: listingsKeys.goat(),
+                });
+            }
+        },
+        onError: (error, variables, context) => {
+            console.error(`Failed to delete ${platform} listing:`, error);
+        },
+        onSettled: (data, error, variables, context) => {
+            // Always refetch after error or success to ensure cache is up to date
+            if (platform === "stockx") {
+                queryClient.invalidateQueries({
+                    queryKey: listingsKeys.stockx(),
+                });
+            } else if (platform === "goat") {
+                queryClient.invalidateQueries({
+                    queryKey: listingsKeys.goat(),
+                });
+            }
+        },
+    });
+};
