@@ -9,12 +9,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Eye, Info, TrendingDown, TrendingUp } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { useEffect } from "react";
 import { useToken } from "../../context/TokenContext";
 import { InventoryQuantityControl } from "./InventoryQuantityControl";
-// Removed: import { Variant } from '@/components/inventory-drawer/types';
-
-// Removed TypeScript interface
+import {
+    useGoatMarketData,
+    useStockXMarketData,
+} from "./hooks/use-market-data";
 
 export function VariantAccordionItem({
     variant,
@@ -22,17 +22,37 @@ export function VariantAccordionItem({
     onViewListings,
     onQuantityChange,
     itemId = "1",
-    stockXMarketData,
-    goatMarketData,
-    setStockXMarketData,
-    setGoatMarketData,
+    stockXMarketData, // Keep for backward compatibility but don't use
+    goatMarketData, // Keep for backward compatibility but don't use
+    setStockXMarketData, // Keep for backward compatibility but don't use
+    setGoatMarketData, // Keep for backward compatibility but don't use
 }) {
     const { data: session } = useSession();
-
     const token = useToken();
+
     // Important: Ensure we have a unique identifier for the accordion item
     const accordionValue =
         variant._id || variant.variantId || `variant-${Math.random()}`;
+
+    // Use the market data hooks - each variant will have its own data
+    const { data: stockXData, isLoading: isLoadingStockX } =
+        useStockXMarketData(
+            variant?.variant?.stockx?.productId,
+            variant?.variant?.stockx?.variantId,
+            token
+        );
+    setStockXMarketData(stockXData);
+
+    const { data: goatData, isLoading: isLoadingGoat } = useGoatMarketData(
+        variant?.variant?.goat?.catalog_id,
+        variant?.variant?.stockx?.variantValue,
+        token
+    );
+    setGoatMarketData(goatData);
+
+    // Use the data directly from hooks instead of parent state
+    const currentStockXMarketData = stockXData;
+    const currentGoatMarketData = goatData;
 
     // View market data handler
     const handleViewMarketData = (e) => {
@@ -53,80 +73,6 @@ export function VariantAccordionItem({
         const date = new Date(dateString);
         return date.toLocaleDateString();
     };
-
-    // Static dummy market data
-    const dummyStockXData = {
-        lowestAskAmount: "$220",
-        highestBidAmount: "$185",
-        lastSoldAmount: "$210",
-    };
-
-    const dummyGoatData = {
-        lowestListingPrice: "$225",
-        highestOfferPrice: "$180",
-        lastSoldPrice: "$210",
-    };
-
-    useEffect(() => {
-        const fetchMarketData = async () => {
-            try {
-                // Prepare headers with authentication if available
-                const headers = {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                };
-
-                const stockXResponse = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URL}/stockx/market/${variant?.variant?.stockx?.productId}/${variant?.variant?.stockx?.variantId}`,
-                    { headers },
-                    { cache: "force-cache" },
-                    { next: { revalidate: 86400 } }
-                );
-
-                if (stockXResponse.ok) {
-                    const stockXData = await stockXResponse.json();
-                    setStockXMarketData(stockXData?.data?.marketData);
-                } else {
-                    console.error(
-                        "StockX API error:",
-                        stockXResponse.status,
-                        stockXResponse.statusText
-                    );
-                }
-
-                const goatResponse = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URL}/goat/market/${variant?.variant?.goat?.catalog_id}/?size=${variant?.variant?.stockx?.variantValue}`,
-                    { headers },
-                    { cache: "force-cache" },
-                    { next: { revalidate: 86400 } }
-                );
-
-                if (goatResponse.ok) {
-                    const goatData = await goatResponse.json();
-                    setGoatMarketData(goatData?.data?.data?.variants[0]);
-                } else {
-                    console.error(
-                        "GOAT API error:",
-                        goatResponse.status,
-                        goatResponse.statusText
-                    );
-                }
-            } catch (error) {
-                console.error("Error fetching market data:", error);
-            }
-        };
-
-        // Only fetch if we have the required variant data
-        if (
-            variant?.variant?.stockx?.productId &&
-            variant?.variant?.stockx?.variantId
-        ) {
-            fetchMarketData();
-        }
-    }, [variant._id, session?.accessToken]);
-
-    // console.log("stockXMarketData", stockXMarketData);
-    // console.log("goatMarketData", goatMarketData);
 
     return (
         <AccordionItem
@@ -266,7 +212,6 @@ export function VariantAccordionItem({
                                 </div>
                                 <div className="border rounded-md p-3 bg-secondary/10">
                                     <span className="text-muted-foreground text-xs block mb-1">
-                                        {/* Total Sold */}
                                         Release Date
                                     </span>
                                     <div className="grid grid-cols-2 gap-2 mt-1">
@@ -276,55 +221,11 @@ export function VariantAccordionItem({
                                                   variant.product?.productAttributes?.releaseDate
                                               ).toLocaleDateString("en-GB")
                                             : "N/A"}
-                                        {/* <div className="flex flex-col">
-                                            <span className="text-xs text-muted-foreground">
-                                                StockX
-                                            </span>
-                                            <span className="text-sm font-medium">
-                                                {variant.totalSoldStockX ||
-                                                    "N/A"}
-                                            </span>
-                                        </div>
-                                        <div className="flex flex-col">
-                                            <span className="text-xs text-muted-foreground">
-                                                GOAT
-                                            </span>
-                                            <span className="text-sm font-medium">
-                                                {variant.totalSoldGoat || "N/A"}
-                                            </span>
-                                        </div> */}
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-
-                    {/* Quick Actions Section */}
-                    {/* <h3 className="text-sm font-medium mb-3">Quick Actions</h3> */}
-                    {/* <div className="grid grid-cols-2 gap-3 text-sm mb-4">
-                        <div className="border rounded-md p-3 bg-secondary/10">
-                            <span className="text-muted-foreground block mb-1">
-                                StockX:
-                            </span>
-                            <Badge
-                                variant="outline"
-                                className="bg-secondary/20"
-                            >
-                                0 active
-                            </Badge>
-                        </div>
-                        <div className="border rounded-md p-3 bg-secondary/10">
-                            <span className="text-muted-foreground block mb-1">
-                                GOAT:
-                            </span>
-                            <Badge
-                                variant="outline"
-                                className="bg-secondary/20"
-                            >
-                                0 active
-                            </Badge>
-                        </div>
-                    </div> */}
 
                     <div className="grid grid-cols-2 gap-3">
                         {/* StockX Market Data Card */}
@@ -335,6 +236,11 @@ export function VariantAccordionItem({
                                         StockX
                                     </h3>
                                 </div>
+                                {isLoadingStockX && (
+                                    <div className="ml-2">
+                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                    </div>
+                                )}
                             </div>
                             <div className="grid grid-cols-2 gap-2">
                                 <div className="bg-green-900/20 rounded-lg p-2 border border-green-800/30">
@@ -345,8 +251,8 @@ export function VariantAccordionItem({
                                         <TrendingDown className="h-3 w-3 text-green-400" />
                                     </div>
                                     <div className="mt-1 text-lg font-bold text-green-300">
-                                        {stockXMarketData?.lowestAskAmount
-                                            ? `$${stockXMarketData.lowestAskAmount}`
+                                        {currentStockXMarketData?.lowestAskAmount
+                                            ? `$${currentStockXMarketData.lowestAskAmount}`
                                             : "N/A"}
                                     </div>
                                 </div>
@@ -359,8 +265,8 @@ export function VariantAccordionItem({
                                         <TrendingUp className="h-3 w-3 text-blue-400" />
                                     </div>
                                     <div className="mt-1 text-lg font-bold text-blue-300">
-                                        {stockXMarketData?.highestBidAmount
-                                            ? `$${stockXMarketData.highestBidAmount}`
+                                        {currentStockXMarketData?.highestBidAmount
+                                            ? `$${currentStockXMarketData.highestBidAmount}`
                                             : "N/A"}
                                     </div>
                                 </div>
@@ -373,8 +279,8 @@ export function VariantAccordionItem({
                                     <Info className="h-3 w-3 text-purple-400" />
                                 </div>
                                 <div className="mt-1 text-lg font-bold text-purple-300">
-                                    {stockXMarketData?.flexLowestAskAmount
-                                        ? `$${stockXMarketData.flexLowestAskAmount}`
+                                    {currentStockXMarketData?.flexLowestAskAmount
+                                        ? `$${currentStockXMarketData.flexLowestAskAmount}`
                                         : "N/A"}
                                 </div>
                             </div>
@@ -401,6 +307,11 @@ export function VariantAccordionItem({
                                         GOAT
                                     </h3>
                                 </div>
+                                {isLoadingGoat && (
+                                    <div className="ml-2">
+                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                    </div>
+                                )}
                             </div>
                             <div className="grid grid-cols-2 gap-2">
                                 <div className="bg-green-900/20 rounded-lg p-2 border border-green-800/30">
@@ -411,12 +322,13 @@ export function VariantAccordionItem({
                                         <TrendingDown className="h-3 w-3 text-green-400" />
                                     </div>
                                     <div className="mt-1 text-lg font-bold text-green-300">
-                                        {goatMarketData?.availability
+                                        {currentGoatMarketData?.availability
                                             ?.lowest_listing_price_cents &&
-                                        goatMarketData.availability
+                                        currentGoatMarketData.availability
                                             .lowest_listing_price_cents != 0
                                             ? `$${(
-                                                  goatMarketData.availability
+                                                  currentGoatMarketData
+                                                      .availability
                                                       .lowest_listing_price_cents /
                                                   100
                                               ).toFixed(0)}`
@@ -432,12 +344,13 @@ export function VariantAccordionItem({
                                         <TrendingUp className="h-3 w-3 text-blue-400" />
                                     </div>
                                     <div className="mt-1 text-lg font-bold text-blue-300">
-                                        {goatMarketData?.availability
+                                        {currentGoatMarketData?.availability
                                             ?.highest_offer_price_cents &&
-                                        goatMarketData.availability
+                                        currentGoatMarketData.availability
                                             .highest_offer_price_cents != 0
                                             ? `$${(
-                                                  goatMarketData.availability
+                                                  currentGoatMarketData
+                                                      .availability
                                                       .highest_offer_price_cents /
                                                   100
                                               ).toFixed(0)}`
@@ -453,31 +366,18 @@ export function VariantAccordionItem({
                                     <Info className="h-3 w-3 text-purple-400" />
                                 </div>
                                 <div className="mt-1 text-lg font-bold text-purple-300">
-                                    {goatMarketData?.availability
+                                    {currentGoatMarketData?.availability
                                         ?.last_sold_listing_price_cents &&
-                                    goatMarketData.availability
+                                    currentGoatMarketData.availability
                                         .last_sold_listing_price_cents != 0
                                         ? `$${(
-                                              goatMarketData.availability
+                                              currentGoatMarketData.availability
                                                   .last_sold_listing_price_cents /
                                               100
                                           ).toFixed(0)}`
                                         : "N/A"}
                                 </div>
                             </div>
-                            {/* <Button
-                                size="sm"
-                                variant="outline"
-                                className="gap-1.5 w-full bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary border-primary/20 mt-2"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    onListItem("goat", variant.variantId);
-                                }}
-                            >
-                                <Truck size={14} />
-                                List on GOAT
-                            </Button> */}
                         </div>
                     </div>
                 </div>

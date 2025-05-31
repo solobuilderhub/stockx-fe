@@ -18,8 +18,17 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Pencil, Plus, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { toast } from "sonner";
 import { useToken } from "../../context/TokenContext";
+import { CreateListingModal } from "./CreateListingModal";
+import { DeleteListingModal } from "./DeleteListingModal";
+import {
+    useCreateListing,
+    useDeleteListing,
+    useGoatListings,
+    useUpdateListing,
+} from "./hooks/use-listings-data";
 
 export function GoatListings({
     listings = [],
@@ -29,8 +38,25 @@ export function GoatListings({
     size,
     styleId,
 }) {
-    const [goatListings, setGoatListings] = useState([]);
     const token = useToken();
+    const { data: goatListings, isLoading: isLoadingGoat } = useGoatListings(
+        size,
+        styleId,
+        token
+    );
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editMode, setEditMode] = useState(false);
+    const [editingListing, setEditingListing] = useState(null);
+
+    // Delete modal state
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [deletingListing, setDeletingListing] = useState(null);
+
+    // Use the create, update, and delete listing mutations
+    const createListingMutation = useCreateListing("goat", token);
+    const updateListingMutation = useUpdateListing("goat", token);
+    const deleteListingMutation = useDeleteListing("goat", token);
 
     // Function to format date to dd/mm/yyyy format
     const formatDate = (dateString) => {
@@ -47,30 +73,6 @@ export function GoatListings({
     const formatPrice = (priceCents) => {
         return `$${Math.floor(priceCents / 100)}`;
     };
-
-    useEffect(() => {
-        if (styleId && size) {
-            const fetchGoatListings = async () => {
-                const response = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URL}/goat/listings?searchTerm=${styleId}&size=${size}`,
-                    {
-                        method: "GET",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${token}`,
-                        },
-                    },
-                    { cache: "force-cache" },
-                    { next: { revalidate: 60 * 60 * 24 } }
-                );
-                const data = await response.json();
-                setGoatListings(data?.data?.listings);
-            };
-            fetchGoatListings();
-        }
-    }, [styleId, size]);
-
-    console.log("goatListings", goatListings);
 
     // Status badge color mapping
     const getStatusBadge = (status) => {
@@ -101,120 +103,236 @@ export function GoatListings({
         );
     };
 
+    const handleCreateListing = () => {
+        setEditMode(false);
+        setEditingListing(null);
+        setIsModalOpen(true);
+    };
+
+    const handleEditListing = (listing) => {
+        setEditMode(true);
+        setEditingListing(listing);
+        setIsModalOpen(true);
+    };
+
+    const handleDeleteListing = (listing) => {
+        setDeletingListing(listing);
+        setIsDeleteModalOpen(true);
+    };
+
+    const handleConfirmDelete = async (listing) => {
+        try {
+            await deleteListingMutation.mutateAsync(listing);
+            toast.success("GOAT listing deleted successfully!");
+            setIsDeleteModalOpen(false);
+            setDeletingListing(null);
+        } catch (error) {
+            // Error handling - modal stays open
+            toast.error(`Failed to delete listing: ${error.message}`);
+            // Don't close modal on error
+        }
+    };
+
+    const handleSubmitListing = async (formData) => {
+        try {
+            if (editMode) {
+                // Update existing listing
+                const result = await updateListingMutation.mutateAsync(
+                    formData
+                );
+                toast.success("GOAT listing updated successfully!");
+                handleModalClose(); // Close modal only on success
+            } else {
+                // Create new listing
+                const result = await createListingMutation.mutateAsync(
+                    formData
+                );
+                toast.success("GOAT listing created successfully!");
+                handleModalClose(); // Close modal only on success
+            }
+        } catch (error) {
+            // Error handling - modal stays open
+            toast.error(
+                editMode
+                    ? `Failed to update listing: ${error.message}`
+                    : `Failed to create listing: ${error.message}`
+            );
+            // Don't close modal on error
+        }
+    };
+
+    const handleModalClose = () => {
+        setIsModalOpen(false);
+        setEditMode(false);
+        setEditingListing(null);
+    };
+
+    const handleDeleteModalClose = () => {
+        setIsDeleteModalOpen(false);
+        setDeletingListing(null);
+    };
+
+    const isLoadingData = isLoading || isLoadingGoat;
+    const isSubmitting =
+        createListingMutation.isPending || updateListingMutation.isPending;
+    const isDeleting = deleteListingMutation.isPending;
+
     return (
-        <Card>
-            <CardHeader>
-                <div className="flex justify-between items-center">
-                    <div>
-                        <CardTitle>GOAT Listings</CardTitle>
-                        <CardDescription>
-                            {isLoading
-                                ? "Loading listings..."
-                                : `${goatListings.length} listings found`}
-                        </CardDescription>
+        <>
+            <Card>
+                <CardHeader>
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <CardTitle>GOAT Listings</CardTitle>
+                            <CardDescription>
+                                {isLoadingData
+                                    ? "Loading listings..."
+                                    : `${
+                                          goatListings?.length || 0
+                                      } listings found`}
+                            </CardDescription>
+                        </div>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="gap-1"
+                            disabled={isLoadingData}
+                            onClick={handleCreateListing}
+                        >
+                            <Plus size={14} />
+                            Create Listing in GOAT
+                        </Button>
                     </div>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        className="gap-1"
-                        disabled={isLoading}
-                    >
-                        <Plus size={14} />
-                        Create Listing in GOAT
-                    </Button>
-                </div>
-            </CardHeader>
-            <CardContent>
-                {isLoading ? (
-                    <div className="flex justify-center items-center h-40">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                    </div>
-                ) : goatListings.length === 0 ? (
-                    <div className="text-center py-10 border rounded-md">
-                        <p className="text-muted-foreground">
-                            No GOAT listings found for this variant
-                        </p>
-                    </div>
-                ) : (
-                    <div className="border rounded-md overflow-hidden">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Size</TableHead>
-                                    <TableHead>Size Unit</TableHead>
-                                    <TableHead>Created At</TableHead>
-                                    <TableHead>Updated At</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead>Price</TableHead>
-                                    <TableHead>Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {goatListings.map((listing) => (
-                                    <TableRow key={listing.id}>
-                                        <TableCell>{listing.size}</TableCell>
-                                        <TableCell>
-                                            {listing.size_unit}
-                                        </TableCell>
-                                        <TableCell>
-                                            {formatDate(listing.created_at)}
-                                        </TableCell>
-                                        <TableCell>
-                                            {formatDate(listing.updated_at)}
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge
-                                                variant={
-                                                    getStatusBadge(
-                                                        listing.status
-                                                    ).variant
-                                                }
-                                                className={
-                                                    getStatusBadge(
-                                                        listing.status
-                                                    ).className
-                                                }
-                                            >
-                                                {listing.status}
-                                            </Badge>
-                                        </TableCell>
-                                        <TableCell className="font-medium">
-                                            {formatPrice(listing.price_cents)}
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex gap-2">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    disabled={
-                                                        listing.status !==
-                                                        "LISTING_STATUS_ACTIVE"
-                                                    }
-                                                >
-                                                    <Pencil size={14} />
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    disabled={
-                                                        listing.status !==
-                                                        "LISTING_STATUS_ACTIVE"
-                                                    }
-                                                >
-                                                    <Trash2 size={14} />
-                                                </Button>
-                                            </div>
-                                        </TableCell>
+                </CardHeader>
+                <CardContent>
+                    {isLoadingData ? (
+                        <div className="flex justify-center items-center h-40">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                        </div>
+                    ) : !goatListings || goatListings.length === 0 ? (
+                        <div className="text-center py-10 border rounded-md">
+                            <p className="text-muted-foreground">
+                                No GOAT listings found for this variant
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="border rounded-md overflow-hidden">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Size</TableHead>
+                                        <TableHead>Size Unit</TableHead>
+                                        <TableHead>Created At</TableHead>
+                                        <TableHead>Updated At</TableHead>
+                                        <TableHead>Status</TableHead>
+                                        <TableHead>Price</TableHead>
+                                        <TableHead>Actions</TableHead>
                                     </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
+                                </TableHeader>
+                                <TableBody>
+                                    {goatListings.map((listing) => (
+                                        <TableRow key={listing.id}>
+                                            <TableCell>
+                                                {listing.size}
+                                            </TableCell>
+                                            <TableCell>
+                                                {listing.size_unit}
+                                            </TableCell>
+                                            <TableCell>
+                                                {formatDate(listing.created_at)}
+                                            </TableCell>
+                                            <TableCell>
+                                                {formatDate(listing.updated_at)}
+                                            </TableCell>
+                                            <TableCell>
+                                                <Badge
+                                                    variant={
+                                                        getStatusBadge(
+                                                            listing.status
+                                                        ).variant
+                                                    }
+                                                    className={
+                                                        getStatusBadge(
+                                                            listing.status
+                                                        ).className
+                                                    }
+                                                >
+                                                    {listing.status}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell className="font-medium">
+                                                {formatPrice(
+                                                    listing.price_cents
+                                                )}
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="flex gap-2">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        disabled={
+                                                            listing.status !==
+                                                            "LISTING_STATUS_ACTIVE"
+                                                        }
+                                                        onClick={() =>
+                                                            handleEditListing(
+                                                                listing
+                                                            )
+                                                        }
+                                                    >
+                                                        <Pencil size={14} />
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        disabled={
+                                                            listing.status !==
+                                                            "LISTING_STATUS_ACTIVE"
+                                                        }
+                                                        onClick={() =>
+                                                            handleDeleteListing(
+                                                                listing
+                                                            )
+                                                        }
+                                                    >
+                                                        <Trash2 size={14} />
+                                                    </Button>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    )}
+                    <div className="text-xs text-muted-foreground mt-2 text-right">
+                        Last updated: {formatDate(lastUpdated)}
                     </div>
-                )}
-                <div className="text-xs text-muted-foreground mt-2 text-right">
-                    Last updated: {formatDate(lastUpdated)}
-                </div>
-            </CardContent>
-        </Card>
+                </CardContent>
+            </Card>
+
+            <CreateListingModal
+                open={isModalOpen}
+                onOpenChange={handleModalClose}
+                platform="goat"
+                variantData={{
+                    catalogId: styleId,
+                    size: size,
+                }}
+                editMode={editMode}
+                listingData={editingListing}
+                onSubmit={handleSubmitListing}
+                isSubmitting={isSubmitting}
+            />
+
+            <DeleteListingModal
+                open={isDeleteModalOpen}
+                onOpenChange={handleDeleteModalClose}
+                platform="goat"
+                listing={deletingListing}
+                onConfirm={handleConfirmDelete}
+                isDeleting={isDeleting}
+            />
+        </>
     );
 }

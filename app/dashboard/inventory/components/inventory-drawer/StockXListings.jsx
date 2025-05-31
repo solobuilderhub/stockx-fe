@@ -18,8 +18,17 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Pencil, Plus, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { toast } from "sonner";
 import { useToken } from "../../context/TokenContext";
+import { CreateListingModal } from "./CreateListingModal";
+import { DeleteListingModal } from "./DeleteListingModal";
+import {
+    useCreateListing,
+    useDeleteListing,
+    useStockXListings,
+    useUpdateListing,
+} from "./hooks/use-listings-data";
 
 export function StockXListings({
     listings = [],
@@ -28,9 +37,24 @@ export function StockXListings({
     filterByVariantId,
     variantId,
 }) {
-    // Function to format date to readable format
-    const [stockXListings, setStockXListings] = useState([]);
     const token = useToken();
+    const { data: stockXListings, isLoading: isLoadingStockX } =
+        useStockXListings(variantId, token);
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editMode, setEditMode] = useState(false);
+    const [editingListing, setEditingListing] = useState(null);
+
+    // Delete modal state
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [deletingListing, setDeletingListing] = useState(null);
+
+    // Use the create, update, and delete listing mutations
+    const createListingMutation = useCreateListing("stockx", token);
+    const updateListingMutation = useUpdateListing("stockx", token);
+    const deleteListingMutation = useDeleteListing("stockx", token);
+
+    // Function to format date to readable format
     const formatDate = (dateString) => {
         if (!dateString) return "N/A";
         const date = new Date(dateString);
@@ -40,36 +64,6 @@ export function StockXListings({
             year: "numeric",
         });
     };
-
-    useEffect(() => {
-        if (variantId) {
-            const fetchStockXListings = async () => {
-                const response = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URL}/stockx/listings?variantIds=${variantId}&fromDate=2025-01-01`,
-                    {
-                        method: "GET",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${token}`,
-                        },
-                    },
-                    { cache: "force-cache" },
-                    { next: { revalidate: 60 * 60 * 24 } }
-                );
-                const data = await response.json();
-                setStockXListings(data?.data?.listings);
-            };
-            fetchStockXListings();
-        }
-    }, [variantId]);
-
-    console.log("stockXListings", stockXListings);
-    // Filter listings by variant ID if provided
-    const filteredListings = filterByVariantId
-        ? listings.filter(
-              (listing) => listing.variant.variantId === filterByVariantId
-          )
-        : listings;
 
     // Status badge color mapping
     const getStatusBadge = (status) => {
@@ -100,128 +94,233 @@ export function StockXListings({
         );
     };
 
+    const handleCreateListing = () => {
+        setEditMode(false);
+        setEditingListing(null);
+        setIsModalOpen(true);
+    };
+
+    const handleEditListing = (listing) => {
+        setEditMode(true);
+        setEditingListing(listing);
+        setIsModalOpen(true);
+    };
+
+    const handleDeleteListing = (listing) => {
+        setDeletingListing(listing);
+        setIsDeleteModalOpen(true);
+    };
+
+    const handleConfirmDelete = async (listing) => {
+        try {
+            await deleteListingMutation.mutateAsync(listing);
+            toast.success("StockX listing deleted successfully!");
+            setIsDeleteModalOpen(false);
+            setDeletingListing(null);
+        } catch (error) {
+            // Error handling - modal stays open
+            toast.error(`Failed to delete listing: ${error.message}`);
+            // Don't close modal on error
+        }
+    };
+
+    const handleSubmitListing = async (formData) => {
+        try {
+            if (editMode) {
+                // Update existing listing
+                const result = await updateListingMutation.mutateAsync(
+                    formData
+                );
+                toast.success("StockX listing updated successfully!");
+                handleModalClose(); // Close modal only on success
+            } else {
+                // Create new listing
+                const result = await createListingMutation.mutateAsync(
+                    formData
+                );
+                toast.success("StockX listing created successfully!");
+                handleModalClose(); // Close modal only on success
+            }
+        } catch (error) {
+            // Error handling - modal stays open
+            toast.error(
+                editMode
+                    ? `Failed to update listing: ${error.message}`
+                    : `Failed to create listing: ${error.message}`
+            );
+            // Don't close modal on error
+        }
+    };
+
+    const handleModalClose = () => {
+        setIsModalOpen(false);
+        setEditMode(false);
+        setEditingListing(null);
+    };
+
+    const handleDeleteModalClose = () => {
+        setIsDeleteModalOpen(false);
+        setDeletingListing(null);
+    };
+
+    const isLoadingData = isLoading || isLoadingStockX;
+    const isSubmitting =
+        createListingMutation.isPending || updateListingMutation.isPending;
+    const isDeleting = deleteListingMutation.isPending;
+
     return (
-        <Card>
-            <CardHeader>
-                <div className="flex justify-between items-center">
-                    <div>
-                        <CardTitle>StockX Listings</CardTitle>
-                        <CardDescription>
-                            {isLoading
-                                ? "Loading listings..."
-                                : `${
-                                      stockXListings?.length || 0
-                                  } listings found`}
-                        </CardDescription>
+        <>
+            <Card>
+                <CardHeader>
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <CardTitle>StockX Listings</CardTitle>
+                            <CardDescription>
+                                {isLoadingData
+                                    ? "Loading listings..."
+                                    : `${
+                                          stockXListings?.length || 0
+                                      } listings found`}
+                            </CardDescription>
+                        </div>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="gap-1"
+                            disabled={isLoadingData}
+                            onClick={handleCreateListing}
+                        >
+                            <Plus size={14} />
+                            Create Listing in StockX
+                        </Button>
                     </div>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        className="gap-1"
-                        disabled={isLoading}
-                    >
-                        <Plus size={14} />
-                        Create Listing in StockX
-                    </Button>
-                </div>
-            </CardHeader>
-            <CardContent>
-                {isLoading ? (
-                    <div className="flex justify-center items-center h-40">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                    </div>
-                ) : !stockXListings || stockXListings.length === 0 ? (
-                    <div className="text-center py-10 border rounded-md">
-                        <p className="text-muted-foreground">
-                            No StockX listings found for this variant
-                        </p>
-                    </div>
-                ) : (
-                    <div className="border rounded-md overflow-hidden">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Amount</TableHead>
-                                    <TableHead>Variant Name</TableHead>
-                                    <TableHead>Variant Value</TableHead>
-                                    <TableHead>Listing ID</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead>Created At</TableHead>
-                                    <TableHead>Updated At</TableHead>
-                                    <TableHead>Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {stockXListings.map((listing) => (
-                                    <TableRow key={listing.listingId}>
-                                        <TableCell className="font-medium">
-                                            ${listing.amount}
-                                        </TableCell>
-                                        <TableCell>
-                                            {listing.variant.variantName}
-                                        </TableCell>
-                                        <TableCell>
-                                            {listing.variant.variantValue}
-                                        </TableCell>
-                                        <TableCell>
-                                            {listing.listingId}
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge
-                                                variant={
-                                                    getStatusBadge(
-                                                        listing.status
-                                                    ).variant
-                                                }
-                                                className={
-                                                    getStatusBadge(
-                                                        listing.status
-                                                    ).className
-                                                }
-                                            >
-                                                {listing.status}
-                                            </Badge>
-                                        </TableCell>
-                                        <TableCell>
-                                            {formatDate(listing.createdAt)}
-                                        </TableCell>
-                                        <TableCell>
-                                            {formatDate(listing.updatedAt)}
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex gap-2">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    disabled={
-                                                        listing.status !==
-                                                        "ACTIVE"
-                                                    }
-                                                >
-                                                    <Pencil size={14} />
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    disabled={
-                                                        listing.status !==
-                                                        "ACTIVE"
-                                                    }
-                                                >
-                                                    <Trash2 size={14} />
-                                                </Button>
-                                            </div>
-                                        </TableCell>
+                </CardHeader>
+                <CardContent>
+                    {isLoadingData ? (
+                        <div className="flex justify-center items-center h-40">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                        </div>
+                    ) : !stockXListings || stockXListings.length === 0 ? (
+                        <div className="text-center py-10 border rounded-md">
+                            <p className="text-muted-foreground">
+                                No StockX listings found for this variant
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="border rounded-md overflow-hidden">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Variant Name</TableHead>
+                                        <TableHead>Size</TableHead>
+                                        <TableHead>Amount</TableHead>
+                                        <TableHead>Status</TableHead>
+                                        <TableHead>Created At</TableHead>
+                                        <TableHead>Updated At</TableHead>
+                                        <TableHead>Actions</TableHead>
                                     </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
+                                </TableHeader>
+                                <TableBody>
+                                    {stockXListings.map((listing) => (
+                                        <TableRow key={listing.listingId}>
+                                            <TableCell>
+                                                {listing.variant.variantName}
+                                            </TableCell>
+                                            <TableCell>
+                                                {listing.variant.variantValue}
+                                            </TableCell>
+                                            <TableCell className="font-medium">
+                                                ${listing.amount}
+                                            </TableCell>
+                                            <TableCell>
+                                                <Badge
+                                                    variant={
+                                                        getStatusBadge(
+                                                            listing.status
+                                                        ).variant
+                                                    }
+                                                    className={
+                                                        getStatusBadge(
+                                                            listing.status
+                                                        ).className
+                                                    }
+                                                >
+                                                    {listing.status}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell>
+                                                {formatDate(listing.createdAt)}
+                                            </TableCell>
+                                            <TableCell>
+                                                {formatDate(listing.updatedAt)}
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="flex gap-2">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        disabled={
+                                                            listing.status !==
+                                                            "ACTIVE"
+                                                        }
+                                                        onClick={() =>
+                                                            handleEditListing(
+                                                                listing
+                                                            )
+                                                        }
+                                                    >
+                                                        <Pencil size={14} />
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        disabled={
+                                                            listing.status !==
+                                                            "ACTIVE"
+                                                        }
+                                                        onClick={() =>
+                                                            handleDeleteListing(
+                                                                listing
+                                                            )
+                                                        }
+                                                    >
+                                                        <Trash2 size={14} />
+                                                    </Button>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    )}
+                    <div className="text-xs text-muted-foreground mt-2 text-right">
+                        Last updated: {formatDate(lastUpdated)}
                     </div>
-                )}
-                <div className="text-xs text-muted-foreground mt-2 text-right">
-                    Last updated: {formatDate(lastUpdated)}
-                </div>
-            </CardContent>
-        </Card>
+                </CardContent>
+            </Card>
+
+            <CreateListingModal
+                open={isModalOpen}
+                onOpenChange={handleModalClose}
+                platform="stockx"
+                variantData={{
+                    variantId: variantId,
+                }}
+                editMode={editMode}
+                listingData={editingListing}
+                onSubmit={handleSubmitListing}
+                isSubmitting={isSubmitting}
+            />
+
+            <DeleteListingModal
+                open={isDeleteModalOpen}
+                onOpenChange={handleDeleteModalClose}
+                platform="stockx"
+                listing={deletingListing}
+                onConfirm={handleConfirmDelete}
+                isDeleting={isDeleting}
+            />
+        </>
     );
 }
