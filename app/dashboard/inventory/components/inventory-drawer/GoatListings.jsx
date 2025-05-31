@@ -39,6 +39,8 @@ export function GoatListings({
     );
 
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editMode, setEditMode] = useState(false);
+    const [editingListing, setEditingListing] = useState(null);
 
     // Function to format date to dd/mm/yyyy format
     const formatDate = (dateString) => {
@@ -86,12 +88,31 @@ export function GoatListings({
     };
 
     const handleCreateListing = () => {
+        setEditMode(false);
+        setEditingListing(null);
+        setIsModalOpen(true);
+    };
+
+    const handleEditListing = (listing) => {
+        setEditMode(true);
+        setEditingListing(listing);
         setIsModalOpen(true);
     };
 
     const handleSubmitListing = (formData) => {
-        console.log("GOAT Listing Data:", formData);
-        // TODO: Add API call to create listing
+        if (editMode) {
+            console.log("Updating GOAT Listing:", formData);
+            // TODO: Add API call to update listing
+        } else {
+            console.log("Creating GOAT Listing:", formData);
+            // TODO: Add API call to create listing
+        }
+    };
+
+    const handleModalClose = () => {
+        setIsModalOpen(false);
+        setEditMode(false);
+        setEditingListing(null);
     };
 
     const isLoadingData = isLoading || isLoadingGoat;
@@ -193,6 +214,11 @@ export function GoatListings({
                                                             listing.status !==
                                                             "LISTING_STATUS_ACTIVE"
                                                         }
+                                                        onClick={() =>
+                                                            handleEditListing(
+                                                                listing
+                                                            )
+                                                        }
                                                     >
                                                         <Pencil size={14} />
                                                     </Button>
@@ -222,12 +248,14 @@ export function GoatListings({
 
             <CreateListingModal
                 open={isModalOpen}
-                onOpenChange={setIsModalOpen}
+                onOpenChange={handleModalClose}
                 platform="goat"
                 variantData={{
                     catalogId: styleId,
                     size: size,
                 }}
+                editMode={editMode}
+                listingData={editingListing}
                 onSubmit={handleSubmitListing}
             />
         </>

@@ -17,33 +17,72 @@ export function CreateListingModal({
     platform,
     variantData,
     onSubmit,
+    editMode = false,
+    listingData = null,
 }) {
     const [formData, setFormData] = useState({});
 
-    // Initialize form data based on platform
+    // Initialize form data based on platform and mode
     useEffect(() => {
         if (platform === "stockx") {
-            setFormData({
-                amount: "",
-                variantId: variantData?.variantId || "",
-                currencyCode: "USD",
-                active: false,
-            });
+            if (editMode && listingData) {
+                // Pre-fill form with existing listing data for editing
+                setFormData({
+                    amount: listingData.amount || "",
+                    variantId:
+                        listingData.variantId || variantData?.variantId || "",
+                    currencyCode: listingData.currencyCode || "USD",
+                    active: listingData.active || false,
+                });
+            } else {
+                // Default form for creating new listing
+                setFormData({
+                    amount: "",
+                    variantId: variantData?.variantId || "",
+                    currencyCode: "USD",
+                    active: false,
+                });
+            }
         } else if (platform === "goat") {
-            setFormData({
-                catalogId: variantData?.catalogId || "",
-                priceCents: "",
-                condition: "CONDITION_NEW",
-                packagingCondition: "PACKAGING_CONDITION_GOOD_CONDITION",
-                size: variantData?.size || "",
-                sizeUnit: "SIZE_UNIT_US",
-                activate: false,
-            });
+            if (editMode && listingData) {
+                // Pre-fill form with existing listing data for editing
+                setFormData({
+                    catalogId:
+                        listingData.catalogId || variantData?.catalogId || "",
+                    priceCents:
+                        listingData.price_cents || listingData.priceCents || "",
+                    condition: listingData.condition || "CONDITION_NEW",
+                    packagingCondition:
+                        listingData.packaging_condition ||
+                        listingData.packagingCondition ||
+                        "PACKAGING_CONDITION_GOOD_CONDITION",
+                    size: listingData.size || variantData?.size || "",
+                    sizeUnit:
+                        listingData.size_unit ||
+                        listingData.sizeUnit ||
+                        "SIZE_UNIT_US",
+                    activate: listingData.activate || false,
+                });
+            } else {
+                // Default form for creating new listing
+                setFormData({
+                    catalogId: variantData?.catalogId || "",
+                    priceCents: "",
+                    condition: "CONDITION_NEW",
+                    packagingCondition: "PACKAGING_CONDITION_GOOD_CONDITION",
+                    size: variantData?.size || "",
+                    sizeUnit: "SIZE_UNIT_US",
+                    activate: false,
+                });
+            }
         }
-    }, [platform, variantData]);
+    }, [platform, variantData, editMode, listingData]);
 
     const handleSubmit = () => {
-        onSubmit(formData);
+        const submitData = editMode
+            ? { ...formData, id: listingData?.id || listingData?.listingId }
+            : formData;
+        onSubmit(submitData);
         onOpenChange(false);
     };
 
@@ -181,7 +220,8 @@ export function CreateListingModal({
                 <Label htmlFor="size">Size</Label>
                 <Input
                     id="size"
-                    defaultValue={formData.size}
+                    value={formData.size}
+                    disabled
                     className="bg-secondary/50"
                 />
             </div>
@@ -190,7 +230,8 @@ export function CreateListingModal({
                 <Label htmlFor="sizeUnit">Size Unit</Label>
                 <Input
                     id="sizeUnit"
-                    defaultValue={formData.sizeUnit}
+                    value={formData.sizeUnit}
+                    disabled
                     className="bg-secondary/50"
                 />
             </div>
@@ -220,7 +261,8 @@ export function CreateListingModal({
             <DialogContent className="max-w-md">
                 <DialogHeader>
                     <DialogTitle>
-                        Create Listing on {platform?.toUpperCase()}
+                        {editMode ? "Edit" : "Create"} Listing on{" "}
+                        {platform?.toUpperCase()}
                     </DialogTitle>
                 </DialogHeader>
 
@@ -240,7 +282,7 @@ export function CreateListingModal({
                                     : !formData.priceCents
                             }
                         >
-                            Submit Listing
+                            {editMode ? "Update Listing" : "Submit Listing"}
                         </Button>
                     </div>
                 </div>

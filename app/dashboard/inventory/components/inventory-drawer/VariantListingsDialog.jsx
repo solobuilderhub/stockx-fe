@@ -202,7 +202,11 @@ export function VariantListingsDialog({
     };
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange} className="min-w-7xl">
+        <Dialog
+            open={open}
+            onOpenChange={onOpenChange}
+            className="min-w-7xl max-h-[70vh] overflow-y-auto"
+        >
             <DialogContent className="min-w-7xl">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">

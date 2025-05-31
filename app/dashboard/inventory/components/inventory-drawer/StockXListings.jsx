@@ -35,6 +35,8 @@ export function StockXListings({
         useStockXListings(variantId, token);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editMode, setEditMode] = useState(false);
+    const [editingListing, setEditingListing] = useState(null);
 
     // Function to format date to readable format
     const formatDate = (dateString) => {
@@ -77,12 +79,31 @@ export function StockXListings({
     };
 
     const handleCreateListing = () => {
+        setEditMode(false);
+        setEditingListing(null);
+        setIsModalOpen(true);
+    };
+
+    const handleEditListing = (listing) => {
+        setEditMode(true);
+        setEditingListing(listing);
         setIsModalOpen(true);
     };
 
     const handleSubmitListing = (formData) => {
-        console.log("StockX Listing Data:", formData);
-        // TODO: Add API call to create listing
+        if (editMode) {
+            console.log("Updating StockX Listing:", formData);
+            // TODO: Add API call to update listing
+        } else {
+            console.log("Creating StockX Listing:", formData);
+            // TODO: Add API call to create listing
+        }
+    };
+
+    const handleModalClose = () => {
+        setIsModalOpen(false);
+        setEditMode(false);
+        setEditingListing(null);
     };
 
     const isLoadingData = isLoading || isLoadingStockX;
@@ -186,6 +207,11 @@ export function StockXListings({
                                                             listing.status !==
                                                             "ACTIVE"
                                                         }
+                                                        onClick={() =>
+                                                            handleEditListing(
+                                                                listing
+                                                            )
+                                                        }
                                                     >
                                                         <Pencil size={14} />
                                                     </Button>
@@ -215,11 +241,13 @@ export function StockXListings({
 
             <CreateListingModal
                 open={isModalOpen}
-                onOpenChange={setIsModalOpen}
+                onOpenChange={handleModalClose}
                 platform="stockx"
                 variantData={{
                     variantId: variantId,
                 }}
+                editMode={editMode}
+                listingData={editingListing}
                 onSubmit={handleSubmitListing}
             />
         </>
