@@ -19,9 +19,10 @@ import {
 } from "@/components/ui/table";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import { useToken } from "../../context/TokenContext";
 import { CreateListingModal } from "./CreateListingModal";
-import { useGoatListings } from "./hooks/use-listings-data";
+import { useCreateListing, useGoatListings } from "./hooks/use-listings-data";
 
 export function GoatListings({
     listings = [],
@@ -41,6 +42,9 @@ export function GoatListings({
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editMode, setEditMode] = useState(false);
     const [editingListing, setEditingListing] = useState(null);
+
+    // Use the create listing mutation
+    const createListingMutation = useCreateListing("goat", token);
 
     // Function to format date to dd/mm/yyyy format
     const formatDate = (dateString) => {
@@ -99,13 +103,28 @@ export function GoatListings({
         setIsModalOpen(true);
     };
 
-    const handleSubmitListing = (formData) => {
-        if (editMode) {
-            console.log("Updating GOAT Listing:", formData);
-            // TODO: Add API call to update listing
-        } else {
-            console.log("Creating GOAT Listing:", formData);
-            // TODO: Add API call to create listing
+    const handleSubmitListing = async (formData) => {
+        try {
+            if (editMode) {
+                console.log("Updating GOAT Listing:", formData);
+                // TODO: Implement update functionality
+                toast.info("Update functionality not yet implemented");
+            } else {
+                // Create new listing
+                const result = await createListingMutation.mutateAsync(
+                    formData
+                );
+                toast.success("GOAT listing created successfully!");
+                handleModalClose(); // Close modal only on success
+            }
+        } catch (error) {
+            // Error handling - modal stays open
+            toast.error(
+                editMode
+                    ? `Failed to update listing: ${error.message}`
+                    : `Failed to create listing: ${error.message}`
+            );
+            // Don't close modal on error
         }
     };
 
@@ -116,6 +135,7 @@ export function GoatListings({
     };
 
     const isLoadingData = isLoading || isLoadingGoat;
+    const isSubmitting = createListingMutation.isPending;
 
     return (
         <>
@@ -257,6 +277,7 @@ export function GoatListings({
                 editMode={editMode}
                 listingData={editingListing}
                 onSubmit={handleSubmitListing}
+                isSubmitting={isSubmitting}
             />
         </>
     );

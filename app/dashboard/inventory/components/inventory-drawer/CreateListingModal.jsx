@@ -19,6 +19,7 @@ export function CreateListingModal({
     onSubmit,
     editMode = false,
     listingData = null,
+    isSubmitting = false,
 }) {
     const [formData, setFormData] = useState({});
 
@@ -83,7 +84,6 @@ export function CreateListingModal({
             ? { ...formData, id: listingData?.id || listingData?.listingId }
             : formData;
         onSubmit(submitData);
-        onOpenChange(false);
     };
 
     const handleCancel = () => {
@@ -271,18 +271,32 @@ export function CreateListingModal({
                     {platform === "goat" && renderGoatForm()}
 
                     <div className="flex justify-end gap-3 pt-4">
-                        <Button variant="outline" onClick={handleCancel}>
+                        <Button
+                            variant="outline"
+                            onClick={handleCancel}
+                            disabled={isSubmitting}
+                        >
                             Cancel
                         </Button>
                         <Button
                             onClick={handleSubmit}
                             disabled={
-                                platform === "stockx"
+                                isSubmitting ||
+                                (platform === "stockx"
                                     ? !formData.amount
-                                    : !formData.priceCents
+                                    : !formData.priceCents)
                             }
                         >
-                            {editMode ? "Update Listing" : "Submit Listing"}
+                            {isSubmitting ? (
+                                <div className="flex items-center gap-2">
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                    {editMode ? "Updating..." : "Creating..."}
+                                </div>
+                            ) : editMode ? (
+                                "Update Listing"
+                            ) : (
+                                "Submit Listing"
+                            )}
                         </Button>
                     </div>
                 </div>

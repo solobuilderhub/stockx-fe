@@ -85,16 +85,97 @@ export const useGoatListings = (size, styleId, token) => {
 /**
  * Hook to create a new listing with optimistic updates
  */
-export const useCreateListing = (platform) => {
+export const useCreateListing = (platform, token) => {
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: async (listingData) => {
-            // TODO: Replace with real API call
-            return { success: true };
+            if (!token) {
+                throw new Error("Authentication token is required");
+            }
+
+            let apiUrl, requestBody;
+
+            if (platform === "stockx") {
+                apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/stockx/listings/`;
+                requestBody = {
+                    amount: listingData.amount,
+                    variantId: listingData.variantId,
+                    currencyCode: listingData.currencyCode,
+                    active: listingData.active,
+                };
+            } else if (platform === "goat") {
+                apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/goat/listings/`;
+                requestBody = {
+                    catalogId: listingData.catalogId,
+                    priceCents: listingData.priceCents,
+                    condition: listingData.condition,
+                    packagingCondition: listingData.packagingCondition,
+                    size: listingData.size,
+                    sizeUnit: listingData.sizeUnit,
+                    activate: listingData.activate,
+                };
+            } else {
+                throw new Error(`Unsupported platform: ${platform}`);
+            }
+
+            const response = await fetch(apiUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(requestBody),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => null);
+                throw new Error(
+                    errorData?.message || `Failed to create ${platform} listing`
+                );
+            }
+
+            const data = await response.json();
+
+            // Check if the response indicates success
+            if (data.status !== "success") {
+                // Extract error message from the response or use a default message
+                const errorMessage =
+                    data.message ||
+                    data.error ||
+                    data.data?.error ||
+                    `Failed to create ${platform} listing: Operation was not successful`;
+                throw new Error(errorMessage);
+            }
+
+            // Additional check for data.success if it exists
+            if (data.data && data.data.success === false) {
+                const errorMessage =
+                    data.data.error ||
+                    data.data.message ||
+                    `Failed to create ${platform} listing: Operation failed`;
+                throw new Error(errorMessage);
+            }
+
+            return data;
         },
         onMutate: async (newListing) => {
             return { previousListing: null };
+        },
+        onSuccess: (data, variables, context) => {
+            // Invalidate and refetch relevant queries on success
+            if (platform === "stockx") {
+                queryClient.invalidateQueries({
+                    queryKey: listingsKeys.stockx(),
+                });
+            } else if (platform === "goat") {
+                queryClient.invalidateQueries({
+                    queryKey: listingsKeys.goat(),
+                });
+            }
+        },
+        onError: (error, variables, context) => {
+            console.error(`Failed to create ${platform} listing:`, error);
         },
         onSettled: (data, error, variables, context) => {
             // Always refetch after error or success to ensure cache is up to date
@@ -102,7 +183,7 @@ export const useCreateListing = (platform) => {
                 queryClient.invalidateQueries({
                     queryKey: listingsKeys.stockx(),
                 });
-            } else {
+            } else if (platform === "goat") {
                 queryClient.invalidateQueries({
                     queryKey: listingsKeys.goat(),
                 });

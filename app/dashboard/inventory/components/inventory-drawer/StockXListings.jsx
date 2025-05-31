@@ -19,9 +19,10 @@ import {
 } from "@/components/ui/table";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import { useToken } from "../../context/TokenContext";
 import { CreateListingModal } from "./CreateListingModal";
-import { useStockXListings } from "./hooks/use-listings-data";
+import { useCreateListing, useStockXListings } from "./hooks/use-listings-data";
 
 export function StockXListings({
     listings = [],
@@ -37,6 +38,9 @@ export function StockXListings({
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editMode, setEditMode] = useState(false);
     const [editingListing, setEditingListing] = useState(null);
+
+    // Use the create listing mutation
+    const createListingMutation = useCreateListing("stockx", token);
 
     // Function to format date to readable format
     const formatDate = (dateString) => {
@@ -90,13 +94,28 @@ export function StockXListings({
         setIsModalOpen(true);
     };
 
-    const handleSubmitListing = (formData) => {
-        if (editMode) {
-            console.log("Updating StockX Listing:", formData);
-            // TODO: Add API call to update listing
-        } else {
-            console.log("Creating StockX Listing:", formData);
-            // TODO: Add API call to create listing
+    const handleSubmitListing = async (formData) => {
+        try {
+            if (editMode) {
+                console.log("Updating StockX Listing:", formData);
+                // TODO: Implement update functionality
+                toast.info("Update functionality not yet implemented");
+            } else {
+                // Create new listing
+                const result = await createListingMutation.mutateAsync(
+                    formData
+                );
+                toast.success("StockX listing created successfully!");
+                handleModalClose(); // Close modal only on success
+            }
+        } catch (error) {
+            // Error handling - modal stays open
+            toast.error(
+                editMode
+                    ? `Failed to update listing: ${error.message}`
+                    : `Failed to create listing: ${error.message}`
+            );
+            // Don't close modal on error
         }
     };
 
@@ -107,6 +126,7 @@ export function StockXListings({
     };
 
     const isLoadingData = isLoading || isLoadingStockX;
+    const isSubmitting = createListingMutation.isPending;
 
     return (
         <>
@@ -249,6 +269,7 @@ export function StockXListings({
                 editMode={editMode}
                 listingData={editingListing}
                 onSubmit={handleSubmitListing}
+                isSubmitting={isSubmitting}
             />
         </>
     );
