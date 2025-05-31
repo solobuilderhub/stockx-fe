@@ -18,8 +18,8 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Pencil, Plus, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
 import { useToken } from "../../context/TokenContext";
+import { useGoatListings } from "./hooks/use-listings-data";
 
 export function GoatListings({
     listings = [],
@@ -29,8 +29,12 @@ export function GoatListings({
     size,
     styleId,
 }) {
-    const [goatListings, setGoatListings] = useState([]);
     const token = useToken();
+    const { data: goatListings, isLoading: isLoadingGoat } = useGoatListings(
+        size,
+        styleId,
+        token
+    );
 
     // Function to format date to dd/mm/yyyy format
     const formatDate = (dateString) => {
@@ -47,30 +51,6 @@ export function GoatListings({
     const formatPrice = (priceCents) => {
         return `$${Math.floor(priceCents / 100)}`;
     };
-
-    useEffect(() => {
-        if (styleId && size) {
-            const fetchGoatListings = async () => {
-                const response = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URL}/goat/listings?searchTerm=${styleId}&size=${size}`,
-                    {
-                        method: "GET",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${token}`,
-                        },
-                    },
-                    { cache: "force-cache" },
-                    { next: { revalidate: 60 * 60 * 24 } }
-                );
-                const data = await response.json();
-                setGoatListings(data?.data?.listings);
-            };
-            fetchGoatListings();
-        }
-    }, [styleId, size]);
-
-    console.log("goatListings", goatListings);
 
     // Status badge color mapping
     const getStatusBadge = (status) => {
@@ -101,6 +81,8 @@ export function GoatListings({
         );
     };
 
+    const isLoadingData = isLoading || isLoadingGoat;
+
     return (
         <Card>
             <CardHeader>
@@ -108,16 +90,16 @@ export function GoatListings({
                     <div>
                         <CardTitle>GOAT Listings</CardTitle>
                         <CardDescription>
-                            {isLoading
+                            {isLoadingData
                                 ? "Loading listings..."
-                                : `${goatListings.length} listings found`}
+                                : `${goatListings?.length || 0} listings found`}
                         </CardDescription>
                     </div>
                     <Button
                         variant="outline"
                         size="sm"
                         className="gap-1"
-                        disabled={isLoading}
+                        disabled={isLoadingData}
                     >
                         <Plus size={14} />
                         Create Listing in GOAT
@@ -125,11 +107,11 @@ export function GoatListings({
                 </div>
             </CardHeader>
             <CardContent>
-                {isLoading ? (
+                {isLoadingData ? (
                     <div className="flex justify-center items-center h-40">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                     </div>
-                ) : goatListings.length === 0 ? (
+                ) : !goatListings || goatListings.length === 0 ? (
                     <div className="text-center py-10 border rounded-md">
                         <p className="text-muted-foreground">
                             No GOAT listings found for this variant

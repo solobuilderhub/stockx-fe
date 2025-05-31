@@ -11,73 +11,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
 import { GoatListings } from "./GoatListings";
-import { useGoatListings, useStockXListings } from "./hooks/use-listings-data";
 import { StockXListings } from "./StockXListings";
-// Removed: import { Variant } from '@/components/inventory-drawer/types';
-
-// Removed TypeScript interface
-
-// Mock StockX listing data
-const mockStockXListings = [
-    {
-        amount: "150",
-        ask: {
-            askId: "ask123",
-            askCreatedAt: new Date().toISOString(),
-            askUpdatedAt: new Date().toISOString(),
-            askExpiresAt: new Date(
-                Date.now() + 30 * 24 * 60 * 60 * 1000
-            ).toISOString(),
-        },
-        order: null,
-        product: {
-            productId: "prod123",
-            productName: "Nike Dunk Low",
-            styleId: "DD1391-100",
-        },
-        variant: {
-            variantId: "var123",
-            variantName: "US 9",
-            variantValue: "9",
-        },
-        currencyCode: "USD",
-        listingId: "list123",
-        status: "ACTIVE",
-        inventoryType: "standard",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        authenticationDetails: null,
-        batch: {
-            batchId: "batch123",
-            taskId: "task123",
-        },
-        initiatedShipments: null,
-    },
-];
-
-// Mock GOAT listing data
-const mockGoatListings = [
-    {
-        amount: "150",
-        order: null,
-        product: {
-            productId: "prod123",
-            productName: "Nike Dunk Low",
-            styleId: "DD1391-100",
-        },
-        variant: {
-            variantId: "var123",
-            variantName: "US 9",
-            variantValue: "9",
-        },
-        currencyCode: "USD",
-        listingId: "list123",
-        status: "ACTIVE",
-        inventoryType: "standard",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-    },
-];
 
 export function VariantListingsDialog({
     open,
@@ -90,27 +24,25 @@ export function VariantListingsDialog({
 }) {
     const [activeTab, setActiveTab] = useState("stockx");
 
-    console.log("stockXMarketData", stockXMarketData);
-    console.log("goatMarketData", goatMarketData);
-
-    // Use our custom hooks to fetch listings
-    const { data: stockXListings, isLoading: isLoadingStockX } =
-        useStockXListings(variant?.variantId);
-    const { data: goatListings, isLoading: isLoadingGoat } = useGoatListings(
-        variant?.size
-    );
-
-    // Function to get StockX listings or fallback to mock data
-    const getStockXListings = () => {
-        return stockXListings || mockStockXListings;
-    };
-
-    // Function to get GOAT listings or fallback to mock data
-    const getGoatListings = () => {
-        return goatListings || mockGoatListings;
-    };
-
     if (!variant) return null;
+
+    // // Debug logging to see what data we have
+    // console.log("VariantListingsDialog - variant:", variant);
+    // console.log("VariantListingsDialog - styleId:", styleId);
+    // console.log("VariantListingsDialog - stockXMarketData:", stockXMarketData);
+    // console.log("VariantListingsDialog - goatMarketData:", goatMarketData);
+
+    // Get the correct IDs for API calls
+    const stockXVariantId =
+        variant?.variant?.stockx?.variantId || stockXMarketData?.variantId;
+    const goatSize =
+        variant?.variant?.stockx?.variantValue ||
+        variant?.size ||
+        goatMarketData?.size;
+
+    // console.log("Using stockXVariantId:", stockXVariantId);
+    // console.log("Using goatSize:", goatSize);
+    // console.log("Using styleId:", styleId);
 
     // Helper function to format StockX market data
     const renderStockXMarketData = () => {
@@ -290,23 +222,19 @@ export function VariantListingsDialog({
                     <TabsContent value="stockx" className="mt-4">
                         {renderStockXMarketData()}
                         <StockXListings
-                            listings={getStockXListings()}
-                            isLoading={isLoadingStockX}
+                            isLoading={false}
                             lastUpdated={new Date().toISOString()}
-                            filterByVariantId={variant.variantId}
-                            variantId={stockXMarketData?.variantId}
+                            variantId={stockXVariantId}
                         />
                     </TabsContent>
 
                     <TabsContent value="goat" className="mt-4">
                         {renderGoatMarketData()}
                         <GoatListings
-                            listings={getGoatListings()}
-                            isLoading={isLoadingGoat}
+                            isLoading={false}
                             lastUpdated={new Date().toISOString()}
-                            filterByVariantId={variant.variantId}
+                            size={goatSize}
                             styleId={styleId}
-                            size={goatMarketData?.size}
                         />
                     </TabsContent>
                 </Tabs>

@@ -18,8 +18,8 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Pencil, Plus, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
 import { useToken } from "../../context/TokenContext";
+import { useStockXListings } from "./hooks/use-listings-data";
 
 export function StockXListings({
     listings = [],
@@ -28,9 +28,11 @@ export function StockXListings({
     filterByVariantId,
     variantId,
 }) {
-    // Function to format date to readable format
-    const [stockXListings, setStockXListings] = useState([]);
     const token = useToken();
+    const { data: stockXListings, isLoading: isLoadingStockX } =
+        useStockXListings(variantId, token);
+
+    // Function to format date to readable format
     const formatDate = (dateString) => {
         if (!dateString) return "N/A";
         const date = new Date(dateString);
@@ -40,36 +42,6 @@ export function StockXListings({
             year: "numeric",
         });
     };
-
-    useEffect(() => {
-        if (variantId) {
-            const fetchStockXListings = async () => {
-                const response = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URL}/stockx/listings?variantIds=${variantId}&fromDate=2025-01-01`,
-                    {
-                        method: "GET",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${token}`,
-                        },
-                    },
-                    { cache: "force-cache" },
-                    { next: { revalidate: 60 * 60 * 24 } }
-                );
-                const data = await response.json();
-                setStockXListings(data?.data?.listings);
-            };
-            fetchStockXListings();
-        }
-    }, [variantId]);
-
-    console.log("stockXListings", stockXListings);
-    // Filter listings by variant ID if provided
-    const filteredListings = filterByVariantId
-        ? listings.filter(
-              (listing) => listing.variant.variantId === filterByVariantId
-          )
-        : listings;
 
     // Status badge color mapping
     const getStatusBadge = (status) => {
@@ -100,6 +72,8 @@ export function StockXListings({
         );
     };
 
+    const isLoadingData = isLoading || isLoadingStockX;
+
     return (
         <Card>
             <CardHeader>
@@ -107,7 +81,7 @@ export function StockXListings({
                     <div>
                         <CardTitle>StockX Listings</CardTitle>
                         <CardDescription>
-                            {isLoading
+                            {isLoadingData
                                 ? "Loading listings..."
                                 : `${
                                       stockXListings?.length || 0
@@ -118,7 +92,7 @@ export function StockXListings({
                         variant="outline"
                         size="sm"
                         className="gap-1"
-                        disabled={isLoading}
+                        disabled={isLoadingData}
                     >
                         <Plus size={14} />
                         Create Listing in StockX
@@ -126,7 +100,7 @@ export function StockXListings({
                 </div>
             </CardHeader>
             <CardContent>
-                {isLoading ? (
+                {isLoadingData ? (
                     <div className="flex justify-center items-center h-40">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                     </div>
