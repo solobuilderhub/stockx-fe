@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Eye, Info, TrendingDown, TrendingUp, Truck } from "lucide-react";
+import { Eye, Info, TrendingDown, TrendingUp } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useToken } from "../../context/TokenContext";
 import { InventoryQuantityControl } from "./InventoryQuantityControl";
@@ -41,12 +41,14 @@ export function VariantAccordionItem({
             variant?.variant?.stockx?.variantId,
             token
         );
+    setStockXMarketData(stockXData);
 
     const { data: goatData, isLoading: isLoadingGoat } = useGoatMarketData(
         variant?.variant?.goat?.catalog_id,
         variant?.variant?.stockx?.variantValue,
         token
     );
+    setGoatMarketData(goatData);
 
     // Use the data directly from hooks instead of parent state
     const currentStockXMarketData = stockXData;
